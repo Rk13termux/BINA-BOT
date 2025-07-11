@@ -1,10 +1,6 @@
-name: 🚀 Build Unified - APK & EXE & Web
+name: 🚀 Build Unified - APK & EXE & Web (Advanced)
 
 on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
     inputs:
       build_type:

@@ -1,0 +1,74 @@
+name: 🚀 Build Main - Simple & Fast
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  FLUTTER_VERSION: '3.27.1'
+
+jobs:
+  build:
+    name: 🔨 Build Android APK
+    runs-on: windows-latest
+    timeout-minutes: 30
+    
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: 🐦 Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+        cache: false  # Disable cache to avoid extraction issues
+
+    - name: ☕ Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+
+    - name: 🔧 Flutter Doctor
+      run: |
+        flutter doctor -v
+        flutter clean
+        flutter pub get
+
+    # Android Build
+    - name: 🤖 Build Android APK
+      run: |
+        echo "🤖 Building Android APK..."
+        flutter build apk --release
+        echo "✅ Android build completed"
+
+    # Upload Android Artifacts
+    - name: 📦 Upload Android APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: invictus-trader-android-${{ github.run_number }}
+        path: build/app/outputs/flutter-apk/*.apk
+        retention-days: 30
+
+    # Create Release on main branch
+    - name: 🚀 Create Release
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v1.0.${{ github.run_number }}
+        name: Invictus Trader Pro v1.0.${{ github.run_number }}
+        body: |
+          🚀 **Invictus Trader Pro - Build #${{ github.run_number }}**
+          
+          � **Android APK incluido**
+          📅 **Build:** ${{ github.event.head_commit.timestamp }}
+        files: |
+          build/app/outputs/flutter-apk/*.apk
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
