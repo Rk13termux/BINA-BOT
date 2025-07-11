@@ -4,12 +4,18 @@ import '../../models/candle.dart';
 import '../../models/signal.dart';
 import '../../services/binance_service.dart';
 import '../../services/notification_service.dart';
+import '../../services/premium_api_service.dart';
+import '../../services/initialization_service.dart';
 import '../../utils/logger.dart';
 
 class TradingController extends ChangeNotifier {
   final BinanceService _binanceService = BinanceService();
   final NotificationService _notificationService = NotificationService();
   final AppLogger _logger = AppLogger();
+  
+  // Premium services
+  PremiumApiService? _premiumApiService;
+  InitializationService? _initService;
 
   // State variables
   bool _isLoading = false;
@@ -21,6 +27,7 @@ class TradingController extends ChangeNotifier {
   List<Trade> _tradeHistory = [];
   List<Signal> _activeSignals = [];
   Map<String, dynamic> _marketStats = {};
+  Map<String, dynamic> _premiumData = {};
   bool _isConnected = false;
 
   // Getters
@@ -33,15 +40,27 @@ class TradingController extends ChangeNotifier {
   List<Trade> get tradeHistory => _tradeHistory;
   List<Signal> get activeSignals => _activeSignals;
   Map<String, dynamic> get marketStats => _marketStats;
+  Map<String, dynamic> get premiumData => _premiumData;
   bool get isConnected => _isConnected;
 
   /// Initialize trading controller
   Future<void> initialize() async {
     try {
       _setLoading(true);
+      
+      // Initialize services
       await _binanceService.initialize();
       await _notificationService.initialize();
+      
+      // Get premium API service from initialization service
+      _initService = InitializationService();
+      if (_initService!.isInitialized) {
+        _premiumApiService = _initService!.premiumApiService;
+      }
+      
       await _loadInitialData();
+      await _loadPremiumData();
+      
       _isConnected = true;
       _logger.info('Trading controller initialized successfully');
     } catch (e) {
@@ -59,6 +78,43 @@ class TradingController extends ChangeNotifier {
       _updateCandleData(),
       _updateMarketStats(),
     ]);
+  }
+
+  /// Load premium data from Premium API Service
+  Future<void> _loadPremiumData() async {
+    if (_premiumApiService == null) return;
+    
+    try {
+      // Load premium market data
+      final marketData = await _premiumApiService!.getRealTimeMarketData(_selectedSymbol);
+      if (marketData != null) {
+        _premiumData['market_data'] = marketData;
+      }
+
+      // Load AI predictions
+      final predictions = await _premiumApiService!.getAiPredictions(_selectedSymbol);
+      if (predictions != null) {
+        _premiumData['ai_predictions'] = predictions;
+      }
+
+      // Load advanced technical indicators
+      final indicators = await _premiumApiService!.getAdvancedTechnicalIndicators(_selectedSymbol);
+      if (indicators != null) {
+        _premiumData['technical_indicators'] = indicators;
+      }
+
+      // Load sentiment analysis
+      final sentiment = await _premiumApiService!.getNewsSentimentAnalysis();
+      if (sentiment != null) {
+        _premiumData['sentiment_analysis'] = sentiment;
+      }
+
+      _logger.info('Premium data loaded successfully');
+      notifyListeners();
+    } catch (e) {
+      _logger.error('Failed to load premium data: $e');
+      // Don't throw error, premium data is optional
+    }
   }
 
   /// Set selected trading symbol

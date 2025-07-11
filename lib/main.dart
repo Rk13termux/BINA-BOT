@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'dart:async';
 
 // Theme imports
 import 'ui/theme/app_theme.dart';
 
 // Feature imports
+import 'features/splash/splash_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
 import 'features/news/news_controller.dart';
 import 'features/trading/trading_controller.dart';
@@ -15,32 +16,45 @@ import 'features/alerts/alerts_controller.dart';
 // Service imports
 import 'services/auth_service.dart';
 import 'services/subscription_service.dart';
+import 'services/initialization_service.dart';
+
+// Utils
+import 'utils/logger.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  // Configurar manejo de errores global
+  FlutterError.onError = (FlutterErrorDetails details) {
+    AppLogger().error('Flutter Error: ${details.exception}');
+    AppLogger().error('Stack trace: ${details.stack}');
+  };
 
-  // Inicializar Hive para almacenamiento local
-  await Hive.initFlutter();
+  // Configurar manejo de errores en Zone
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  // Configurar orientación de pantalla
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight,
-  ]);
+    // Configurar orientación de pantalla
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
 
-  // Configurar barra de estado
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: Color(0xFF1A1A1A),
-      systemNavigationBarIconBrightness: Brightness.light,
-    ),
-  );
+    // Configurar barra de estado
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor: Color(0xFF1A1A1A),
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
+    );
 
-  runApp(const InvictusTraderApp());
+    runApp(const InvictusTraderApp());
+  }, (error, stack) {
+    AppLogger().error('Zone Error: $error');
+    AppLogger().error('Zone Stack: $stack');
+  });
 }
 
 class InvictusTraderApp extends StatelessWidget {
@@ -50,6 +64,9 @@ class InvictusTraderApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // Initialization Service (debe ser el primero)
+        ChangeNotifierProvider(create: (_) => InitializationService()),
+        
         // Controllers
         ChangeNotifierProvider(create: (_) => NewsController()),
         ChangeNotifierProvider(create: (_) => TradingController()),
@@ -63,10 +80,13 @@ class InvictusTraderApp extends StatelessWidget {
         title: 'Invictus Trader Pro',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
-        home: const DashboardScreen(),
+        
+        // Iniciar con SplashScreen
+        home: const SplashScreen(),
 
         // Configuración de rutas
         routes: {
+          '/splash': (context) => const SplashScreen(),
           '/dashboard': (context) => const DashboardScreen(),
           // TODO: Agregar más rutas cuando las pantallas estén implementadas
           // '/trading': (context) => const TradingScreen(),
@@ -80,10 +100,16 @@ class InvictusTraderApp extends StatelessWidget {
         builder: (context, child) {
           return MediaQuery(
             data: MediaQuery.of(context).copyWith(
-              textScaler:
-                  const TextScaler.linear(1.0), // Prevenir escalado de texto
+              textScaler: const TextScaler.linear(1.0), // Prevenir escalado de texto
             ),
             child: child!,
+          );
+        },
+        
+        // Manejar rutas desconocidas
+        onUnknownRoute: (settings) {
+          return MaterialPageRoute(
+            builder: (context) => const SplashScreen(),
           );
         },
       ),
