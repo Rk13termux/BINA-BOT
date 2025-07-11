@@ -34,7 +34,7 @@ jobs:
     - name: 📱 Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.27.0'
+        flutter-version: '3.27.1'
         channel: 'stable'
         cache: true
 
@@ -50,7 +50,11 @@ jobs:
     - name: 📦 Get dependencies again
       run: flutter pub get
 
-    - name: 🔨 Build APK (Debug)
+    - name: � Analyze code
+      run: flutter analyze --no-fatal-infos
+      continue-on-error: true
+
+    - name: �🔨 Build APK (Debug)
       if: github.event.inputs.build_type == 'debug' || contains(github.ref, 'develop')
       run: flutter build apk --debug
 
@@ -89,7 +93,7 @@ jobs:
     - name: 📱 Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.27.0'
+        flutter-version: '3.27.1'
         channel: 'stable'
         cache: true
 
@@ -105,7 +109,11 @@ jobs:
     - name: 📦 Get dependencies again
       run: flutter pub get
 
-    - name: 🖥️ Enable Windows desktop
+    - name: � Analyze code
+      run: flutter analyze --no-fatal-infos
+      continue-on-error: true
+
+    - name: �🖥️ Enable Windows desktop
       run: flutter config --enable-windows-desktop
 
     - name: 🔨 Build Windows EXE (Debug)

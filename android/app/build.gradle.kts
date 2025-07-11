@@ -55,6 +55,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             
             signingConfig = if (keystoreProperties.containsKey("keyAlias")) {
@@ -67,6 +68,8 @@ android {
         debug {
             signingConfig = signingConfigs.getByName("debug")
             isDebuggable = true
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }

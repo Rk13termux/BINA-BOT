@@ -34,7 +34,7 @@ class WebSocketManager {
 
   /// Suscribe a datos del libro de órdenes
   Stream<Map<String, dynamic>> subscribeDepth(String symbol, {int levels = 5}) {
-    final streamName = '${symbol.toLowerCase()}@depth${levels}@100ms';
+    final streamName = '${symbol.toLowerCase()}@depth$levels@100ms';
     return _createStream(streamName);
   }
 

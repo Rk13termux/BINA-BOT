@@ -127,7 +127,7 @@ class AlertsController extends ChangeNotifier {
     notifyListeners();
 
     _logger.info(
-        'Price alert added: ${alert.symbol} ${_getConditionText(condition)} ${value}');
+        'Price alert added: ${alert.symbol} ${_getConditionText(condition)} $value');
   }
 
   /// Remove an alert
