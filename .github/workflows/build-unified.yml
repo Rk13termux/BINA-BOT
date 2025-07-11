@@ -32,7 +32,8 @@ jobs:
   build-multiplatform:
     name: 🔨 Build All Platforms
     runs-on: windows-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
+    continue-on-error: false
     
     strategy:
       matrix:
@@ -79,6 +80,25 @@ jobs:
         channel: 'stable'
         cache: true
 
+    - name: 🔧 Pre-build Checks & Cleanup
+      run: |
+        echo "🔧 Pre-build environment checks..."
+        
+        # Check available space
+        echo "💾 Available disk space:"
+        df -h
+        echo ""
+        
+        # Clean any previous builds
+        echo "🧹 Cleaning previous builds..."
+        flutter clean || echo "No previous builds to clean"
+        
+        # Verify Flutter installation
+        echo "🐦 Flutter verification:"
+        flutter --version
+        flutter config --list
+        echo ""
+
     - name: ☕ Setup Java (Android)
       if: matrix.platform == 'android' || github.event.inputs.build_type == 'all' || github.event.inputs.build_type == 'android-only'
       uses: actions/setup-java@v4
@@ -112,7 +132,21 @@ jobs:
     - name: 📦 Install Dependencies
       run: |
         echo "📦 Installing Flutter dependencies..."
-        flutter pub get
+        # Retry logic for network issues
+        for i in {1..3}; do
+          echo "Attempt $i/3..."
+          if flutter pub get; then
+            echo "✅ Dependencies installed successfully"
+            break
+          else
+            echo "❌ Attempt $i failed, retrying..."
+            sleep 5
+          fi
+          if [ $i -eq 3 ]; then
+            echo "❌ Failed to install dependencies after 3 attempts"
+            exit 1
+          fi
+        done
         echo ""
         echo "🔧 Running build runner (if needed)..."
         flutter packages pub run build_runner build --delete-conflicting-outputs || echo "No build runner configured"
@@ -157,10 +191,26 @@ jobs:
         
         echo ""
         echo "🔨 Executing build command: ${{ matrix.build_command }}"
-        ${{ matrix.build_command }}
         
-        echo ""
-        echo "✅ Build completed successfully!"
+        # Retry logic for builds
+        for i in {1..2}; do
+          echo "Build attempt $i/2..."
+          if ${{ matrix.build_command }}; then
+            echo "✅ Build completed successfully!"
+            break
+          else
+            echo "❌ Build attempt $i failed"
+            if [ $i -eq 2 ]; then
+              echo "❌ Build failed after 2 attempts"
+              exit 1
+            else
+              echo "🔄 Cleaning and retrying..."
+              flutter clean
+              flutter pub get
+              sleep 10
+            fi
+          fi
+        done
         
         # Verify build artifacts
         if [ -d "${{ matrix.artifact_path }}" ]; then
