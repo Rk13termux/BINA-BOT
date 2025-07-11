@@ -1,0 +1,19 @@
+# BINA-BOT Android Signing Configuration
+# This file contains instructions for setting up Android app signing
+
+# For GitHub Actions, you need to:
+# 1. Generate a keystore file
+# 2. Add the following secrets to your GitHub repository:
+#    - ANDROID_KEYSTORE_BASE64: Base64 encoded keystore file
+#    - ANDROID_KEY_ALIAS: The alias of the key
+#    - ANDROID_KEY_PASSWORD: Password for the key
+#    - ANDROID_STORE_PASSWORD: Password for the keystore
+
+# To generate a keystore file locally, run:
+# keytool -genkey -v -keystore bina-bot-release-key.keystore -alias binabot -keyalg RSA -keysize 2048 -validity 10000
+
+# Example values (DO NOT use these in production):
+storePassword=your_store_password_here
+keyPassword=your_key_password_here
+keyAlias=binabot
+storeFile=bina-bot-release-key.keystore

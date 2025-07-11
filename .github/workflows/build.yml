@@ -1,0 +1,262 @@
+name: Build BINA-BOT APK & EXE
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+        - debug
+        - release
+
+env:
+  FLUTTER_VERSION: "3.24.1"
+  JAVA_VERSION: "11"
+
+jobs:
+  # Job para compilar APK Android
+  build-android:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📁 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: ☕ Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: ${{ env.JAVA_VERSION }}
+
+    - name: 📱 Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+        cache: true
+
+    - name: 📦 Get Flutter dependencies
+      run: flutter pub get
+
+    - name: 🔍 Verify Flutter installation
+      run: flutter doctor -v
+
+    - name: 🧹 Clean project
+      run: flutter clean
+
+    - name: 📦 Get dependencies again
+      run: flutter pub get
+
+    - name: 🔨 Build APK (Debug)
+      if: github.event.inputs.build_type == 'debug' || contains(github.ref, 'develop')
+      run: flutter build apk --debug --split-per-abi
+
+    - name: 🚀 Build APK (Release)
+      if: github.event.inputs.build_type == 'release' || github.ref == 'refs/heads/main'
+      run: flutter build apk --release --split-per-abi
+
+    - name: 🏷️ Get version
+      id: version
+      run: |
+        VERSION=$(grep 'version:' pubspec.yaml | cut -d ' ' -f2)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "build_number=${VERSION##*+}" >> $GITHUB_OUTPUT
+
+    - name: 📤 Upload Debug APKs
+      if: github.event.inputs.build_type == 'debug' || contains(github.ref, 'develop')
+      uses: actions/upload-artifact@v4
+      with:
+        name: bina-bot-debug-apks-v${{ steps.version.outputs.version }}
+        path: |
+          build/app/outputs/flutter-apk/app-arm64-v8a-debug.apk
+          build/app/outputs/flutter-apk/app-armeabi-v7a-debug.apk
+          build/app/outputs/flutter-apk/app-x86_64-debug.apk
+        retention-days: 30
+
+    - name: 📤 Upload Release APKs
+      if: github.event.inputs.build_type == 'release' || github.ref == 'refs/heads/main'
+      uses: actions/upload-artifact@v4
+      with:
+        name: bina-bot-release-apks-v${{ steps.version.outputs.version }}
+        path: |
+          build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+          build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+          build/app/outputs/flutter-apk/app-x86_64-release.apk
+        retention-days: 90
+
+  # Job para compilar EXE Windows
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+    - name: 📁 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 📱 Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+        cache: true
+
+    - name: 🔧 Enable Windows desktop
+      run: flutter config --enable-windows-desktop
+
+    - name: 📦 Get Flutter dependencies
+      run: flutter pub get
+
+    - name: 🔍 Verify Flutter installation
+      run: flutter doctor -v
+
+    - name: 🧹 Clean project
+      run: flutter clean
+
+    - name: 📦 Get dependencies again
+      run: flutter pub get
+
+    - name: 🔨 Build Windows EXE (Debug)
+      if: github.event.inputs.build_type == 'debug' || contains(github.ref, 'develop')
+      run: flutter build windows --debug
+
+    - name: 🚀 Build Windows EXE (Release)
+      if: github.event.inputs.build_type == 'release' || github.ref == 'refs/heads/main'
+      run: flutter build windows --release
+
+    - name: 🏷️ Get version
+      id: version
+      shell: powershell
+      run: |
+        $version = Select-String -Path "pubspec.yaml" -Pattern "version:" | ForEach-Object { $_.Line.Split(' ')[1] }
+        echo "version=$version" >> $env:GITHUB_OUTPUT
+        $buildNumber = $version.Split('+')[1]
+        echo "build_number=$buildNumber" >> $env:GITHUB_OUTPUT
+
+    - name: 📦 Create Windows ZIP (Debug)
+      if: github.event.inputs.build_type == 'debug' || contains(github.ref, 'develop')
+      shell: powershell
+      run: |
+        $sourcePath = "build\windows\x64\runner\Debug"
+        $zipPath = "bina-bot-windows-debug-v${{ steps.version.outputs.version }}.zip"
+        Compress-Archive -Path "$sourcePath\*" -DestinationPath $zipPath
+        echo "ZIP_PATH_DEBUG=$zipPath" >> $env:GITHUB_ENV
+
+    - name: 📦 Create Windows ZIP (Release)
+      if: github.event.inputs.build_type == 'release' || github.ref == 'refs/heads/main'
+      shell: powershell
+      run: |
+        $sourcePath = "build\windows\x64\runner\Release"
+        $zipPath = "bina-bot-windows-release-v${{ steps.version.outputs.version }}.zip"
+        Compress-Archive -Path "$sourcePath\*" -DestinationPath $zipPath
+        echo "ZIP_PATH_RELEASE=$zipPath" >> $env:GITHUB_ENV
+
+    - name: 📤 Upload Windows Debug EXE
+      if: github.event.inputs.build_type == 'debug' || contains(github.ref, 'develop')
+      uses: actions/upload-artifact@v4
+      with:
+        name: bina-bot-windows-debug-v${{ steps.version.outputs.version }}
+        path: ${{ env.ZIP_PATH_DEBUG }}
+        retention-days: 30
+
+    - name: 📤 Upload Windows Release EXE
+      if: github.event.inputs.build_type == 'release' || github.ref == 'refs/heads/main'
+      uses: actions/upload-artifact@v4
+      with:
+        name: bina-bot-windows-release-v${{ steps.version.outputs.version }}
+        path: ${{ env.ZIP_PATH_RELEASE }}
+        retention-days: 90
+
+  # Job para crear release automático
+  create-release:
+    if: github.ref == 'refs/heads/main' && (github.event.inputs.build_type == 'release' || github.event.inputs.build_type == '')
+    needs: [build-android, build-windows]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📁 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🏷️ Get version
+      id: version
+      run: |
+        VERSION=$(grep 'version:' pubspec.yaml | cut -d ' ' -f2)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+
+    - name: 📥 Download Android APKs
+      uses: actions/download-artifact@v4
+      with:
+        name: bina-bot-release-apks-v${{ steps.version.outputs.version }}
+        path: ./android-release/
+
+    - name: 📥 Download Windows EXE
+      uses: actions/download-artifact@v4
+      with:
+        name: bina-bot-windows-release-v${{ steps.version.outputs.version }}
+        path: ./windows-release/
+
+    - name: 📝 Generate changelog
+      id: changelog
+      run: |
+        echo "## 🚀 BINA-BOT Release v${{ steps.version.outputs.version }}" > CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        echo "### 📱 Android APK" >> CHANGELOG.md
+        echo "- ARM64: \`app-arm64-v8a-release.apk\`" >> CHANGELOG.md
+        echo "- ARMv7: \`app-armeabi-v7a-release.apk\`" >> CHANGELOG.md
+        echo "- x86_64: \`app-x86_64-release.apk\`" >> CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        echo "### 💻 Windows EXE" >> CHANGELOG.md
+        echo "- Windows x64: \`bina-bot-windows-release-v${{ steps.version.outputs.version }}.zip\`" >> CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        echo "### 🌟 Features" >> CHANGELOG.md
+        echo "- 📊 Professional cryptocurrency trading platform" >> CHANGELOG.md
+        echo "- 📈 Real-time market data and charts" >> CHANGELOG.md
+        echo "- 📰 Crypto news aggregation with search and filters" >> CHANGELOG.md
+        echo "- 🔔 Price alerts and notifications" >> CHANGELOG.md
+        echo "- 🔌 Plugin system for custom strategies" >> CHANGELOG.md
+        echo "- 💰 Portfolio tracking and analysis" >> CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        echo "### 🔧 Installation" >> CHANGELOG.md
+        echo "**Android:** Download and install the APK for your device architecture" >> CHANGELOG.md
+        echo "**Windows:** Download the ZIP file, extract and run \`invictus_trader_pro.exe\`" >> CHANGELOG.md
+
+    - name: 🏷️ Create Release
+      uses: ncipollo/release-action@v1
+      with:
+        tag: ${{ steps.version.outputs.tag }}
+        name: "BINA-BOT v${{ steps.version.outputs.version }}"
+        bodyFile: "CHANGELOG.md"
+        draft: false
+        prerelease: false
+        artifacts: |
+          ./android-release/app-arm64-v8a-release.apk
+          ./android-release/app-armeabi-v7a-release.apk
+          ./android-release/app-x86_64-release.apk
+          ./windows-release/bina-bot-windows-release-v${{ steps.version.outputs.version }}.zip
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Job para notificar el estado del build
+  notify:
+    if: always()
+    needs: [build-android, build-windows]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📊 Build Status
+      run: |
+        echo "🏗️ Build completed!"
+        echo "Android Build: ${{ needs.build-android.result }}"
+        echo "Windows Build: ${{ needs.build-windows.result }}"
+        
+        if [ "${{ needs.build-android.result }}" == "success" ] && [ "${{ needs.build-windows.result }}" == "success" ]; then
+          echo "✅ All builds successful!"
+        else
+          echo "❌ Some builds failed!"
+          exit 1
+        fi

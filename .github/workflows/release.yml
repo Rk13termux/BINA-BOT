@@ -1,0 +1,43 @@
+name: Auto Release BINA-BOT
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📁 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🏷️ Extract version
+      id: version
+      run: |
+        if [ "${{ github.event.inputs.version }}" != "" ]; then
+          VERSION="${{ github.event.inputs.version }}"
+        else
+          VERSION=${GITHUB_REF#refs/tags/}
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "version_number=${VERSION#v}" >> $GITHUB_OUTPUT
+
+    - name: 🔄 Trigger build workflow
+      uses: benc-uk/workflow-dispatch@v1
+      with:
+        workflow: build.yml
+        inputs: '{"build_type": "release"}'
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: ⏳ Wait for build completion
+      run: |
+        echo "Waiting for build workflow to complete..."
+        sleep 60
