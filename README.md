@@ -1,4 +1,168 @@
-# BINA-BOT - Invictus Trader Pro
+# BINA-BOT
+
+![BINA-BOT Logo](https://via.placeholder.com/150x150/FFD700/1A1A1A?text=BINA-BOT)
+
+[![Build Status](https://github.com/Rk13termux/BINA-BOT/actions/workflows/build.yml/badge.svg)](https://github.com/Rk13termux/BINA-BOT/actions/workflows/build.yml)
+[![Test Status](https://github.com/Rk13termux/BINA-BOT/actions/workflows/test.yml/badge.svg)](https://github.com/Rk13termux/BINA-BOT/actions/workflows/test.yml)
+[![Release](https://github.com/Rk13termux/BINA-BOT/actions/workflows/release.yml/badge.svg)](https://github.com/Rk13termux/BINA-BOT/releases)
+
+**Professional Cryptocurrency Trading Platform** - Una aplicación completa de trading de criptomonedas con análisis en tiempo real, noticias automáticas, sistema de plugins y más.
+
+## 📱 Descargas Automáticas
+
+¡Las compilaciones se generan automáticamente! No necesitas compilar manualmente.
+
+### 🔄 Última Release
+[![Latest Release](https://img.shields.io/github/v/release/Rk13termux/BINA-BOT?style=for-the-badge&logo=github&color=gold)](https://github.com/Rk13termux/BINA-BOT/releases/latest)
+
+### 📱 Android APK
+- **ARM64** (Recomendado para dispositivos modernos)
+- **ARMv7** (Dispositivos más antiguos) 
+- **x86_64** (Emuladores)
+
+### 💻 Windows EXE
+- **Windows x64** (ZIP con ejecutable y dependencias)
+
+## 🌟 Características Principales
+
+### 📈 Trading Profesional
+- ✅ Integración completa con Binance API
+- ✅ Gráficos de velas en tiempo real
+- ✅ Indicadores técnicos avanzados
+- ✅ Órdenes de compra/venta automáticas
+- ✅ Análisis de portfolio con P&L
+
+### 📰 Noticias Inteligentes
+- ✅ Scraping automático de múltiples fuentes (CoinDesk, CoinTelegraph, etc.)
+- ✅ Búsqueda y filtros avanzados
+- ✅ Categorización automática
+- ✅ Historial de búsquedas
+- ✅ Sistema de marcadores
+
+### 🔔 Alertas Personalizadas
+- ✅ Alertas de precio en tiempo real
+- ✅ Alertas de volumen y cambios de mercado
+- ✅ Notificaciones push nativas
+- ✅ Sistema de alertas inteligentes
+
+### 🔌 Sistema de Plugins
+- ✅ Arquitectura modular extensible
+- ✅ Plugins personalizados para estrategias
+- ✅ Ejecución segura con dart_eval
+- ✅ Marketplace de plugins integrado
+
+### 💰 Monetización
+- ✅ Versión gratuita con anuncios
+- ✅ Suscripciones Premium y Pro
+- ✅ Características avanzadas por tiers
+- ✅ Integración con Google Ads e In-App Purchases
+
+## 🚀 Instalación Rápida
+
+### Android
+1. Ve a [Releases](https://github.com/Rk13termux/BINA-BOT/releases)
+2. Descarga el APK para tu arquitectura
+3. Instala permitiendo "Fuentes desconocidas"
+
+### Windows
+1. Ve a [Releases](https://github.com/Rk13termux/BINA-BOT/releases)
+2. Descarga el archivo ZIP
+3. Extrae y ejecuta `invictus_trader_pro.exe`
+
+## 🔧 Compilación Automática
+
+Este proyecto utiliza **GitHub Actions** para compilación automática:
+
+- ✅ **Push a main** → Build de release automático
+- ✅ **Push a develop** → Build de debug automático  
+- ✅ **Pull Request** → Tests automáticos
+- ✅ **Tags vX.X.X** → Release automático con APK/EXE
+
+### Compilar Manualmente
+```bash
+# Ir a Actions en GitHub → "Build BINA-BOT APK & EXE" → "Run workflow"
+```
+
+Ver [GitHub Actions Guide](.github/README.md) para más detalles.
+
+## 🏗️ Arquitectura
+
+```
+📁 lib/
+├── 🎯 core/           # API, WebSocket, Storage
+├── 📊 models/         # Modelos de datos
+├── 🏠 features/       # Módulos por funcionalidad
+│   ├── dashboard/     # Panel principal
+│   ├── trading/       # Sistema de trading
+│   ├── news/          # Noticias y scraping
+│   ├── alerts/        # Sistema de alertas
+│   ├── plugins/       # Gestión de plugins
+│   └── settings/      # Configuraciones
+├── 🎨 ui/            # Temas y componentes
+├── 🔧 services/      # Lógica de negocio
+└── 🛠️ utils/         # Utilidades y helpers
+```
+
+## 🎨 Tecnologías
+
+- **Framework**: Flutter 3.24+ (Multiplataforma)
+- **Estado**: Provider Pattern
+- **API**: Binance REST + WebSocket
+- **Storage**: Hive + Flutter Secure Storage
+- **Charts**: Candlesticks + FL Chart
+- **Scraping**: HTML Parser
+- **AI**: TensorFlow Lite
+- **Ads**: Google Mobile Ads
+- **Payments**: In-App Purchase
+
+## 📸 Screenshots
+
+| Dashboard | Trading | Noticias | Alertas |
+|-----------|---------|----------|---------|
+| ![Dashboard](https://via.placeholder.com/200x350/1A1A1A/FFD700?text=Dashboard) | ![Trading](https://via.placeholder.com/200x350/1A1A1A/00FF88?text=Trading) | ![News](https://via.placeholder.com/200x350/1A1A1A/4A90E2?text=News) | ![Alerts](https://via.placeholder.com/200x350/1A1A1A/FF4444?text=Alerts) |
+
+## 🔐 Configuración de APIs
+
+### Binance API
+1. Crea cuenta en [Binance](https://binance.com)
+2. Genera API Key en configuración
+3. Configura en la app: Configuración → API Keys
+
+### Notificaciones
+Las notificaciones push están preconfiguradas y funcionan automáticamente.
+
+## 🤝 Contribuir
+
+1. **Fork** este repositorio
+2. **Clone** tu fork: `git clone https://github.com/TU_USUARIO/BINA-BOT.git`
+3. **Crea** una rama: `git checkout -b feature/nueva-funcionalidad`
+4. **Commitea** tus cambios: `git commit -m 'Add: nueva funcionalidad'`
+5. **Push** a la rama: `git push origin feature/nueva-funcionalidad`
+6. **Abre** un Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver [LICENSE](LICENSE) para más detalles.
+
+## 🔗 Enlaces
+
+- 📱 [Releases](https://github.com/Rk13termux/BINA-BOT/releases) - Descargas APK/EXE
+- 🐛 [Issues](https://github.com/Rk13termux/BINA-BOT/issues) - Reportar bugs
+- 💡 [Discussions](https://github.com/Rk13termux/BINA-BOT/discussions) - Ideas y sugerencias
+- 📖 [Wiki](https://github.com/Rk13termux/BINA-BOT/wiki) - Documentación completa
+
+## ⭐ Soporte
+
+Si este proyecto te ayuda, ¡considera darle una estrella ⭐!
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Rk13termux/BINA-BOT&type=Timeline)](https://star-history.com/#Rk13termux/BINA-BOT&Timeline)
+
+---
+
+<p align="center">
+  <strong>Hecho con ❤️ para la comunidad crypto</strong><br>
+  <sub>© 2025 BINA-BOT. Todos los derechos reservados.</sub>
+</p> - Invictus Trader Pro
 
 Professional Flutter cryptocurrency trading application with Binance integration, real-time analysis, and automation features.
 
