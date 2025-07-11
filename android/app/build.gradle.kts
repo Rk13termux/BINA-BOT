@@ -54,9 +54,15 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            isShrinkResources = false
+            // Optimizations for production builds
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            
+            // Performance optimizations
+            isDebuggable = false
+            isJniDebuggable = false
+            isRenderscriptDebuggable = false
             
             signingConfig = if (keystoreProperties.containsKey("keyAlias")) {
                 signingConfigs.getByName("release")
