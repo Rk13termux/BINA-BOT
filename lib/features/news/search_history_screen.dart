@@ -40,7 +40,7 @@ class SearchHistoryScreen extends StatelessWidget {
       body: Consumer<NewsController>(
         builder: (context, newsController, child) {
           final searchHistory = newsController.searchHistory;
-          
+
           if (searchHistory.isEmpty) {
             return Center(
               child: Column(
@@ -69,7 +69,7 @@ class SearchHistoryScreen extends StatelessWidget {
               ),
             );
           }
-          
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -155,7 +155,8 @@ class SearchHistoryScreen extends StatelessWidget {
                 color: AppColors.textSecondary,
                 size: 20,
               ),
-              onPressed: () => _removeFromHistory(context, query, newsController),
+              onPressed: () =>
+                  _removeFromHistory(context, query, newsController),
               tooltip: 'Remove from history',
             ),
           ],
@@ -195,7 +196,8 @@ class SearchHistoryScreen extends StatelessWidget {
     );
   }
 
-  void _showClearAllDialog(BuildContext context, NewsController newsController) {
+  void _showClearAllDialog(
+      BuildContext context, NewsController newsController) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

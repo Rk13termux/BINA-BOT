@@ -31,7 +31,8 @@ class MarketOverviewWidget extends StatelessWidget {
                 ),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: AppColors.bullish,
                     borderRadius: BorderRadius.circular(12),
@@ -54,14 +55,16 @@ class MarketOverviewWidget extends StatelessWidget {
             const SizedBox(height: 8),
             _buildMarketStat('BTC Dominance', '42.8%', '-0.12%', false),
             const SizedBox(height: 8),
-            _buildMarketStat('Fear & Greed Index', '76 (Extreme Greed)', '+8', true),
+            _buildMarketStat(
+                'Fear & Greed Index', '76 (Extreme Greed)', '+8', true),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMarketStat(String label, String value, String change, bool isPositive) {
+  Widget _buildMarketStat(
+      String label, String value, String change, bool isPositive) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

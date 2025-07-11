@@ -9,9 +9,9 @@ import '../utils/logger.dart';
 class PluginService {
   static final PluginService _instance = PluginService._internal();
   static final AppLogger _logger = AppLogger();
-  
+
   factory PluginService() => _instance;
-  
+
   PluginService._internal();
 
   final Map<String, Plugin> _loadedPlugins = {};
@@ -36,7 +36,7 @@ class PluginService {
   Future<void> _createPluginDirectories() async {
     final appDir = await getApplicationDocumentsDirectory();
     final pluginDir = Directory('${appDir.path}/plugins');
-    
+
     if (!await pluginDir.exists()) {
       await pluginDir.create(recursive: true);
       _logger.info('Plugin directory created');
@@ -48,7 +48,7 @@ class PluginService {
     try {
       final appDir = await getApplicationDocumentsDirectory();
       final pluginDir = Directory('${appDir.path}/plugins');
-      
+
       if (!await pluginDir.exists()) return;
 
       await for (final entity in pluginDir.list()) {
@@ -68,10 +68,10 @@ class PluginService {
     try {
       final pluginCode = await pluginFile.readAsString();
       final pluginName = _extractPluginName(pluginFile.path);
-      
+
       // For demo purposes, we'll skip runtime creation for now
       // final runtime = Runtime.ofCode(pluginCode);
-      
+
       // Basic plugin validation
       if (_validatePluginCode(pluginCode)) {
         final plugin = Plugin(
@@ -82,12 +82,14 @@ class PluginService {
           author: 'User',
           type: PluginType.strategy,
           createdAt: DateTime.now(),
+          code: pluginCode,
+          category: PluginCategory.trading,
           configuration: {'code': pluginCode, 'filePath': pluginFile.path},
         );
 
         _loadedPlugins[pluginName] = plugin;
         // _runtimes[pluginName] = runtime;
-        
+
         _logger.info('Plugin loaded: $pluginName');
       } else {
         _logger.warning('Invalid plugin code: $pluginName');
@@ -105,8 +107,12 @@ class PluginService {
   /// Basic validation of plugin code
   bool _validatePluginCode(String code) {
     // Basic checks for security and structure
-    final forbiddenKeywords = ['import \'dart:io\'', 'import \'dart:ffi\'', 'Process.run'];
-    
+    final forbiddenKeywords = [
+      'import \'dart:io\'',
+      'import \'dart:ffi\'',
+      'Process.run'
+    ];
+
     for (final keyword in forbiddenKeywords) {
       if (code.contains(keyword)) {
         return false;
@@ -132,9 +138,9 @@ class PluginService {
 
       final appDir = await getApplicationDocumentsDirectory();
       final pluginFile = File('${appDir.path}/plugins/$name.dart');
-      
+
       await pluginFile.writeAsString(code);
-      
+
       final plugin = Plugin(
         id: name,
         name: name,
@@ -143,11 +149,13 @@ class PluginService {
         author: author,
         type: PluginType.strategy,
         createdAt: DateTime.now(),
+        code: code,
+        category: PluginCategory.trading,
         configuration: {'code': code, 'filePath': pluginFile.path},
       );
 
       _loadedPlugins[name] = plugin;
-      
+
       // Create runtime for the new plugin (disabled for demo)
       // try {
       //   final runtime = Runtime.ofFile(pluginFile);
@@ -173,7 +181,7 @@ class PluginService {
       // Remove file
       final filePath = plugin.configuration['filePath'] as String?;
       if (filePath == null) return false;
-      
+
       final file = File(filePath);
       if (await file.exists()) {
         await file.delete();
@@ -196,19 +204,19 @@ class PluginService {
     final plugin = _loadedPlugins[pluginId];
     if (plugin != null) {
       _loadedPlugins[pluginId] = plugin.copyWith(
-        status: enabled ? PluginStatus.active : PluginStatus.inactive
-      );
+          status: enabled ? PluginStatus.active : PluginStatus.inactive);
       _logger.info('Plugin $pluginId ${enabled ? 'enabled' : 'disabled'}');
     }
   }
 
   /// Execute plugin analysis
-  Future<List<Signal>> executePluginAnalysis(String symbol, Map<String, dynamic> marketData) async {
+  Future<List<Signal>> executePluginAnalysis(
+      String symbol, Map<String, dynamic> marketData) async {
     final signals = <Signal>[];
 
     for (final entry in _loadedPlugins.entries) {
       final plugin = entry.value;
-      if (!plugin.isActive) continue;
+      if (plugin.status != PluginStatus.active) continue;
 
       try {
         final runtime = _runtimes[entry.key];
@@ -229,14 +237,11 @@ class PluginService {
 
   /// Safely execute plugin code
   Future<List<Signal>?> _executePluginSafely(
-    Runtime runtime, 
-    String symbol, 
-    Map<String, dynamic> marketData
-  ) async {
+      Runtime runtime, String symbol, Map<String, dynamic> marketData) async {
     try {
       // This is a simplified version - in practice, you'd need more sophisticated
       // sandboxing and error handling
-      
+
       // Create a mock signal for demonstration
       final signal = Signal(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -264,12 +269,111 @@ class PluginService {
 
   /// Get enabled plugins
   List<Plugin> getEnabledPlugins() {
-    return _loadedPlugins.values.where((plugin) => plugin.isActive).toList();
+    return _loadedPlugins.values
+        .where((plugin) => plugin.status == PluginStatus.active)
+        .toList();
   }
 
   /// Get plugin by ID
   Plugin? getPlugin(String pluginId) {
     return _loadedPlugins[pluginId];
+  }
+
+  /// Get all installed plugins
+  Future<List<Plugin>> getInstalledPlugins() async {
+    if (!_isInitialized) await initialize();
+    return _loadedPlugins.values.toList();
+  }
+
+  /// Install a plugin from Plugin object
+  Future<bool> installPluginFromObject(Plugin plugin) async {
+    try {
+      final appDir = await getApplicationDocumentsDirectory();
+      final pluginFile = File('${appDir.path}/plugins/${plugin.id}.json');
+      await pluginFile.writeAsString(plugin.toJson().toString());
+
+      _loadedPlugins[plugin.id] = plugin;
+      _logger.info('Plugin ${plugin.name} installed successfully');
+      return true;
+    } catch (e) {
+      _logger.error('Failed to install plugin ${plugin.name}: $e');
+      return false;
+    }
+  }
+
+  /// Uninstall a plugin
+  Future<bool> uninstallPlugin(String pluginId) async {
+    try {
+      final appDir = await getApplicationDocumentsDirectory();
+      final pluginFile = File('${appDir.path}/plugins/$pluginId.json');
+
+      if (await pluginFile.exists()) {
+        await pluginFile.delete();
+      }
+
+      _loadedPlugins.remove(pluginId);
+      _runtimes.remove(pluginId);
+
+      _logger.info('Plugin $pluginId uninstalled successfully');
+      return true;
+    } catch (e) {
+      _logger.error('Failed to uninstall plugin $pluginId: $e');
+      return false;
+    }
+  }
+
+  /// Activate a plugin
+  Future<bool> activatePlugin(String pluginId) async {
+    try {
+      final plugin = _loadedPlugins[pluginId];
+      if (plugin == null) return false;
+
+      final updatedPlugin = plugin.copyWith(status: PluginStatus.active);
+      _loadedPlugins[pluginId] = updatedPlugin;
+
+      _logger.info('Plugin ${plugin.name} activated');
+      return true;
+    } catch (e) {
+      _logger.error('Failed to activate plugin $pluginId: $e');
+      return false;
+    }
+  }
+
+  /// Deactivate a plugin
+  Future<bool> deactivatePlugin(String pluginId) async {
+    try {
+      final plugin = _loadedPlugins[pluginId];
+      if (plugin == null) return false;
+
+      final updatedPlugin = plugin.copyWith(status: PluginStatus.inactive);
+      _loadedPlugins[pluginId] = updatedPlugin;
+
+      _logger.info('Plugin ${plugin.name} deactivated');
+      return true;
+    } catch (e) {
+      _logger.error('Failed to deactivate plugin $pluginId: $e');
+      return false;
+    }
+  }
+
+  /// Create a new plugin
+  Future<Plugin> createPlugin(
+      String name, String description, String code, PluginType type) async {
+    final plugin = Plugin(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      name: name,
+      description: description,
+      version: '1.0.0',
+      type: type,
+      author: 'User',
+      createdAt: DateTime.now(),
+      code: code,
+      category: PluginCategory.trading,
+      permissions: [PluginPermission.readMarketData],
+    );
+
+    await installPluginFromObject(plugin);
+    return plugin;
   }
 
   /// Create a sample plugin template
@@ -336,8 +440,10 @@ class SampleTradingPlugin {
   /// Get plugin statistics
   Map<String, dynamic> getPluginStats() {
     final totalPlugins = _loadedPlugins.length;
-    final enabledPlugins = _loadedPlugins.values.where((p) => p.isActive).length;
-    
+    final enabledPlugins = _loadedPlugins.values
+        .where((p) => p.status == PluginStatus.active)
+        .length;
+
     return {
       'total': totalPlugins,
       'enabled': enabledPlugins,

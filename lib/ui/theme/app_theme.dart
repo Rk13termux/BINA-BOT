@@ -4,13 +4,12 @@ import 'colors.dart';
 
 /// Tema principal de la aplicación Invictus Trader Pro
 class AppTheme {
-  
   /// Tema oscuro principal
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      
+
       // Esquema de colores
       colorScheme: const ColorScheme.dark(
         primary: AppColors.goldPrimary,
@@ -21,7 +20,7 @@ class AppTheme {
         onSurface: AppColors.textPrimary,
         onError: AppColors.textPrimary,
       ),
-      
+
       // Tema de la app bar
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.primaryDark,
@@ -38,7 +37,7 @@ class AppTheme {
           statusBarIconBrightness: Brightness.light,
         ),
       ),
-      
+
       // Tema de tarjetas
       cardTheme: const CardThemeData(
         color: AppColors.cardBackground,
@@ -51,7 +50,7 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       // Tema de botones elevados
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -68,7 +67,7 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       // Tema de botones de texto
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
@@ -79,7 +78,7 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       // Tema de botones outline
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
@@ -91,7 +90,7 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         ),
       ),
-      
+
       // Tema de campos de texto
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -115,13 +114,13 @@ class AppTheme {
         labelStyle: const TextStyle(color: AppColors.textSecondary),
         hintStyle: const TextStyle(color: AppColors.textDisabled),
       ),
-      
+
       // Tema de iconos
       iconTheme: const IconThemeData(
         color: AppColors.textSecondary,
         size: 24,
       ),
-      
+
       // Tema de la bottom navigation bar
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.secondaryDark,
@@ -130,7 +129,7 @@ class AppTheme {
         type: BottomNavigationBarType.fixed,
         elevation: 8,
       ),
-      
+
       // Tema de chips
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.cardBackground,
@@ -141,13 +140,13 @@ class AppTheme {
           borderRadius: BorderRadius.circular(16),
         ),
       ),
-      
+
       // Tema de divisores
       dividerTheme: const DividerThemeData(
         color: AppColors.dividerColor,
         thickness: 1,
       ),
-      
+
       // Tema de diálogos
       dialogTheme: const DialogThemeData(
         backgroundColor: AppColors.cardBackground,
@@ -164,7 +163,7 @@ class AppTheme {
           fontSize: 16,
         ),
       ),
-      
+
       // Tema de snackbars
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.cardBackground,
@@ -174,7 +173,7 @@ class AppTheme {
         ),
         behavior: SnackBarBehavior.floating,
       ),
-      
+
       // Tema de switches
       switchTheme: SwitchThemeData(
         thumbColor: MaterialStateProperty.resolveWith((states) {
@@ -190,7 +189,7 @@ class AppTheme {
           return AppColors.borderColor;
         }),
       ),
-      
+
       // Tema de sliders
       sliderTheme: const SliderThemeData(
         activeTrackColor: AppColors.goldPrimary,
@@ -198,7 +197,7 @@ class AppTheme {
         thumbColor: AppColors.goldPrimary,
         overlayColor: AppColors.goldSecondary,
       ),
-      
+
       // Tema de la bottom sheet
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.cardBackground,
@@ -206,14 +205,14 @@ class AppTheme {
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
       ),
-      
+
       // Tema del tab bar
       tabBarTheme: const TabBarThemeData(
         labelColor: AppColors.goldPrimary,
         unselectedLabelColor: AppColors.textSecondary,
         indicatorColor: AppColors.goldPrimary,
       ),
-      
+
       // Tema de progress indicators
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.goldPrimary,
@@ -222,80 +221,80 @@ class AppTheme {
       ),
     );
   }
-  
+
   /// Estilos de texto personalizados
   static const TextStyle headlineLarge = TextStyle(
     fontSize: 32,
     fontWeight: FontWeight.bold,
     color: AppColors.textPrimary,
   );
-  
+
   static const TextStyle headlineMedium = TextStyle(
     fontSize: 28,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
   );
-  
+
   static const TextStyle headlineSmall = TextStyle(
     fontSize: 24,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
   );
-  
+
   static const TextStyle titleLarge = TextStyle(
     fontSize: 22,
     fontWeight: FontWeight.w500,
     color: AppColors.textPrimary,
   );
-  
+
   static const TextStyle titleMedium = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w500,
     color: AppColors.textPrimary,
   );
-  
+
   static const TextStyle titleSmall = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w500,
     color: AppColors.textPrimary,
   );
-  
+
   static const TextStyle bodyLarge = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.normal,
     color: AppColors.textPrimary,
   );
-  
+
   static const TextStyle bodyMedium = TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.normal,
     color: AppColors.textSecondary,
   );
-  
+
   static const TextStyle bodySmall = TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.normal,
     color: AppColors.textSecondary,
   );
-  
+
   // Estilos específicos para trading
   static const TextStyle priceText = TextStyle(
     fontSize: 24,
     fontWeight: FontWeight.bold,
     fontFamily: 'monospace',
   );
-  
+
   static const TextStyle percentageText = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w600,
     fontFamily: 'monospace',
   );
-  
+
   static const TextStyle goldText = TextStyle(
     color: AppColors.goldPrimary,
     fontWeight: FontWeight.w600,
   );
-  
+
   static const TextStyle premiumText = TextStyle(
     color: AppColors.goldPrimary,
     fontSize: 16,

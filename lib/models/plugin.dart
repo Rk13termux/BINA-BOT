@@ -12,6 +12,27 @@ enum PluginStatus {
   inactive,
   error,
   loading,
+  available,
+  installed,
+}
+
+/// Categorías de plugins
+enum PluginCategory {
+  trading,
+  analysis,
+  automation,
+  alerts,
+  indicators,
+  strategies,
+}
+
+/// Permisos de plugins
+enum PluginPermission {
+  readMarketData,
+  executeTrades,
+  accessAPI,
+  sendNotifications,
+  accessStorage,
 }
 
 /// Modelo para plugins de estrategias de trading
@@ -28,6 +49,9 @@ class Plugin {
   final Map<String, dynamic> configuration;
   final Map<String, dynamic> metadata;
   final List<String> supportedSymbols;
+  final String code;
+  final PluginCategory category;
+  final List<PluginPermission> permissions;
   final double? successRate;
   final int? executionCount;
 
@@ -44,6 +68,9 @@ class Plugin {
     this.configuration = const {},
     this.metadata = const {},
     this.supportedSymbols = const [],
+    required this.code,
+    required this.category,
+    this.permissions = const [],
     this.successRate,
     this.executionCount,
   });
@@ -63,6 +90,9 @@ class Plugin {
       'configuration': configuration,
       'metadata': metadata,
       'supportedSymbols': supportedSymbols,
+      'code': code,
+      'category': category.name,
+      'permissions': permissions.map((p) => p.name).toList(),
       'successRate': successRate,
       'executionCount': executionCount,
     };
@@ -71,55 +101,89 @@ class Plugin {
   /// Crea desde JSON
   factory Plugin.fromJson(Map<String, dynamic> json) {
     return Plugin(
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
-      description: json['description'] ?? '',
-      version: json['version'] ?? '1.0.0',
+      id: json['id'] as String,
+      name: json['name'] as String,
+      description: json['description'] as String,
+      version: json['version'] as String,
       type: PluginType.values.firstWhere(
-        (e) => e.name == json['type'],
+        (t) => t.name == json['type'],
         orElse: () => PluginType.strategy,
       ),
       status: PluginStatus.values.firstWhere(
-        (e) => e.name == json['status'],
+        (s) => s.name == json['status'],
         orElse: () => PluginStatus.inactive,
       ),
-      author: json['author'] ?? 'Unknown',
-      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
-      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
+      author: json['author'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'] as String)
+          : null,
       configuration: Map<String, dynamic>.from(json['configuration'] ?? {}),
       metadata: Map<String, dynamic>.from(json['metadata'] ?? {}),
       supportedSymbols: List<String>.from(json['supportedSymbols'] ?? []),
+      code: json['code'] as String? ?? '',
+      category: PluginCategory.values.firstWhere(
+        (c) => c.name == json['category'],
+        orElse: () => PluginCategory.trading,
+      ),
+      permissions: (json['permissions'] as List<dynamic>?)
+              ?.map((p) => PluginPermission.values.firstWhere(
+                    (perm) => perm.name == p,
+                    orElse: () => PluginPermission.readMarketData,
+                  ))
+              .toList() ??
+          [],
       successRate: (json['successRate'] as num?)?.toDouble(),
-      executionCount: json['executionCount'],
+      executionCount: json['executionCount'] as int?,
     );
   }
 
-  /// Crea desde configuración JSON de estrategia
-  factory Plugin.fromStrategyJson(Map<String, dynamic> strategyJson) {
+  /// Copia con nuevos valores
+  Plugin copyWith({
+    String? id,
+    String? name,
+    String? description,
+    String? version,
+    PluginType? type,
+    PluginStatus? status,
+    String? author,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Map<String, dynamic>? configuration,
+    Map<String, dynamic>? metadata,
+    List<String>? supportedSymbols,
+    String? code,
+    PluginCategory? category,
+    List<PluginPermission>? permissions,
+    double? successRate,
+    int? executionCount,
+  }) {
     return Plugin(
-      id: strategyJson['id'] ?? DateTime.now().millisecondsSinceEpoch.toString(),
-      name: strategyJson['name'] ?? 'Custom Strategy',
-      description: strategyJson['description'] ?? 'User defined strategy',
-      version: strategyJson['version'] ?? '1.0.0',
-      type: PluginType.strategy,
-      author: strategyJson['author'] ?? 'User',
-      createdAt: DateTime.now(),
-      configuration: strategyJson,
-      supportedSymbols: List<String>.from(strategyJson['symbols'] ?? ['BTCUSDT']),
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      version: version ?? this.version,
+      type: type ?? this.type,
+      status: status ?? this.status,
+      author: author ?? this.author,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      configuration: configuration ?? this.configuration,
+      metadata: metadata ?? this.metadata,
+      supportedSymbols: supportedSymbols ?? this.supportedSymbols,
+      code: code ?? this.code,
+      category: category ?? this.category,
+      permissions: permissions ?? this.permissions,
+      successRate: successRate ?? this.successRate,
+      executionCount: executionCount ?? this.executionCount,
     );
   }
 
-  /// Verifica si el plugin está activo
-  bool get isActive => status == PluginStatus.active;
-
-  /// Verifica si el plugin tiene errores
-  bool get hasError => status == PluginStatus.error;
-
-  /// Obtiene el icono del tipo de plugin
+  /// Obtiene el icono según el tipo
   String get typeIcon {
     switch (type) {
       case PluginType.strategy:
-        return '🎯';
+        return '📈';
       case PluginType.indicator:
         return '📊';
       case PluginType.alert:
@@ -140,6 +204,10 @@ class Plugin {
         return '#FF4444';
       case PluginStatus.loading:
         return '#FFB800';
+      case PluginStatus.available:
+        return '#2196F3';
+      case PluginStatus.installed:
+        return '#4CAF50';
     }
   }
 
@@ -154,10 +222,14 @@ class Plugin {
         return 'Error';
       case PluginStatus.loading:
         return 'Loading';
+      case PluginStatus.available:
+        return 'Available';
+      case PluginStatus.installed:
+        return 'Installed';
     }
   }
 
-  /// Obtiene el rating basado en success rate
+  /// Obtiene el rating basado en el successRate
   int get rating {
     if (successRate == null) return 0;
     if (successRate! >= 80) return 5;
@@ -167,62 +239,26 @@ class Plugin {
     return 1;
   }
 
-  /// Verifica si soporta un símbolo específico
+  /// Verifica si el plugin soporta un símbolo específico
   bool supportsSymbol(String symbol) {
     if (supportedSymbols.isEmpty) return true; // Soporta todos por defecto
     return supportedSymbols.contains(symbol.toUpperCase());
   }
 
-  /// Obtiene parámetros de configuración
-  T? getConfigValue<T>(String key, [T? defaultValue]) {
+  /// Obtiene un valor de configuración
+  T? getConfigValue<T>(String key) {
     final value = configuration[key];
-    if (value is T) return value;
-    return defaultValue;
+    return value is T ? value : null;
   }
 
-  /// Actualiza parámetro de configuración
-  Plugin updateConfig(String key, dynamic value) {
+  /// Actualiza la configuración
+  Plugin updateConfiguration(String key, dynamic value) {
     final newConfig = Map<String, dynamic>.from(configuration);
     newConfig[key] = value;
-    
+
     return copyWith(
       configuration: newConfig,
       updatedAt: DateTime.now(),
-    );
-  }
-
-  /// Crea copia con modificaciones
-  Plugin copyWith({
-    String? id,
-    String? name,
-    String? description,
-    String? version,
-    PluginType? type,
-    PluginStatus? status,
-    String? author,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    Map<String, dynamic>? configuration,
-    Map<String, dynamic>? metadata,
-    List<String>? supportedSymbols,
-    double? successRate,
-    int? executionCount,
-  }) {
-    return Plugin(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      description: description ?? this.description,
-      version: version ?? this.version,
-      type: type ?? this.type,
-      status: status ?? this.status,
-      author: author ?? this.author,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      configuration: configuration ?? this.configuration,
-      metadata: metadata ?? this.metadata,
-      supportedSymbols: supportedSymbols ?? this.supportedSymbols,
-      successRate: successRate ?? this.successRate,
-      executionCount: executionCount ?? this.executionCount,
     );
   }
 
@@ -234,7 +270,6 @@ class Plugin {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    
     return other is Plugin && other.id == id;
   }
 

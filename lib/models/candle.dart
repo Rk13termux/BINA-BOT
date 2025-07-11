@@ -83,7 +83,7 @@ class Candle {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    
+
     return other is Candle &&
         other.openTime == openTime &&
         other.open == open &&

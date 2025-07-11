@@ -18,10 +18,10 @@ import 'services/subscription_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Inicializar Hive para almacenamiento local
   await Hive.initFlutter();
-  
+
   // Configurar orientación de pantalla
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -29,7 +29,7 @@ void main() async {
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);
-  
+
   // Configurar barra de estado
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -39,7 +39,7 @@ void main() async {
       systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
-  
+
   runApp(const InvictusTraderApp());
 }
 
@@ -54,7 +54,7 @@ class InvictusTraderApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => NewsController()),
         ChangeNotifierProvider(create: (_) => TradingController()),
         ChangeNotifierProvider(create: (_) => AlertsController()),
-        
+
         // Services
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => SubscriptionService()),
@@ -64,7 +64,7 @@ class InvictusTraderApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
         home: const DashboardScreen(),
-        
+
         // Configuración de rutas
         routes: {
           '/dashboard': (context) => const DashboardScreen(),
@@ -75,12 +75,13 @@ class InvictusTraderApp extends StatelessWidget {
           // '/settings': (context) => const SettingsScreen(),
           // '/news': (context) => const NewsScreen(),
         },
-        
+
         // Configuración del builder para el tema
         builder: (context, child) {
           return MediaQuery(
             data: MediaQuery.of(context).copyWith(
-              textScaler: const TextScaler.linear(1.0), // Prevenir escalado de texto
+              textScaler:
+                  const TextScaler.linear(1.0), // Prevenir escalado de texto
             ),
             child: child!,
           );

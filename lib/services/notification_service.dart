@@ -8,12 +8,13 @@ import '../ui/theme/colors.dart';
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
   static final AppLogger _logger = AppLogger();
-  
+
   factory NotificationService() => _instance;
-  
+
   NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _notifications =
+      FlutterLocalNotificationsPlugin();
   bool _isInitialized = false;
 
   /// Initialize notification service
@@ -22,15 +23,16 @@ class NotificationService {
 
     try {
       // Request notification permissions
-      final permissionStatus = await _requestPermissions();
+      final permissionStatus = await requestPermissions();
       if (!permissionStatus) {
         _logger.warning('Notification permissions not granted');
         return;
       }
 
       // Android initialization
-      const androidInitialization = AndroidInitializationSettings('@mipmap/ic_launcher');
-      
+      const androidInitialization =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
+
       // iOS initialization
       const iosInitialization = DarwinInitializationSettings(
         requestSoundPermission: true,
@@ -57,19 +59,19 @@ class NotificationService {
   }
 
   /// Request notification permissions
-  Future<bool> _requestPermissions() async {
+  Future<bool> requestPermissions() async {
     try {
       final status = await Permission.notification.status;
-      
+
       if (status == PermissionStatus.granted) {
         return true;
       }
-      
+
       if (status == PermissionStatus.denied) {
         final result = await Permission.notification.request();
         return result == PermissionStatus.granted;
       }
-      
+
       return false;
     } catch (e) {
       _logger.error('Failed to request notification permissions: $e');
@@ -100,7 +102,8 @@ class NotificationService {
       const channelDescription = 'Notifications for price alerts';
 
       final title = 'Price Alert: $symbol';
-      final body = '$symbol is now ${condition == 'above' ? 'above' : 'below'} \$${targetPrice.toStringAsFixed(2)}';
+      final body =
+          '$symbol is now ${condition == 'above' ? 'above' : 'below'} \$${targetPrice.toStringAsFixed(2)}';
       final payload = 'price_alert:$symbol:$currentPrice';
 
       await _notifications.show(
@@ -145,7 +148,8 @@ class NotificationService {
       const channelDescription = 'Notifications for trading signals';
 
       final title = 'Trading Signal: ${signal.symbol}';
-      final body = '${signal.type.name.toUpperCase()} signal generated for ${signal.symbol}';
+      final body =
+          '${signal.type.name.toUpperCase()} signal generated for ${signal.symbol}';
       final payload = 'trading_signal:${signal.symbol}:${signal.type}';
 
       await _notifications.show(
@@ -160,7 +164,9 @@ class NotificationService {
             importance: Importance.high,
             priority: Priority.high,
             icon: '@mipmap/ic_launcher',
-            color: signal.type == SignalType.buy ? AppColors.bullish : AppColors.bearish,
+            color: signal.type == SignalType.buy
+                ? AppColors.bullish
+                : AppColors.bearish,
             playSound: true,
           ),
           iOS: const DarwinNotificationDetails(
@@ -244,7 +250,8 @@ class NotificationService {
 
       final title = 'Portfolio Update';
       final changeSymbol = changePercent >= 0 ? '+' : '';
-      final body = 'Your portfolio is worth \$${totalValue.toStringAsFixed(2)} ($changeSymbol${changePercent.toStringAsFixed(2)}% $period)';
+      final body =
+          'Your portfolio is worth \$${totalValue.toStringAsFixed(2)} ($changeSymbol${changePercent.toStringAsFixed(2)}% $period)';
       final payload = 'portfolio:$totalValue:$changePercent';
 
       await _notifications.show(
@@ -292,7 +299,7 @@ class NotificationService {
       const channelDescription = 'Notifications for connection status';
 
       final title = isConnected ? 'Connected' : 'Connection Lost';
-      final body = isConnected 
+      final body = isConnected
           ? '$service connection restored'
           : 'Lost connection to $service';
       final payload = 'connection:$service:$isConnected';
@@ -354,7 +361,8 @@ class NotificationService {
   }) async {
     // This would implement scheduled notifications
     // For now, just log the intent
-    _logger.info('Portfolio update scheduled for every ${interval.inHours} hours at $timeOfDay');
+    _logger.info(
+        'Portfolio update scheduled for every ${interval.inHours} hours at $timeOfDay');
   }
 
   /// Generate unique notification ID

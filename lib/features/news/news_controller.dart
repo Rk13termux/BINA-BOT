@@ -65,7 +65,7 @@ class NewsController extends ChangeNotifier {
 
     try {
       _logger.info('Loading news articles...');
-      
+
       // Load articles and trending topics in parallel
       final futures = await Future.wait([
         _scrapingService.scrapeAllNews(maxArticlesPerSource: 10),
@@ -94,7 +94,7 @@ class NewsController extends ChangeNotifier {
 
     _setSearching(true);
     _searchQuery = query.trim();
-    
+
     // Add to search history
     if (!_searchHistory.contains(_searchQuery)) {
       _searchHistory.insert(0, _searchQuery);
@@ -105,12 +105,17 @@ class NewsController extends ChangeNotifier {
 
     try {
       _logger.info('Searching news for: $_searchQuery');
-      
+
       // Search in existing articles first
       final localResults = _allArticles.where((article) {
-        return article.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-               article.summary.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-               article.tags.any((tag) => tag.toLowerCase().contains(_searchQuery.toLowerCase()));
+        return article.title
+                .toLowerCase()
+                .contains(_searchQuery.toLowerCase()) ||
+            article.summary
+                .toLowerCase()
+                .contains(_searchQuery.toLowerCase()) ||
+            article.tags.any((tag) =>
+                tag.toLowerCase().contains(_searchQuery.toLowerCase()));
       }).toList();
 
       // If we have good local results, use them
@@ -123,8 +128,9 @@ class NewsController extends ChangeNotifier {
       }
 
       // Otherwise, search online
-      final searchResults = await _scrapingService.searchCryptoNews(_searchQuery);
-      
+      final searchResults =
+          await _scrapingService.searchCryptoNews(_searchQuery);
+
       // Merge with local results and remove duplicates
       final allResults = <NewsArticle>[...localResults, ...searchResults];
       final uniqueResults = <NewsArticle>[];
@@ -139,7 +145,7 @@ class NewsController extends ChangeNotifier {
 
       _filteredArticles = uniqueResults;
       _applySorting();
-      
+
       _logger.info('Found ${_filteredArticles.length} search results');
     } catch (e) {
       _setError('Failed to search news: $e');
@@ -228,7 +234,9 @@ class NewsController extends ChangeNotifier {
   /// Get articles from specific time period
   List<NewsArticle> getArticlesFromPeriod(Duration period) {
     final cutoff = DateTime.now().subtract(period);
-    return _allArticles.where((article) => article.publishedAt.isAfter(cutoff)).toList();
+    return _allArticles
+        .where((article) => article.publishedAt.isAfter(cutoff))
+        .toList();
   }
 
   /// Apply filters to articles
@@ -236,9 +244,14 @@ class NewsController extends ChangeNotifier {
     _filteredArticles = _allArticles.where((article) {
       // Category filter
       if (_selectedCategory != 'All') {
-        final categoryMatch = article.title.toLowerCase().contains(_selectedCategory.toLowerCase()) ||
-                             article.summary.toLowerCase().contains(_selectedCategory.toLowerCase()) ||
-                             article.tags.any((tag) => tag.toLowerCase().contains(_selectedCategory.toLowerCase()));
+        final categoryMatch = article.title
+                .toLowerCase()
+                .contains(_selectedCategory.toLowerCase()) ||
+            article.summary
+                .toLowerCase()
+                .contains(_selectedCategory.toLowerCase()) ||
+            article.tags.any((tag) =>
+                tag.toLowerCase().contains(_selectedCategory.toLowerCase()));
         if (!categoryMatch) return false;
       }
 
@@ -258,7 +271,8 @@ class NewsController extends ChangeNotifier {
   void _applySorting() {
     switch (_sortBy) {
       case 'date':
-        _filteredArticles.sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
+        _filteredArticles
+            .sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
         break;
       case 'source':
         _filteredArticles.sort((a, b) => a.source.compareTo(b.source));
@@ -267,7 +281,8 @@ class NewsController extends ChangeNotifier {
         _filteredArticles.sort((a, b) => a.title.compareTo(b.title));
         break;
       default:
-        _filteredArticles.sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
+        _filteredArticles
+            .sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
     }
   }
 

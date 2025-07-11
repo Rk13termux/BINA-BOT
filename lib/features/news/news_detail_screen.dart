@@ -48,7 +48,8 @@ class NewsDetailScreen extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: AppColors.goldPrimary,
                     borderRadius: BorderRadius.circular(6),
@@ -72,9 +73,9 @@ class NewsDetailScreen extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Title
             Text(
               article.title,
@@ -85,9 +86,9 @@ class NewsDetailScreen extends StatelessWidget {
                 height: 1.3,
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Summary/excerpt
             if (article.summary.isNotEmpty) ...[
               Container(
@@ -109,7 +110,7 @@ class NewsDetailScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
             ],
-            
+
             // Tags
             if (article.tags.isNotEmpty) ...[
               Text(
@@ -126,11 +127,13 @@ class NewsDetailScreen extends StatelessWidget {
                 runSpacing: 8,
                 children: article.tags.map((tag) {
                   return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: AppColors.goldPrimary.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.goldPrimary.withOpacity(0.5)),
+                      border: Border.all(
+                          color: AppColors.goldPrimary.withOpacity(0.5)),
                     ),
                     child: Text(
                       tag,
@@ -145,7 +148,7 @@ class NewsDetailScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
             ],
-            
+
             // Article info
             Container(
               padding: const EdgeInsets.all(16),
@@ -167,14 +170,15 @@ class NewsDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   _buildInfoRow('Source', article.source),
-                  _buildInfoRow('Published', _formatDateTime(article.publishedAt)),
+                  _buildInfoRow(
+                      'Published', _formatDateTime(article.publishedAt)),
                   _buildInfoRow('URL', article.url, isUrl: true),
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Read full article button
             SizedBox(
               width: double.infinity,
@@ -192,9 +196,9 @@ class NewsDetailScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Share button
             SizedBox(
               width: double.infinity,
@@ -262,7 +266,7 @@ class NewsDetailScreen extends StatelessWidget {
   String _formatDateTime(DateTime dateTime) {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
-    
+
     if (difference.inDays > 0) {
       return '${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
     } else if (difference.inHours > 0) {

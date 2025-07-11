@@ -12,7 +12,6 @@ import 'widgets/portfolio_widget.dart';
 import 'widgets/quick_actions_widget.dart';
 import 'widgets/recent_alerts_widget.dart';
 import '../../services/auth_service.dart';
-import '../../services/subscription_service.dart';
 
 /// Pantalla principal del dashboard con navegación por pestañas
 class DashboardScreen extends StatefulWidget {
@@ -25,7 +24,6 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  int _currentIndex = 0;
 
   final List<Map<String, dynamic>> _screens = [
     {
@@ -59,11 +57,6 @@ class _DashboardScreenState extends State<DashboardScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: _screens.length, vsync: this);
-    _tabController.addListener(() {
-      setState(() {
-        _currentIndex = _tabController.index;
-      });
-    });
   }
 
   @override
@@ -105,7 +98,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                 margin: const EdgeInsets.only(right: 8),
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: auth.isAuthenticated ? AppColors.success : AppColors.warning,
+                  color: auth.isAuthenticated
+                      ? AppColors.success
+                      : AppColors.warning,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -161,15 +156,14 @@ class _DashboardScreenState extends State<DashboardScreen>
         ),
         child: TabBar(
           controller: _tabController,
-          type: TabBarType.fixed,
-          backgroundColor: AppColors.surfaceDark,
+          tabAlignment: TabAlignment.fill,
           indicatorColor: AppColors.goldPrimary,
           labelColor: AppColors.goldPrimary,
           unselectedLabelColor: AppColors.textSecondary,
-          labelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+          labelStyle:
+              const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
           unselectedLabelStyle: const TextStyle(fontSize: 10),
           tabs: _screens.map((screen) {
-            final index = _screens.indexOf(screen);
             return Tab(
               icon: Icon(
                 screen['icon'] as IconData,
@@ -246,7 +240,8 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    user?.email.split('@')[0].toUpperCase() ?? 'Trader',
+                                    user?.email.split('@')[0].toUpperCase() ??
+                                        'Trader',
                                     style: TextStyle(
                                       color: AppColors.textPrimary,
                                       fontSize: 24,
@@ -258,23 +253,27 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
                             ),
                             if (user != null) ...[
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
                                   gradient: user.subscriptionTier == 'premium'
                                       ? LinearGradient(
-                                          colors: [AppColors.goldPrimary, AppColors.warning],
+                                          colors: [
+                                            AppColors.goldPrimary,
+                                            AppColors.warning
+                                          ],
                                         )
                                       : null,
-                                  color: user.subscriptionTier == 'premium' 
-                                      ? null 
+                                  color: user.subscriptionTier == 'premium'
+                                      ? null
                                       : AppColors.info,
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                                 child: Text(
                                   user.subscriptionTier.toUpperCase(),
                                   style: TextStyle(
-                                    color: user.subscriptionTier == 'premium' 
-                                        ? AppColors.primaryDark 
+                                    color: user.subscriptionTier == 'premium'
+                                        ? AppColors.primaryDark
                                         : Colors.white,
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
@@ -302,42 +301,32 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
                   children: [
                     PriceTile(
                       symbol: 'BTC',
-                      name: 'Bitcoin',
-                      price: '\$94,825.67',
-                      change: '+2.45%',
-                      isPositive: true,
+                      price: 94825.67,
+                      change: 2.45,
                     ),
                     const SizedBox(width: 12),
                     PriceTile(
                       symbol: 'ETH',
-                      name: 'Ethereum',
-                      price: '\$3,245.89',
-                      change: '+1.23%',
-                      isPositive: true,
+                      price: 3245.89,
+                      change: 1.23,
                     ),
                     const SizedBox(width: 12),
                     PriceTile(
                       symbol: 'BNB',
-                      name: 'Binance Coin',
-                      price: '\$642.15',
-                      change: '-0.67%',
-                      isPositive: false,
+                      price: 642.15,
+                      change: -0.67,
                     ),
                     const SizedBox(width: 12),
                     PriceTile(
                       symbol: 'SOL',
-                      name: 'Solana',
-                      price: '\$234.56',
-                      change: '+5.89%',
-                      isPositive: true,
+                      price: 234.56,
+                      change: 5.89,
                     ),
                     const SizedBox(width: 12),
                     PriceTile(
                       symbol: 'ADA',
-                      name: 'Cardano',
-                      price: '\$1.23',
-                      change: '+3.45%',
-                      isPositive: true,
+                      price: 1.23,
+                      change: 3.45,
                     ),
                   ],
                 ),
@@ -477,7 +466,7 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
   Future<void> _refreshData() async {
     // Simulate data refresh
     await Future.delayed(const Duration(seconds: 1));
-    
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -520,7 +509,6 @@ class _MoreTab extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-
             _buildSection(
               'Tools & Analysis',
               [
@@ -530,7 +518,8 @@ class _MoreTab extends StatelessWidget {
                   Icons.extension,
                   () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const PluginsScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const PluginsScreen()),
                   ),
                 ),
                 _buildMenuItem(
@@ -547,9 +536,7 @@ class _MoreTab extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 24),
-
             _buildSection(
               'Account & Settings',
               [
@@ -559,7 +546,8 @@ class _MoreTab extends StatelessWidget {
                   Icons.settings,
                   () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const SettingsScreen()),
                   ),
                 ),
                 _buildMenuItem(
@@ -576,9 +564,7 @@ class _MoreTab extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 24),
-
             _buildSection(
               'Learning & Support',
               [
@@ -602,9 +588,7 @@ class _MoreTab extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 24),
-
             Consumer<AuthService>(
               builder: (context, auth, child) {
                 final user = auth.currentUser;
@@ -642,11 +626,13 @@ class _MoreTab extends StatelessWidget {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: () => _showComingSoon(context, 'Premium Upgrade'),
+                              onPressed: () =>
+                                  _showComingSoon(context, 'Premium Upgrade'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.goldPrimary,
                                 foregroundColor: AppColors.primaryDark,
-                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
                               ),
                               child: const Text('Upgrade to Premium'),
                             ),

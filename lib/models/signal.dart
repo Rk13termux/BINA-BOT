@@ -74,7 +74,8 @@ class Signal {
         orElse: () => ConfidenceLevel.low,
       ),
       reason: json['reason'] ?? '',
-      timestamp: DateTime.parse(json['timestamp'] ?? DateTime.now().toIso8601String()),
+      timestamp:
+          DateTime.parse(json['timestamp'] ?? DateTime.now().toIso8601String()),
       metadata: Map<String, dynamic>.from(json['metadata'] ?? {}),
       source: json['source'],
       targetPrice: (json['targetPrice'] as num?)?.toDouble(),
@@ -85,7 +86,7 @@ class Signal {
   /// Calcula el potencial de ganancia
   double? get potentialProfit {
     if (targetPrice == null) return null;
-    
+
     switch (type) {
       case SignalType.buy:
         return ((targetPrice! - price) / price) * 100;
@@ -99,7 +100,7 @@ class Signal {
   /// Calcula el riesgo potencial
   double? get potentialLoss {
     if (stopLoss == null) return null;
-    
+
     switch (type) {
       case SignalType.buy:
         return ((price - stopLoss!) / price) * 100;
@@ -114,9 +115,9 @@ class Signal {
   double? get riskRewardRatio {
     final profit = potentialProfit;
     final loss = potentialLoss;
-    
+
     if (profit == null || loss == null || loss == 0) return null;
-    
+
     return profit / loss;
   }
 
@@ -124,7 +125,7 @@ class Signal {
   bool get isExpired {
     final now = DateTime.now();
     final ageInHours = now.difference(timestamp).inHours;
-    
+
     // Las señales expiran después de 24 horas por defecto
     return ageInHours > 24;
   }
@@ -194,7 +195,7 @@ class Signal {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    
+
     return other is Signal && other.id == id;
   }
 

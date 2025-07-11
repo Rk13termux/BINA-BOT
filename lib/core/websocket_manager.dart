@@ -8,11 +8,11 @@ import '../utils/logger.dart';
 class WebSocketManager {
   static const String _binanceWsUrl = 'wss://stream.binance.com:9443/ws/';
   static const String _binanceTestnetWsUrl = 'wss://testnet.binance.vision/ws/';
-  
+
   final AppLogger _logger = AppLogger();
   final Map<String, WebSocketChannel> _connections = {};
   final Map<String, StreamController> _streamControllers = {};
-  
+
   bool _isTestnet = false;
 
   /// Configura si usar testnet
@@ -53,7 +53,9 @@ class WebSocketManager {
   /// Crea un stream WebSocket
   Stream<Map<String, dynamic>> _createStream(String streamName) {
     if (_streamControllers.containsKey(streamName)) {
-      return _streamControllers[streamName]!.stream.cast<Map<String, dynamic>>();
+      return _streamControllers[streamName]!
+          .stream
+          .cast<Map<String, dynamic>>();
     }
 
     final controller = StreamController<Map<String, dynamic>>.broadcast();
@@ -65,11 +67,12 @@ class WebSocketManager {
   }
 
   /// Conecta a WebSocket
-  void _connectWebSocket(String streamName, StreamController<Map<String, dynamic>> controller) {
+  void _connectWebSocket(
+      String streamName, StreamController<Map<String, dynamic>> controller) {
     try {
       final wsUrl = _isTestnet ? _binanceTestnetWsUrl : _binanceWsUrl;
       final uri = Uri.parse('$wsUrl$streamName');
-      
+
       final channel = WebSocketChannel.connect(uri);
       _connections[streamName] = channel;
 
@@ -101,9 +104,10 @@ class WebSocketManager {
   }
 
   /// Reconecta WebSocket después de una desconexión
-  void _reconnect(String streamName, StreamController<Map<String, dynamic>> controller) {
+  void _reconnect(
+      String streamName, StreamController<Map<String, dynamic>> controller) {
     _logger.info('Attempting to reconnect WebSocket: $streamName');
-    
+
     Timer(const Duration(seconds: 5), () {
       if (!controller.isClosed) {
         _connectWebSocket(streamName, controller);
@@ -136,9 +140,9 @@ class WebSocketManager {
 
   /// Verifica si una conexión está activa
   bool isConnected(String streamName) {
-    return _connections.containsKey(streamName) && 
-           _streamControllers.containsKey(streamName) &&
-           !_streamControllers[streamName]!.isClosed;
+    return _connections.containsKey(streamName) &&
+        _streamControllers.containsKey(streamName) &&
+        !_streamControllers[streamName]!.isClosed;
   }
 
   /// Obtiene el estado de todas las conexiones

@@ -19,12 +19,12 @@ class _TradingScreenState extends State<TradingScreen>
   late TabController _tabController;
   String _selectedSymbol = 'BTCUSDT';
   String _selectedInterval = '1h';
-  
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<TradingController>().setSelectedSymbol(_selectedSymbol);
       context.read<TradingController>().setSelectedInterval(_selectedInterval);
@@ -45,7 +45,8 @@ class _TradingScreenState extends State<TradingScreen>
         backgroundColor: AppColors.primaryDark,
         title: Text(
           'Trading',
-          style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: AppColors.textPrimary, fontWeight: FontWeight.bold),
         ),
         bottom: TabBar(
           controller: _tabController,
@@ -89,16 +90,18 @@ class _TradingScreenState extends State<TradingScreen>
             ],
           ),
         ),
-        
+
         // Price info
         Consumer<TradingController>(
           builder: (context, trading, child) {
             final currentPrice = trading.currentPrice;
             final marketStats = trading.marketStats;
-            final priceChangePercent = marketStats['priceChangePercent'] != null 
-                ? double.tryParse(marketStats['priceChangePercent'].toString()) ?? 0.0
+            final priceChangePercent = marketStats['priceChangePercent'] != null
+                ? double.tryParse(
+                        marketStats['priceChangePercent'].toString()) ??
+                    0.0
                 : 0.0;
-            
+
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
@@ -126,9 +129,12 @@ class _TradingScreenState extends State<TradingScreen>
                   ),
                   const Spacer(),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: priceChangePercent >= 0 ? AppColors.bullish : AppColors.bearish,
+                      color: priceChangePercent >= 0
+                          ? AppColors.bullish
+                          : AppColors.bearish,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
@@ -144,17 +150,18 @@ class _TradingScreenState extends State<TradingScreen>
             );
           },
         ),
-        
+
         // Chart
         Expanded(
           child: Consumer<TradingController>(
             builder: (context, trading, child) {
               if (trading.isLoading) {
                 return const Center(
-                  child: CircularProgressIndicator(color: AppColors.goldPrimary),
+                  child:
+                      CircularProgressIndicator(color: AppColors.goldPrimary),
                 );
               }
-              
+
               final candles = trading.candleData;
               if (candles.isEmpty) {
                 return Center(
@@ -164,18 +171,20 @@ class _TradingScreenState extends State<TradingScreen>
                   ),
                 );
               }
-              
+
               return Padding(
                 padding: const EdgeInsets.all(16),
                 child: Candlesticks(
-                  candles: candles.map((c) => Candle(
-                    date: c.openTime,
-                    high: c.high,
-                    low: c.low,
-                    open: c.open,
-                    close: c.close,
-                    volume: c.volume,
-                  )).toList(),
+                  candles: candles
+                      .map((c) => Candle(
+                            date: c.openTime,
+                            high: c.high,
+                            low: c.low,
+                            open: c.open,
+                            close: c.close,
+                            volume: c.volume,
+                          ))
+                      .toList(),
                 ),
               );
             },
@@ -196,7 +205,7 @@ class _TradingScreenState extends State<TradingScreen>
             builder: (context, auth, child) {
               final user = auth.currentUser;
               final showAds = user?.subscriptionTier == 'free';
-              
+
               return Column(
                 children: [
                   if (showAds) _buildAdBanner(),
@@ -205,14 +214,14 @@ class _TradingScreenState extends State<TradingScreen>
               );
             },
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           // Order form
           _buildOrderForm(),
-          
+
           const SizedBox(height: 20),
-          
+
           // Quick actions
           _buildQuickActions(),
         ],
@@ -224,7 +233,7 @@ class _TradingScreenState extends State<TradingScreen>
     return Consumer<TradingController>(
       builder: (context, trading, child) {
         final orders = trading.tradeHistory;
-        
+
         if (orders.isEmpty) {
           return Center(
             child: Column(
@@ -247,7 +256,7 @@ class _TradingScreenState extends State<TradingScreen>
             ),
           );
         }
-        
+
         return ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: orders.length,
@@ -258,19 +267,26 @@ class _TradingScreenState extends State<TradingScreen>
               margin: const EdgeInsets.only(bottom: 12),
               child: ListTile(
                 leading: Icon(
-                  order.side.name.toUpperCase() == 'BUY' ? Icons.trending_up : Icons.trending_down,
-                  color: order.side.name.toUpperCase() == 'BUY' ? AppColors.bullish : AppColors.bearish,
+                  order.side.name.toUpperCase() == 'BUY'
+                      ? Icons.trending_up
+                      : Icons.trending_down,
+                  color: order.side.name.toUpperCase() == 'BUY'
+                      ? AppColors.bullish
+                      : AppColors.bearish,
                 ),
                 title: Text(
                   '${order.side.name.toUpperCase()} ${order.symbol}',
-                  style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(
                   'Qty: ${order.quantity} @ \$${(order.price ?? 0.0).toStringAsFixed(2)}',
                   style: TextStyle(color: AppColors.textSecondary),
                 ),
                 trailing: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: _getStatusColor(order.status.name),
                     borderRadius: BorderRadius.circular(4),
@@ -305,7 +321,9 @@ class _TradingScreenState extends State<TradingScreen>
               setState(() {
                 _selectedSymbol = newValue;
               });
-              context.read<TradingController>().setSelectedSymbol(_selectedSymbol);
+              context
+                  .read<TradingController>()
+                  .setSelectedSymbol(_selectedSymbol);
             }
           },
           items: const [
@@ -342,7 +360,9 @@ class _TradingScreenState extends State<TradingScreen>
               setState(() {
                 _selectedInterval = newValue;
               });
-              context.read<TradingController>().setSelectedInterval(_selectedInterval);
+              context
+                  .read<TradingController>()
+                  .setSelectedInterval(_selectedInterval);
             }
           },
           items: const [
@@ -439,7 +459,7 @@ class _TradingScreenState extends State<TradingScreen>
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Order type selector
             Row(
               children: [
@@ -466,9 +486,9 @@ class _TradingScreenState extends State<TradingScreen>
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Price input
             TextField(
               style: TextStyle(color: AppColors.textPrimary),
@@ -486,9 +506,9 @@ class _TradingScreenState extends State<TradingScreen>
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             // Quantity input
             TextField(
               style: TextStyle(color: AppColors.textPrimary),
@@ -506,9 +526,9 @@ class _TradingScreenState extends State<TradingScreen>
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Place order button
             SizedBox(
               width: double.infinity,
@@ -556,7 +576,6 @@ class _TradingScreenState extends State<TradingScreen>
               ),
             ),
             const SizedBox(height: 16),
-            
             Row(
               children: [
                 Expanded(

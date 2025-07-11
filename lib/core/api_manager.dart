@@ -8,24 +8,25 @@ import '../utils/logger.dart';
 class ApiManager {
   static const String _binanceBaseUrl = 'https://api.binance.com';
   static const String _binanceSpotUrl = '/api/v3';
-  
+
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   final AppLogger _logger = AppLogger();
-  
+
   String? _apiKey;
   String? _secretKey;
   bool _isTestnet = false;
 
   /// Configura las credenciales de la API
-  Future<void> setCredentials(String apiKey, String secretKey, {bool testnet = false}) async {
+  Future<void> setCredentials(String apiKey, String secretKey,
+      {bool testnet = false}) async {
     await _secureStorage.write(key: 'binance_api_key', value: apiKey);
     await _secureStorage.write(key: 'binance_secret_key', value: secretKey);
     await _secureStorage.write(key: 'is_testnet', value: testnet.toString());
-    
+
     _apiKey = apiKey;
     _secretKey = secretKey;
     _isTestnet = testnet;
-    
+
     _logger.info('API credentials configured');
   }
 
@@ -43,13 +44,15 @@ class ApiManager {
   /// Obtiene el precio actual de un símbolo
   Future<Map<String, dynamic>?> getSymbolPrice(String symbol) async {
     try {
-      final url = '${_getBaseUrl()}$_binanceSpotUrl/ticker/price?symbol=${symbol.toUpperCase()}';
+      final url =
+          '${_getBaseUrl()}$_binanceSpotUrl/ticker/price?symbol=${symbol.toUpperCase()}';
       final response = await http.get(Uri.parse(url));
-      
+
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        _logger.error('Error getting price for $symbol: ${response.statusCode}');
+        _logger
+            .error('Error getting price for $symbol: ${response.statusCode}');
         return null;
       }
     } catch (e) {
@@ -59,28 +62,29 @@ class ApiManager {
   }
 
   /// Obtiene las velas (candlesticks) para un símbolo
-  Future<List<Map<String, dynamic>>?> getKlines(
-    String symbol, 
-    String interval, 
-    {int limit = 500}
-  ) async {
+  Future<List<Map<String, dynamic>>?> getKlines(String symbol, String interval,
+      {int limit = 500}) async {
     try {
-      final url = '${_getBaseUrl()}$_binanceSpotUrl/klines?symbol=${symbol.toUpperCase()}&interval=$interval&limit=$limit';
+      final url =
+          '${_getBaseUrl()}$_binanceSpotUrl/klines?symbol=${symbol.toUpperCase()}&interval=$interval&limit=$limit';
       final response = await http.get(Uri.parse(url));
-      
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        return data.map((kline) => {
-          'openTime': kline[0],
-          'open': double.parse(kline[1]),
-          'high': double.parse(kline[2]),
-          'low': double.parse(kline[3]),
-          'close': double.parse(kline[4]),
-          'volume': double.parse(kline[5]),
-          'closeTime': kline[6],
-        }).toList();
+        return data
+            .map((kline) => {
+                  'openTime': kline[0],
+                  'open': double.parse(kline[1]),
+                  'high': double.parse(kline[2]),
+                  'low': double.parse(kline[3]),
+                  'close': double.parse(kline[4]),
+                  'volume': double.parse(kline[5]),
+                  'closeTime': kline[6],
+                })
+            .toList();
       } else {
-        _logger.error('Error getting klines for $symbol: ${response.statusCode}');
+        _logger
+            .error('Error getting klines for $symbol: ${response.statusCode}');
         return null;
       }
     } catch (e) {
@@ -100,13 +104,14 @@ class ApiManager {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final queryString = 'timestamp=$timestamp';
       final signature = _generateSignature(queryString);
-      
-      final url = '${_getBaseUrl()}$_binanceSpotUrl/account?$queryString&signature=$signature';
+
+      final url =
+          '${_getBaseUrl()}$_binanceSpotUrl/account?$queryString&signature=$signature';
       final response = await http.get(
         Uri.parse(url),
         headers: {'X-MBX-APIKEY': _apiKey!},
       );
-      
+
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
@@ -148,12 +153,11 @@ class ApiManager {
         params['timeInForce'] = timeInForce!;
       }
 
-      final queryString = params.entries
-          .map((e) => '${e.key}=${e.value}')
-          .join('&');
-      
+      final queryString =
+          params.entries.map((e) => '${e.key}=${e.value}').join('&');
+
       final signature = _generateSignature(queryString);
-      
+
       final url = '${_getBaseUrl()}$_binanceSpotUrl/order';
       final response = await http.post(
         Uri.parse(url),
@@ -163,12 +167,13 @@ class ApiManager {
         },
         body: '$queryString&signature=$signature',
       );
-      
+
       if (response.statusCode == 200) {
         _logger.info('Order placed successfully: ${response.body}');
         return json.decode(response.body);
       } else {
-        _logger.error('Error placing order: ${response.statusCode} - ${response.body}');
+        _logger.error(
+            'Error placing order: ${response.statusCode} - ${response.body}');
         return null;
       }
     } catch (e) {
@@ -188,9 +193,7 @@ class ApiManager {
 
   /// Obtiene la URL base según si es testnet o no
   String _getBaseUrl() {
-    return _isTestnet 
-        ? 'https://testnet.binance.vision'
-        : _binanceBaseUrl;
+    return _isTestnet ? 'https://testnet.binance.vision' : _binanceBaseUrl;
   }
 
   /// Obtiene todos los símbolos disponibles
@@ -198,7 +201,7 @@ class ApiManager {
     try {
       final url = '${_getBaseUrl()}$_binanceSpotUrl/exchangeInfo';
       final response = await http.get(Uri.parse(url));
-      
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         return List<Map<String, dynamic>>.from(data['symbols']);
@@ -215,13 +218,15 @@ class ApiManager {
   /// Obtiene las estadísticas de 24h para un símbolo
   Future<Map<String, dynamic>?> get24hrStats(String symbol) async {
     try {
-      final url = '${_getBaseUrl()}$_binanceSpotUrl/ticker/24hr?symbol=${symbol.toUpperCase()}';
+      final url =
+          '${_getBaseUrl()}$_binanceSpotUrl/ticker/24hr?symbol=${symbol.toUpperCase()}';
       final response = await http.get(Uri.parse(url));
-      
+
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        _logger.error('Error getting 24hr stats for $symbol: ${response.statusCode}');
+        _logger.error(
+            'Error getting 24hr stats for $symbol: ${response.statusCode}');
         return null;
       }
     } catch (e) {

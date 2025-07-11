@@ -44,12 +44,14 @@ class User {
       email: json['email'] ?? '',
       displayName: json['displayName'],
       subscriptionTier: json['subscriptionTier'] ?? 'free',
-      subscriptionExpiry: json['subscriptionExpiry'] != null 
+      subscriptionExpiry: json['subscriptionExpiry'] != null
           ? DateTime.parse(json['subscriptionExpiry'])
           : null,
       preferences: Map<String, dynamic>.from(json['preferences'] ?? {}),
-      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
-      lastLoginAt: DateTime.parse(json['lastLoginAt'] ?? DateTime.now().toIso8601String()),
+      createdAt:
+          DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
+      lastLoginAt: DateTime.parse(
+          json['lastLoginAt'] ?? DateTime.now().toIso8601String()),
       isEmailVerified: json['isEmailVerified'] ?? false,
     );
   }
@@ -118,7 +120,7 @@ class User {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    
+
     return other is User && other.id == id;
   }
 

@@ -10,7 +10,7 @@ class BinanceService {
   static const String _baseUrl = 'https://api.binance.com';
   static const FlutterSecureStorage _storage = FlutterSecureStorage();
   static final AppLogger _logger = AppLogger();
-  
+
   String? _apiKey;
   String? _secretKey;
   bool _isAuthenticated = false;
@@ -21,7 +21,7 @@ class BinanceService {
       _apiKey = await _storage.read(key: StorageKeys.binanceApiKey);
       _secretKey = await _storage.read(key: StorageKeys.binanceSecretKey);
       _isAuthenticated = _apiKey != null && _secretKey != null;
-      
+
       if (_isAuthenticated) {
         _logger.info('Binance service initialized with credentials');
       } else {
@@ -51,7 +51,8 @@ class BinanceService {
   Future<double> getCurrentPrice(String symbol) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/api/v3/ticker/price?symbol=${symbol.toUpperCase()}'),
+        Uri.parse(
+            '$_baseUrl/api/v3/ticker/price?symbol=${symbol.toUpperCase()}'),
       );
 
       if (response.statusCode == 200) {
@@ -70,7 +71,8 @@ class BinanceService {
   Future<Map<String, dynamic>> get24hStats(String symbol) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/api/v3/ticker/24hr?symbol=${symbol.toUpperCase()}'),
+        Uri.parse(
+            '$_baseUrl/api/v3/ticker/24hr?symbol=${symbol.toUpperCase()}'),
       );
 
       if (response.statusCode == 200) {
@@ -85,29 +87,30 @@ class BinanceService {
   }
 
   // Get candlestick data
-  Future<List<Candle>> getCandlestickData(
-    String symbol, 
-    String interval, 
-    {int limit = 100}
-  ) async {
+  Future<List<Candle>> getCandlestickData(String symbol, String interval,
+      {int limit = 100}) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/api/v3/klines?symbol=${symbol.toUpperCase()}&interval=$interval&limit=$limit'),
+        Uri.parse(
+            '$_baseUrl/api/v3/klines?symbol=${symbol.toUpperCase()}&interval=$interval&limit=$limit'),
       );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        return data.map((item) => Candle(
-          openTime: DateTime.fromMillisecondsSinceEpoch(item[0]),
-          open: double.parse(item[1]),
-          high: double.parse(item[2]),
-          low: double.parse(item[3]),
-          close: double.parse(item[4]),
-          volume: double.parse(item[5]),
-          closeTime: DateTime.fromMillisecondsSinceEpoch(item[6]),
-        )).toList();
+        return data
+            .map((item) => Candle(
+                  openTime: DateTime.fromMillisecondsSinceEpoch(item[0]),
+                  open: double.parse(item[1]),
+                  high: double.parse(item[2]),
+                  low: double.parse(item[3]),
+                  close: double.parse(item[4]),
+                  volume: double.parse(item[5]),
+                  closeTime: DateTime.fromMillisecondsSinceEpoch(item[6]),
+                ))
+            .toList();
       } else {
-        throw Exception('Failed to get candlestick data: ${response.statusCode}');
+        throw Exception(
+            'Failed to get candlestick data: ${response.statusCode}');
       }
     } catch (e) {
       _logger.error('Failed to get candlestick data for $symbol: $e');
@@ -125,7 +128,7 @@ class BinanceService {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final queryString = 'timestamp=$timestamp';
       final signature = _generateSignature(queryString);
-      
+
       final response = await http.get(
         Uri.parse('$_baseUrl/api/v3/account?$queryString&signature=$signature'),
         headers: {
@@ -159,7 +162,8 @@ class BinanceService {
             .toList();
         return symbols;
       } else {
-        throw Exception('Failed to get trading symbols: ${response.statusCode}');
+        throw Exception(
+            'Failed to get trading symbols: ${response.statusCode}');
       }
     } catch (e) {
       _logger.error('Failed to get trading symbols: $e');
@@ -181,16 +185,18 @@ class BinanceService {
 
     try {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      var queryString = 'symbol=${symbol.toUpperCase()}&side=$side&type=$type&quantity=$quantity&timestamp=$timestamp';
-      
+      var queryString =
+          'symbol=${symbol.toUpperCase()}&side=$side&type=$type&quantity=$quantity&timestamp=$timestamp';
+
       if (price != null && type == 'LIMIT') {
         queryString += '&price=$price&timeInForce=GTC';
       }
-      
+
       final signature = _generateSignature(queryString);
-      
+
       final response = await http.post(
-        Uri.parse('$_baseUrl/api/v3/order/test?$queryString&signature=$signature'),
+        Uri.parse(
+            '$_baseUrl/api/v3/order/test?$queryString&signature=$signature'),
         headers: {
           'X-MBX-APIKEY': _apiKey!,
         },
@@ -217,13 +223,15 @@ class BinanceService {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        data.sort((a, b) => double.parse(b['quoteVolume']).compareTo(double.parse(a['quoteVolume'])));
+        data.sort((a, b) => double.parse(b['quoteVolume'])
+            .compareTo(double.parse(a['quoteVolume'])));
         return data
             .take(limit)
             .map<String>((item) => item['symbol'] as String)
             .toList();
       } else {
-        throw Exception('Failed to get top trading pairs: ${response.statusCode}');
+        throw Exception(
+            'Failed to get top trading pairs: ${response.statusCode}');
       }
     } catch (e) {
       _logger.error('Failed to get top trading pairs: $e');

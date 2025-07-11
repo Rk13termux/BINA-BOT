@@ -37,7 +37,8 @@ class NewsArticle {
       title: json['title'] ?? '',
       url: json['url'] ?? '',
       source: json['source'] ?? '',
-      publishedAt: DateTime.parse(json['publishedAt'] ?? DateTime.now().toIso8601String()),
+      publishedAt: DateTime.parse(
+          json['publishedAt'] ?? DateTime.now().toIso8601String()),
       summary: json['summary'] ?? '',
       imageUrl: json['imageUrl'],
       tags: List<String>.from(json['tags'] ?? []),
@@ -73,7 +74,7 @@ class NewsArticle {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    
+
     return other is NewsArticle &&
         other.title == title &&
         other.url == url &&

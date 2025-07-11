@@ -68,7 +68,7 @@ class TradingController extends ChangeNotifier {
     try {
       _selectedSymbol = symbol;
       notifyListeners();
-      
+
       await _loadInitialData();
       _logger.info('Selected symbol changed to: $symbol');
     } catch (e) {
@@ -83,7 +83,7 @@ class TradingController extends ChangeNotifier {
     try {
       _selectedInterval = interval;
       notifyListeners();
-      
+
       await _updateCandleData();
       _logger.info('Selected interval changed to: $interval');
     } catch (e) {
@@ -135,7 +135,7 @@ class TradingController extends ChangeNotifier {
   }) async {
     try {
       _setLoading(true);
-      
+
       // For now, use test order
       final result = await _binanceService.placeTestOrder(
         symbol: _selectedSymbol,
@@ -167,7 +167,8 @@ class TradingController extends ChangeNotifier {
           Signal(
             id: trade.id,
             symbol: _selectedSymbol,
-            type: side.toLowerCase() == 'buy' ? SignalType.buy : SignalType.sell,
+            type:
+                side.toLowerCase() == 'buy' ? SignalType.buy : SignalType.sell,
             price: _currentPrice,
             confidence: ConfidenceLevel.high,
             reason: 'Manual $side order executed',
@@ -198,7 +199,7 @@ class TradingController extends ChangeNotifier {
   }) async {
     try {
       _setLoading(true);
-      
+
       // For now, use test order
       final result = await _binanceService.placeTestOrder(
         symbol: _selectedSymbol,
@@ -224,7 +225,8 @@ class TradingController extends ChangeNotifier {
         _tradeHistory.insert(0, trade);
         notifyListeners();
 
-        _logger.info('Limit order placed: $side $quantity $_selectedSymbol at \$${price.toStringAsFixed(2)}');
+        _logger.info(
+            'Limit order placed: $side $quantity $_selectedSymbol at \$${price.toStringAsFixed(2)}');
         return true;
       }
 
@@ -240,12 +242,12 @@ class TradingController extends ChangeNotifier {
   /// Add a trading signal
   void addSignal(Signal signal) {
     _activeSignals.insert(0, signal);
-    
+
     // Keep only recent signals (last 50)
     if (_activeSignals.length > 50) {
       _activeSignals = _activeSignals.take(50).toList();
     }
-    
+
     notifyListeners();
     _logger.info('Signal added: ${signal.type.name} for ${signal.symbol}');
   }
@@ -275,9 +277,11 @@ class TradingController extends ChangeNotifier {
     }
 
     final totalTrades = _tradeHistory.length;
-    final buyTrades = _tradeHistory.where((t) => t.side == OrderSide.buy).length;
-    final sellTrades = _tradeHistory.where((t) => t.side == OrderSide.sell).length;
-    
+    final buyTrades =
+        _tradeHistory.where((t) => t.side == OrderSide.buy).length;
+    final sellTrades =
+        _tradeHistory.where((t) => t.side == OrderSide.sell).length;
+
     final totalVolume = _tradeHistory.fold<double>(
       0.0,
       (sum, trade) => sum + (trade.quantity * (trade.price ?? 0.0)),
@@ -289,9 +293,8 @@ class TradingController extends ChangeNotifier {
       'sellTrades': sellTrades,
       'totalVolume': totalVolume,
       'avgTradeSize': totalVolume / totalTrades,
-      'lastTradeTime': _tradeHistory.isNotEmpty 
-          ? _tradeHistory.first.createdAt 
-          : null,
+      'lastTradeTime':
+          _tradeHistory.isNotEmpty ? _tradeHistory.first.createdAt : null,
     };
   }
 
@@ -331,7 +334,7 @@ class TradingController extends ChangeNotifier {
     final sum = _candleData
         .take(period)
         .fold<double>(0, (sum, candle) => sum + candle.close);
-    
+
     return sum / period;
   }
 

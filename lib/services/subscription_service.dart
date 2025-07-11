@@ -8,13 +8,13 @@ import '../utils/constants.dart';
 class SubscriptionService extends ChangeNotifier {
   final InAppPurchase _inAppPurchase = InAppPurchase.instance;
   final AppLogger _logger = AppLogger();
-  
+
   // Subscription product IDs (these should match your Play Store/App Store IDs)
   static const String premiumMonthlyId = 'invictus_premium_monthly';
   static const String premiumYearlyId = 'invictus_premium_yearly';
   static const String proMonthlyId = 'invictus_pro_monthly';
   static const String proYearlyId = 'invictus_pro_yearly';
-  
+
   static const Set<String> _kProductIds = {
     premiumMonthlyId,
     premiumYearlyId,
@@ -46,17 +46,17 @@ class SubscriptionService extends ChangeNotifier {
   Future<void> initialize() async {
     try {
       _loading = true;
-      
+
       // Initialize In-App Purchase
       _isAvailable = await _inAppPurchase.isAvailable();
       if (_isAvailable) {
         await _loadProducts();
         await _loadPurchases();
       }
-      
+
       // Initialize AdMob
       await _initializeAdMob();
-      
+
       _loading = false;
       _logger.info('Subscription service initialized successfully');
     } catch (e) {
@@ -68,12 +68,13 @@ class SubscriptionService extends ChangeNotifier {
   // Load available products
   Future<void> _loadProducts() async {
     try {
-      final ProductDetailsResponse response = await _inAppPurchase.queryProductDetails(_kProductIds);
-      
+      final ProductDetailsResponse response =
+          await _inAppPurchase.queryProductDetails(_kProductIds);
+
       if (response.notFoundIDs.isNotEmpty) {
         _logger.warning('Products not found: ${response.notFoundIDs}');
       }
-      
+
       _products = response.productDetails;
       _logger.info('Loaded ${_products.length} products');
     } catch (e) {
@@ -101,12 +102,11 @@ class SubscriptionService extends ChangeNotifier {
         return false;
       }
 
-      final ProductDetails? productDetails = _products
-          .cast<ProductDetails?>()
-          .firstWhere(
-            (product) => product?.id == productId,
-            orElse: () => null,
-          );
+      final ProductDetails? productDetails =
+          _products.cast<ProductDetails?>().firstWhere(
+                (product) => product?.id == productId,
+                orElse: () => null,
+              );
 
       if (productDetails == null) {
         _logger.error('Product not found: $productId');
@@ -132,6 +132,18 @@ class SubscriptionService extends ChangeNotifier {
     }
   }
 
+  // Purchase premium subscription (convenience method)
+  Future<bool> purchasePremium({bool yearly = false}) async {
+    final productId = yearly ? premiumYearlyId : premiumMonthlyId;
+    return await purchaseSubscription(productId);
+  }
+
+  // Purchase pro subscription (convenience method)
+  Future<bool> purchasePro({bool yearly = false}) async {
+    final productId = yearly ? proYearlyId : proMonthlyId;
+    return await purchaseSubscription(productId);
+  }
+
   // Restore purchases
   Future<void> restorePurchases() async {
     try {
@@ -149,11 +161,11 @@ class SubscriptionService extends ChangeNotifier {
       if (purchase.status == PurchaseStatus.purchased) {
         switch (tier) {
           case 'premium':
-            return purchase.productID == premiumMonthlyId || 
-                   purchase.productID == premiumYearlyId;
+            return purchase.productID == premiumMonthlyId ||
+                purchase.productID == premiumYearlyId;
           case 'pro':
-            return purchase.productID == proMonthlyId || 
-                   purchase.productID == proYearlyId;
+            return purchase.productID == proMonthlyId ||
+                purchase.productID == proYearlyId;
         }
       }
     }
@@ -166,27 +178,26 @@ class SubscriptionService extends ChangeNotifier {
       if (purchase.status == PurchaseStatus.purchased) {
         bool isCorrectTier = false;
         bool isYearly = false;
-        
+
         switch (tier) {
           case 'premium':
-            isCorrectTier = purchase.productID == premiumMonthlyId || 
-                           purchase.productID == premiumYearlyId;
+            isCorrectTier = purchase.productID == premiumMonthlyId ||
+                purchase.productID == premiumYearlyId;
             isYearly = purchase.productID == premiumYearlyId;
             break;
           case 'pro':
-            isCorrectTier = purchase.productID == proMonthlyId || 
-                           purchase.productID == proYearlyId;
+            isCorrectTier = purchase.productID == proMonthlyId ||
+                purchase.productID == proYearlyId;
             isYearly = purchase.productID == proYearlyId;
             break;
         }
-        
+
         if (isCorrectTier) {
           // In a real app, you'd get this from receipt verification
           final purchaseDate = DateTime.fromMillisecondsSinceEpoch(
-            int.tryParse(purchase.transactionDate ?? '0') ?? 0
-          );
-          
-          return isYearly 
+              int.tryParse(purchase.transactionDate ?? '0') ?? 0);
+
+          return isYearly
               ? purchaseDate.add(const Duration(days: 365))
               : purchaseDate.add(const Duration(days: 30));
         }
@@ -202,7 +213,7 @@ class SubscriptionService extends ChangeNotifier {
       await _loadBannerAd();
       await _loadInterstitialAd();
       await _loadRewardedAd();
-      
+
       _logger.info('AdMob initialized successfully');
     } catch (e) {
       _logger.error('Failed to initialize AdMob: $e');
@@ -243,7 +254,7 @@ class SubscriptionService extends ChangeNotifier {
           _interstitialAd = ad;
           _isInterstitialAdReady = true;
           _logger.info('Interstitial ad loaded');
-          
+
           _interstitialAd!.setImmersiveMode(true);
         },
         onAdFailedToLoad: (LoadAdError error) {
@@ -287,13 +298,14 @@ class SubscriptionService extends ChangeNotifier {
           _loadInterstitialAd();
         },
       );
-      
+
       _interstitialAd!.show();
       _isInterstitialAdReady = false;
     }
   }
 
-  void showRewardedAd({required Function(AdWithoutView, RewardItem) onRewarded}) {
+  void showRewardedAd(
+      {required Function(AdWithoutView, RewardItem) onRewarded}) {
     if (_isRewardedAdReady && _rewardedAd != null) {
       _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
         onAdDismissedFullScreenContent: (RewardedAd ad) {
@@ -306,7 +318,7 @@ class SubscriptionService extends ChangeNotifier {
           _loadRewardedAd();
         },
       );
-      
+
       _rewardedAd!.show(onUserEarnedReward: onRewarded);
       _isRewardedAdReady = false;
     }

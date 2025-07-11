@@ -10,7 +10,8 @@ class ScrapingService {
   static final AppLogger _logger = AppLogger();
   static const Map<String, String> _headers = {
     'User-Agent': AppConstants.userAgent,
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Accept':
+        'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
     'Accept-Language': 'en-US,en;q=0.5',
     'Accept-Encoding': 'gzip, deflate',
     'Connection': 'keep-alive',
@@ -46,15 +47,17 @@ class ScrapingService {
   };
 
   /// Scrape news from all configured sources
-  Future<List<NewsArticle>> scrapeAllNews({int maxArticlesPerSource = 5}) async {
+  Future<List<NewsArticle>> scrapeAllNews(
+      {int maxArticlesPerSource = 5}) async {
     final List<NewsArticle> allNews = [];
-    
+
     for (final source in _newsSources.keys) {
       try {
-        final articles = await scrapeNewsFromSource(source, limit: maxArticlesPerSource);
+        final articles =
+            await scrapeNewsFromSource(source, limit: maxArticlesPerSource);
         allNews.addAll(articles);
         _logger.info('Scraped ${articles.length} articles from $source');
-        
+
         // Add delay between requests to be respectful
         await Future.delayed(const Duration(seconds: 2));
       } catch (e) {
@@ -64,23 +67,26 @@ class ScrapingService {
 
     // Sort by publish date (newest first)
     allNews.sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
-    
+
     _logger.info('Total scraped articles: ${allNews.length}');
     return allNews;
   }
 
   /// Scrape news from a specific source
-  Future<List<NewsArticle>> scrapeNewsFromSource(String source, {int limit = 10}) async {
+  Future<List<NewsArticle>> scrapeNewsFromSource(String source,
+      {int limit = 10}) async {
     final sourceConfig = _newsSources[source];
     if (sourceConfig == null) {
       throw Exception('Unknown news source: $source');
     }
 
     try {
-      final response = await http.get(
-        Uri.parse(sourceConfig['url']!),
-        headers: _headers,
-      ).timeout(const Duration(seconds: 30));
+      final response = await http
+          .get(
+            Uri.parse(sourceConfig['url']!),
+            headers: _headers,
+          )
+          .timeout(const Duration(seconds: 30));
 
       if (response.statusCode != 200) {
         throw Exception('HTTP ${response.statusCode} for $source');
@@ -90,12 +96,17 @@ class ScrapingService {
       final articles = <NewsArticle>[];
 
       // Extract articles based on selectors
-      final titleElements = document.querySelectorAll(sourceConfig['titleSelector']!);
-      final linkElements = document.querySelectorAll(sourceConfig['linkSelector']!);
-      final excerptElements = document.querySelectorAll(sourceConfig['excerptSelector']!);
-      final timeElements = document.querySelectorAll(sourceConfig['timeSelector']!);
+      final titleElements =
+          document.querySelectorAll(sourceConfig['titleSelector']!);
+      final linkElements =
+          document.querySelectorAll(sourceConfig['linkSelector']!);
+      final excerptElements =
+          document.querySelectorAll(sourceConfig['excerptSelector']!);
+      final timeElements =
+          document.querySelectorAll(sourceConfig['timeSelector']!);
 
-      final maxElements = [titleElements.length, linkElements.length].reduce((a, b) => a < b ? a : b);
+      final maxElements = [titleElements.length, linkElements.length]
+          .reduce((a, b) => a < b ? a : b);
       final articlesCount = maxElements > limit ? limit : maxElements;
 
       for (int i = 0; i < articlesCount; i++) {
@@ -134,12 +145,13 @@ class ScrapingService {
   }
 
   /// Extract and normalize link from DOM elements
-  String _extractLink(List<html_dom.Element> elements, int index, String baseUrl) {
+  String _extractLink(
+      List<html_dom.Element> elements, int index, String baseUrl) {
     if (index >= elements.length) return '';
-    
+
     final href = elements[index].attributes['href'] ?? '';
     if (href.isEmpty) return '';
-    
+
     // Handle relative URLs
     if (href.startsWith('/')) {
       return '$baseUrl$href';
@@ -153,12 +165,12 @@ class ScrapingService {
   /// Extract and parse date from DOM elements
   DateTime _extractDate(List<html_dom.Element> elements, int index) {
     if (index >= elements.length) return DateTime.now();
-    
+
     final element = elements[index];
-    final dateStr = element.attributes['datetime'] ?? 
-                   element.attributes['content'] ?? 
-                   element.text.trim();
-    
+    final dateStr = element.attributes['datetime'] ??
+        element.attributes['content'] ??
+        element.text.trim();
+
     try {
       // Try to parse ISO format first
       return DateTime.parse(dateStr);
@@ -167,9 +179,10 @@ class ScrapingService {
       final patterns = [
         RegExp(r'(\d{4})-(\d{2})-(\d{2})'),
         RegExp(r'(\d{2})/(\d{2})/(\d{4})'),
-        RegExp(r'(\d{1,2})\s+(hours?|minutes?|days?)\s+ago', caseSensitive: false),
+        RegExp(r'(\d{1,2})\s+(hours?|minutes?|days?)\s+ago',
+            caseSensitive: false),
       ];
-      
+
       for (final pattern in patterns) {
         final match = pattern.firstMatch(dateStr);
         if (match != null) {
@@ -178,7 +191,7 @@ class ScrapingService {
               // Handle relative time (e.g., "2 hours ago")
               final value = int.parse(match.group(1)!);
               final unit = match.group(2)!.toLowerCase();
-              
+
               if (unit.startsWith('hour')) {
                 return DateTime.now().subtract(Duration(hours: value));
               } else if (unit.startsWith('minute')) {
@@ -206,7 +219,7 @@ class ScrapingService {
           }
         }
       }
-      
+
       // Default to current time if parsing fails
       return DateTime.now();
     }
@@ -215,41 +228,50 @@ class ScrapingService {
   /// Search for specific cryptocurrency news
   Future<List<NewsArticle>> searchCryptoNews(String cryptocurrency) async {
     final List<NewsArticle> results = [];
-    
+
     // Enhanced search URLs for specific cryptocurrencies
     final searchSources = <String, String>{
-      'coindesk': 'https://www.coindesk.com/tag/${cryptocurrency.toLowerCase()}/',
-      'cointelegraph': 'https://cointelegraph.com/tags/${cryptocurrency.toLowerCase()}',
-      'cryptonews': 'https://cryptonews.com/news/?q=${cryptocurrency.toLowerCase()}',
+      'coindesk':
+          'https://www.coindesk.com/tag/${cryptocurrency.toLowerCase()}/',
+      'cointelegraph':
+          'https://cointelegraph.com/tags/${cryptocurrency.toLowerCase()}',
+      'cryptonews':
+          'https://cryptonews.com/news/?q=${cryptocurrency.toLowerCase()}',
     };
 
     for (final entry in searchSources.entries) {
       try {
         final source = entry.key;
         final url = entry.value;
-        
+
         final sourceConfig = Map<String, String>.from(_newsSources[source]!);
         sourceConfig['url'] = url;
-        
-        final response = await http.get(
-          Uri.parse(url),
-          headers: _headers,
-        ).timeout(const Duration(seconds: 30));
+
+        final response = await http
+            .get(
+              Uri.parse(url),
+              headers: _headers,
+            )
+            .timeout(const Duration(seconds: 30));
 
         if (response.statusCode == 200) {
           final document = html_parser.parse(response.body);
           final articles = <NewsArticle>[];
 
-          final titleElements = document.querySelectorAll(sourceConfig['titleSelector']!);
-          final linkElements = document.querySelectorAll(sourceConfig['linkSelector']!);
+          final titleElements =
+              document.querySelectorAll(sourceConfig['titleSelector']!);
+          final linkElements =
+              document.querySelectorAll(sourceConfig['linkSelector']!);
 
-          final maxElements = [titleElements.length, linkElements.length].reduce((a, b) => a < b ? a : b);
+          final maxElements = [titleElements.length, linkElements.length]
+              .reduce((a, b) => a < b ? a : b);
           final articlesCount = maxElements > 5 ? 5 : maxElements;
 
           for (int i = 0; i < articlesCount; i++) {
             try {
               final title = _extractText(titleElements, i);
-              final link = _extractLink(linkElements, i, sourceConfig['baseUrl']!);
+              final link =
+                  _extractLink(linkElements, i, sourceConfig['baseUrl']!);
 
               if (title.isNotEmpty && link.isNotEmpty) {
                 articles.add(NewsArticle(
@@ -262,17 +284,19 @@ class ScrapingService {
                 ));
               }
             } catch (e) {
-              _logger.debug('Failed to parse search result $i from $source: $e');
+              _logger
+                  .debug('Failed to parse search result $i from $source: $e');
             }
           }
 
           results.addAll(articles);
         }
-        
+
         // Delay between requests
         await Future.delayed(const Duration(seconds: 1));
       } catch (e) {
-        _logger.error('Failed to search $cryptocurrency news from ${entry.key}: $e');
+        _logger.error(
+            'Failed to search $cryptocurrency news from ${entry.key}: $e');
       }
     }
 
@@ -306,11 +330,13 @@ class ScrapingService {
   /// Validate if a URL is accessible
   Future<bool> validateNewsSource(String url) async {
     try {
-      final response = await http.head(
-        Uri.parse(url),
-        headers: _headers,
-      ).timeout(const Duration(seconds: 10));
-      
+      final response = await http
+          .head(
+            Uri.parse(url),
+            headers: _headers,
+          )
+          .timeout(const Duration(seconds: 10));
+
       return response.statusCode == 200;
     } catch (e) {
       _logger.error('Failed to validate news source $url: $e');

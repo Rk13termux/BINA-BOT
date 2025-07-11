@@ -101,8 +101,10 @@ class Trade {
         (e) => e.name == json['status'],
         orElse: () => TradeStatus.pending,
       ),
-      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
-      filledAt: json['filledAt'] != null ? DateTime.parse(json['filledAt']) : null,
+      createdAt:
+          DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
+      filledAt:
+          json['filledAt'] != null ? DateTime.parse(json['filledAt']) : null,
       filledPrice: (json['filledPrice'] as num?)?.toDouble(),
       filledQuantity: (json['filledQuantity'] as num?)?.toDouble(),
       commission: (json['commission'] as num?)?.toDouble(),
@@ -116,26 +118,31 @@ class Trade {
     return Trade(
       id: order['orderId'].toString(),
       symbol: order['symbol'] ?? '',
-      side: order['side']?.toString().toLowerCase() == 'buy' 
-          ? OrderSide.buy 
+      side: order['side']?.toString().toLowerCase() == 'buy'
+          ? OrderSide.buy
           : OrderSide.sell,
       type: _parseOrderType(order['type']?.toString()),
       quantity: double.parse(order['origQty']?.toString() ?? '0'),
-      price: order['price'] != null ? double.parse(order['price'].toString()) : null,
-      stopPrice: order['stopPrice'] != null ? double.parse(order['stopPrice'].toString()) : null,
+      price: order['price'] != null
+          ? double.parse(order['price'].toString())
+          : null,
+      stopPrice: order['stopPrice'] != null
+          ? double.parse(order['stopPrice'].toString())
+          : null,
       status: _parseTradeStatus(order['status']?.toString()),
       createdAt: DateTime.fromMillisecondsSinceEpoch(
-        int.parse(order['time']?.toString() ?? '0')
-      ),
-      filledAt: order['updateTime'] != null 
-          ? DateTime.fromMillisecondsSinceEpoch(int.parse(order['updateTime'].toString()))
+          int.parse(order['time']?.toString() ?? '0')),
+      filledAt: order['updateTime'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              int.parse(order['updateTime'].toString()))
           : null,
-      filledPrice: order['cummulativeQuoteQty'] != null && order['executedQty'] != null
-          ? double.parse(order['cummulativeQuoteQty'].toString()) / 
-            double.parse(order['executedQty'].toString())
-          : null,
-      filledQuantity: order['executedQty'] != null 
-          ? double.parse(order['executedQty'].toString()) 
+      filledPrice:
+          order['cummulativeQuoteQty'] != null && order['executedQty'] != null
+              ? double.parse(order['cummulativeQuoteQty'].toString()) /
+                  double.parse(order['executedQty'].toString())
+              : null,
+      filledQuantity: order['executedQty'] != null
+          ? double.parse(order['executedQty'].toString())
           : null,
       commission: 0.0, // Se calculará por separado
       commissionAsset: null,
@@ -186,7 +193,8 @@ class Trade {
   bool get isCompleted => status == TradeStatus.filled;
 
   /// Verifica si la orden está activa
-  bool get isActive => status == TradeStatus.pending || status == TradeStatus.partiallyFilled;
+  bool get isActive =>
+      status == TradeStatus.pending || status == TradeStatus.partiallyFilled;
 
   /// Calcula el valor total de la orden
   double? get totalValue {
@@ -279,7 +287,7 @@ class Trade {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    
+
     return other is Trade && other.id == id;
   }
 

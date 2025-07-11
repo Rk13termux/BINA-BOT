@@ -1,23 +1,227 @@
-# BINA-BOT
+# Invictus Trader Pro
 
-![BINA-BOT Logo](https://via.placeholder.com/150x150/FFD700/1A1A1A?text=BINA-BOT)
+A professional Flutter trading application for cryptocurrency trading with Binance integration, real-time analysis, and advanced features.
 
-[![Build Status](https://github.com/Rk13termux/BINA-BOT/actions/workflows/build.yml/badge.svg)](https://github.com/Rk13termux/BINA-BOT/actions/workflows/build.yml)
-[![Test Status](https://github.com/Rk13termux/BINA-BOT/actions/workflows/test.yml/badge.svg)](https://github.com/Rk13termux/BINA-BOT/actions/workflows/test.yml)
-[![Release](https://github.com/Rk13termux/BINA-BOT/actions/workflows/release.yml/badge.svg)](https://github.com/Rk13termux/BINA-BOT/releases)
+![Flutter](https://img.shields.io/badge/Flutter-3.27.1-blue.svg)
+![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20Web%20%7C%20Desktop-brightgreen.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-**Professional Cryptocurrency Trading Platform** - Una aplicación completa de trading de criptomonedas con análisis en tiempo real, noticias automáticas, sistema de plugins y más.
+## 🚀 Features
 
-## 📱 Descargas Automáticas
+### Core Features
+- **Real-time Trading**: Live cryptocurrency market data via Binance WebSocket
+- **Professional Charts**: Advanced candlestick charts with technical indicators
+- **News Integration**: Real-time crypto news from multiple sources (CoinDesk, CoinTelegraph, etc.)
+- **Alert System**: Customizable price alerts and notifications
+- **Portfolio Tracking**: Track your investments and P&L analysis
+- **Plugin System**: Extensible architecture with custom trading strategies
 
-¡Las compilaciones se generan automáticamente! No necesitas compilar manualmente.
+### Advanced Features
+- **AI Analysis**: TensorFlow Lite integration for market analysis
+- **Multi-platform**: Android, iOS, Web, and Desktop support
+- **Secure Storage**: Encrypted API keys and sensitive data
+- **Monetization**: Free tier with ads, Premium tiers with advanced features
+- **Dark Theme**: Professional dark theme with gold accents
 
-### 🔄 Última Release
-[![Latest Release](https://img.shields.io/github/v/release/Rk13termux/BINA-BOT?style=for-the-badge&logo=github&color=gold)](https://github.com/Rk13termux/BINA-BOT/releases/latest)
+## 🏗️ Architecture
 
-### 📱 Android APK
-- **ARM64** (Recomendado para dispositivos modernos)
-- **ARMv7** (Dispositivos más antiguos) 
+This project follows **Clean Architecture** principles with:
+
+```
+lib/
+├── core/           # Core functionality (API, WebSocket, Storage)
+├── models/         # Data models and entities
+├── features/       # Feature-based modules
+│   ├── dashboard/  # Main dashboard
+│   ├── trading/    # Trading functionality
+│   ├── alerts/     # Alert system
+│   ├── news/       # News module
+│   ├── plugins/    # Plugin system
+│   └── settings/   # App settings
+├── services/       # Business logic and external integrations
+├── ui/            # UI components and theme
+└── utils/         # Utilities and helpers
+```
+
+## 🛠️ Getting Started
+
+### Prerequisites
+- Flutter 3.27.1 or higher
+- Dart SDK 3.7.0 or higher
+- Android Studio / VS Code
+- Git
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/invictustraderapk.git
+   cd invictustraderapk
+   ```
+
+2. **Install dependencies**
+   ```bash
+   flutter pub get
+   ```
+
+3. **Run the app**
+   ```bash
+   # Debug mode
+   flutter run
+   
+   # Release mode
+   flutter run --release
+   ```
+
+### Building for Different Platforms
+
+#### Android APK
+```bash
+# Debug APK
+flutter build apk --debug
+
+# Release APK
+flutter build apk --release
+```
+
+#### Windows Desktop
+```bash
+# Enable Windows desktop
+flutter config --enable-windows-desktop
+
+# Build Windows executable
+flutter build windows --release
+```
+
+#### Web
+```bash
+# Enable Web
+flutter config --enable-web
+
+# Build Web
+flutter build web --release
+```
+
+#### iOS (macOS only)
+```bash
+# Build iOS
+flutter build ios --release
+```
+
+## 🔧 Configuration
+
+### API Keys Setup
+
+1. Create a `.env` file in the root directory:
+   ```env
+   BINANCE_API_KEY=your_binance_api_key
+   BINANCE_SECRET_KEY=your_binance_secret_key
+   ADMOB_APP_ID_ANDROID=your_android_admob_app_id
+   ADMOB_APP_ID_IOS=your_ios_admob_app_id
+   ```
+
+2. Update `lib/utils/constants.dart` with your configuration
+
+### Firebase Setup (Optional)
+1. Add your `google-services.json` (Android) and `GoogleService-Info.plist` (iOS)
+2. Configure Firebase Console for your project
+
+## 🚀 GitHub Actions CI/CD
+
+This project includes automated building for multiple platforms:
+
+### Automatic Builds
+- **Android APK**: Debug and Release APKs
+- **Windows EXE**: Desktop executable with installer
+- **Web Build**: Deployable web version
+
+### Manual Release
+1. Push to `main` branch
+2. GitHub Actions will automatically:
+   - Build all platforms
+   - Run tests and analysis
+   - Create a release with downloadable assets
+
+### Manual Workflow Dispatch
+You can manually trigger builds from the GitHub Actions tab.
+
+## 📱 Supported Platforms
+
+| Platform | Status | Notes |
+|----------|--------|-------|
+| Android | ✅ Full Support | API Level 21+ |
+| iOS | ✅ Full Support | iOS 12+ |
+| Web | ✅ Full Support | Modern browsers |
+| Windows | ✅ Full Support | Windows 10+ |
+| macOS | ⚠️ Limited | Requires macOS for building |
+| Linux | ⚠️ Limited | Experimental support |
+
+## 🔐 Security Features
+
+- **Encrypted Storage**: All sensitive data encrypted with Flutter Secure Storage
+- **API Security**: Secure API key management
+- **Plugin Sandbox**: Safe plugin execution environment
+- **Input Validation**: Comprehensive input validation and sanitization
+
+## 🎯 Performance
+
+- **Real-time Updates**: Efficient WebSocket connections
+- **Memory Management**: Optimized for mobile devices
+- **Caching**: Smart caching for offline capability
+- **Lazy Loading**: Efficient resource loading
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+flutter test
+
+# Run tests with coverage
+flutter test --coverage
+
+# Run integration tests
+flutter drive --target=test_driver/app.dart
+```
+
+## � Dependencies
+
+### Key Dependencies
+- `provider`: State management
+- `hive`: Local database
+- `flutter_secure_storage`: Secure storage
+- `web_socket_channel`: WebSocket connections
+- `candlesticks`: Chart widgets
+- `google_mobile_ads`: Monetization
+- `in_app_purchase`: Subscription management
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+- **Issues**: [GitHub Issues](https://github.com/your-username/invictustraderapk/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/your-username/invictustraderapk/discussions)
+- **Documentation**: [Wiki](https://github.com/your-username/invictustraderapk/wiki)
+
+## 🏆 Acknowledgments
+
+- Flutter team for the amazing framework
+- Binance for the trading API
+- Contributors and testers
+- Open source community
+
+---
+
+**⚠️ Disclaimer**: This is a trading application. Trading cryptocurrencies involves risk. Use at your own discretion and never invest more than you can afford to lose. 
 - **x86_64** (Emuladores)
 
 ### 💻 Windows EXE

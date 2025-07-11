@@ -87,7 +87,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Consumer<AuthService>(
       builder: (context, auth, child) {
         final user = auth.currentUser;
-        
+
         return _buildSection(
           title: 'Account',
           icon: Icons.person,
@@ -108,18 +108,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 user.subscriptionTier.toUpperCase(),
                 Icons.star,
                 trailing: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: user.subscriptionTier == 'premium' 
-                        ? AppColors.goldPrimary 
+                    color: user.subscriptionTier == 'premium'
+                        ? AppColors.goldPrimary
                         : AppColors.info,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     user.subscriptionTier.toUpperCase(),
                     style: TextStyle(
-                      color: user.subscriptionTier == 'premium' 
-                          ? AppColors.primaryDark 
+                      color: user.subscriptionTier == 'premium'
+                          ? AppColors.primaryDark
                           : Colors.white,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
@@ -189,7 +190,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             labelText: 'API Key',
             labelStyle: TextStyle(color: AppColors.textSecondary),
             hintText: 'Enter your Binance API key',
-            hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.7)),
+            hintStyle:
+                TextStyle(color: AppColors.textSecondary.withOpacity(0.7)),
             prefixIcon: Icon(Icons.key, color: AppColors.goldPrimary),
             border: OutlineInputBorder(
               borderSide: BorderSide(color: AppColors.borderColor),
@@ -211,7 +213,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             labelText: 'Secret Key',
             labelStyle: TextStyle(color: AppColors.textSecondary),
             hintText: 'Enter your Binance secret key',
-            hintStyle: TextStyle(color: AppColors.textSecondary.withOpacity(0.7)),
+            hintStyle:
+                TextStyle(color: AppColors.textSecondary.withOpacity(0.7)),
             prefixIcon: Icon(Icons.security, color: AppColors.goldPrimary),
             border: OutlineInputBorder(
               borderSide: BorderSide(color: AppColors.borderColor),
@@ -578,10 +581,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         subtitle,
         style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
       ),
-      trailing: trailing ?? Icon(
-        Icons.chevron_right,
-        color: AppColors.textSecondary,
-      ),
+      trailing: trailing ??
+          Icon(
+            Icons.chevron_right,
+            color: AppColors.textSecondary,
+          ),
       onTap: onTap,
     );
   }
@@ -660,7 +664,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
+            child: Text('Cancel',
+                style: TextStyle(color: AppColors.textSecondary)),
           ),
           TextButton(
             onPressed: () {
@@ -696,7 +701,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
+            child: Text('Cancel',
+                style: TextStyle(color: AppColors.textSecondary)),
           ),
           TextButton(
             onPressed: () {
@@ -744,7 +750,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Later', style: TextStyle(color: AppColors.textSecondary)),
+            child:
+                Text('Later', style: TextStyle(color: AppColors.textSecondary)),
           ),
           ElevatedButton(
             onPressed: () {

@@ -84,7 +84,8 @@ class PortfolioWidget extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: AppColors.bullish,
                           borderRadius: BorderRadius.circular(4),
@@ -104,11 +105,14 @@ class PortfolioWidget extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            _buildHolding('BTC', 'Bitcoin', '0.2845', '\$8,542.30', '+12.5%', true),
+            _buildHolding(
+                'BTC', 'Bitcoin', '0.2845', '\$8,542.30', '+12.5%', true),
             const SizedBox(height: 8),
-            _buildHolding('ETH', 'Ethereum', '2.156', '\$3,245.67', '+8.2%', true),
+            _buildHolding(
+                'ETH', 'Ethereum', '2.156', '\$3,245.67', '+8.2%', true),
             const SizedBox(height: 8),
-            _buildHolding('BNB', 'Binance Coin', '5.89', '\$759.92', '-2.1%', false),
+            _buildHolding(
+                'BNB', 'Binance Coin', '5.89', '\$759.92', '-2.1%', false),
           ],
         ),
       ),

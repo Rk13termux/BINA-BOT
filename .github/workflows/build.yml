@@ -17,8 +17,8 @@ on:
         - release
 
 env:
-  FLUTTER_VERSION: "3.24.1"
-  JAVA_VERSION: "11"
+  FLUTTER_VERSION: "3.27.0"
+  JAVA_VERSION: "17"
 
 jobs:
   # Job para compilar APK Android
@@ -45,7 +45,10 @@ jobs:
     - name: 📦 Get Flutter dependencies
       run: flutter pub get
 
-    - name: 🔍 Verify Flutter installation
+    - name: � Run flutter pub get again (ensure dependencies)
+      run: flutter pub get
+
+    - name: �🔍 Verify Flutter installation
       run: flutter doctor -v
 
     - name: 🧹 Clean project

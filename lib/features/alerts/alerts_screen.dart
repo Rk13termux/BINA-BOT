@@ -29,7 +29,8 @@ class _AlertsScreenState extends State<AlertsScreen> {
         backgroundColor: AppColors.primaryDark,
         title: Text(
           'Alerts',
-          style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: AppColors.textPrimary, fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
@@ -72,7 +73,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
 
           final alerts = alertsController.alerts;
           final signals = alertsController.signals;
-          
+
           return Column(
             children: [
               // Subscription warning for free users
@@ -105,7 +106,9 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                 ),
                                 Text(
                                   'Upgrade to Premium for 25 alerts or Pro for unlimited',
-                                  style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                                  style: TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 12),
                                 ),
                               ],
                             ),
@@ -117,7 +120,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                   return const SizedBox.shrink();
                 },
               ),
-              
+
               // Tabs for alerts and signals
               DefaultTabController(
                 length: 2,
@@ -287,9 +290,11 @@ class _AlertsScreenState extends State<AlertsScreen> {
                       value: 'delete',
                       child: Row(
                         children: [
-                          Icon(Icons.delete, color: AppColors.bearish, size: 16),
+                          Icon(Icons.delete,
+                              color: AppColors.bearish, size: 16),
                           const SizedBox(width: 8),
-                          Text('Delete', style: TextStyle(color: AppColors.textPrimary)),
+                          Text('Delete',
+                              style: TextStyle(color: AppColors.textPrimary)),
                         ],
                       ),
                     ),
@@ -313,9 +318,12 @@ class _AlertsScreenState extends State<AlertsScreen> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: alert.isEnabled ? AppColors.bullish : AppColors.textSecondary,
+                    color: alert.isEnabled
+                        ? AppColors.bullish
+                        : AppColors.textSecondary,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
@@ -348,11 +356,13 @@ class _AlertsScreenState extends State<AlertsScreen> {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.check_circle, color: AppColors.goldPrimary, size: 16),
+                    Icon(Icons.check_circle,
+                        color: AppColors.goldPrimary, size: 16),
                     const SizedBox(width: 8),
                     Text(
                       'Triggered ${_formatTime(alert.triggeredAt!)}',
-                      style: TextStyle(color: AppColors.goldPrimary, fontSize: 12),
+                      style:
+                          TextStyle(color: AppColors.goldPrimary, fontSize: 12),
                     ),
                   ],
                 ),
@@ -392,7 +402,8 @@ class _AlertsScreenState extends State<AlertsScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: _getConfidenceColor(signal.confidence),
                     borderRadius: BorderRadius.circular(4),
@@ -439,7 +450,8 @@ class _AlertsScreenState extends State<AlertsScreen> {
                 spacing: 8,
                 children: signal.metadata.entries.map((entry) {
                   return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: AppColors.primaryDark,
                       borderRadius: BorderRadius.circular(4),
@@ -554,7 +566,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
   String _formatTime(DateTime time) {
     final now = DateTime.now();
     final difference = now.difference(time);
-    
+
     if (difference.inDays > 0) {
       return '${difference.inDays}d ago';
     } else if (difference.inHours > 0) {
@@ -571,7 +583,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
     AlertCondition selectedCondition = AlertCondition.priceAbove;
     String selectedSymbol = 'BTCUSDT';
     final descriptionController = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -603,19 +615,21 @@ class _AlertsScreenState extends State<AlertsScreen> {
                     borderSide: BorderSide(color: AppColors.textSecondary),
                   ),
                 ),
-                items: AlertCondition.values.map((condition) => DropdownMenuItem(
-                  value: condition,
-                  child: Text(_getConditionText(condition)),
-                )).toList(),
+                items: AlertCondition.values
+                    .map((condition) => DropdownMenuItem(
+                          value: condition,
+                          child: Text(_getConditionText(condition)),
+                        ))
+                    .toList(),
                 onChanged: (value) {
                   setState(() {
                     selectedCondition = value!;
                   });
                 },
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Symbol selector
               Text(
                 'Symbol',
@@ -640,19 +654,21 @@ class _AlertsScreenState extends State<AlertsScreen> {
                   'BNBUSDT',
                   'ADAUSDT',
                   'SOLUSDT',
-                ].map((symbol) => DropdownMenuItem(
-                  value: symbol,
-                  child: Text(symbol),
-                )).toList(),
+                ]
+                    .map((symbol) => DropdownMenuItem(
+                          value: symbol,
+                          child: Text(symbol),
+                        ))
+                    .toList(),
                 onChanged: (value) {
                   setState(() {
                     selectedSymbol = value!;
                   });
                 },
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Value input
               Text(
                 'Value',
@@ -677,9 +693,9 @@ class _AlertsScreenState extends State<AlertsScreen> {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Description input
               Text(
                 'Description (Optional)',
@@ -718,15 +734,15 @@ class _AlertsScreenState extends State<AlertsScreen> {
                 final value = double.tryParse(priceController.text);
                 if (value != null) {
                   context.read<AlertsController>().addPriceAlert(
-                    symbol: selectedSymbol,
-                    condition: selectedCondition,
-                    value: value,
-                    description: descriptionController.text.isEmpty 
-                        ? null 
-                        : descriptionController.text,
-                  );
+                        symbol: selectedSymbol,
+                        condition: selectedCondition,
+                        value: value,
+                        description: descriptionController.text.isEmpty
+                            ? null
+                            : descriptionController.text,
+                      );
                   Navigator.of(context).pop();
-                  
+
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Alert created for $selectedSymbol'),

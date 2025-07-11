@@ -35,13 +35,13 @@ class AuthService extends ChangeNotifier {
     try {
       // In a real app, this would make an API call to your backend
       // For demo purposes, we'll simulate authentication
-      
+
       // In a real implementation, you would validate the hashed password
       // final hashedPassword = _hashPassword(password);
-      
+
       // Simulate API call delay
       await Future.delayed(const Duration(seconds: 1));
-      
+
       // Create demo user (in real app, this would come from your backend)
       _currentUser = User(
         id: '1',
@@ -51,13 +51,13 @@ class AuthService extends ChangeNotifier {
         createdAt: DateTime.now(),
         lastLoginAt: DateTime.now(),
       );
-      
+
       _isAuthenticated = true;
-      
+
       // Store user data securely
       await _saveUserData();
       await _createSession();
-      
+
       _logger.info('User logged in successfully: ${_currentUser!.email}');
       return true;
     } catch (e) {
@@ -77,10 +77,10 @@ class AuthService extends ChangeNotifier {
         createdAt: DateTime.now(),
         lastLoginAt: DateTime.now(),
       );
-      
+
       _isAuthenticated = true;
       await _saveUserData();
-      
+
       _logger.info('Guest login successful');
     } catch (e) {
       _logger.error('Guest login failed: $e');
@@ -92,11 +92,11 @@ class AuthService extends ChangeNotifier {
     try {
       _currentUser = null;
       _isAuthenticated = false;
-      
+
       // Clear stored data
       await _storage.delete(key: _userKey);
       await _storage.delete(key: _sessionKey);
-      
+
       _logger.info('User logged out');
     } catch (e) {
       _logger.error('Logout failed: $e');
@@ -108,7 +108,7 @@ class AuthService extends ChangeNotifier {
     try {
       await _storage.write(key: _apiKeyKey, value: apiKey);
       await _storage.write(key: _apiSecretKey, value: apiSecret);
-      
+
       _logger.info('API credentials saved');
       return true;
     } catch (e) {
@@ -121,7 +121,7 @@ class AuthService extends ChangeNotifier {
     try {
       final apiKey = await _storage.read(key: _apiKeyKey);
       final apiSecret = await _storage.read(key: _apiSecretKey);
-      
+
       return {
         'apiKey': apiKey,
         'apiSecret': apiSecret,
@@ -136,7 +136,7 @@ class AuthService extends ChangeNotifier {
     try {
       await _storage.delete(key: _apiKeyKey);
       await _storage.delete(key: _apiSecretKey);
-      
+
       _logger.info('API credentials cleared');
     } catch (e) {
       _logger.error('Failed to clear API credentials: $e');
@@ -153,10 +153,10 @@ class AuthService extends ChangeNotifier {
   Future<bool> updateSubscription(String newTier) async {
     try {
       if (_currentUser == null) return false;
-      
+
       _currentUser = _currentUser!.copyWith(subscriptionTier: newTier);
       await _saveUserData();
-      
+
       _logger.info('Subscription updated to: $newTier');
       return true;
     } catch (e) {
@@ -169,14 +169,14 @@ class AuthService extends ChangeNotifier {
   Future<bool> updateProfile({String? displayName, String? email}) async {
     try {
       if (_currentUser == null) return false;
-      
+
       _currentUser = _currentUser!.copyWith(
         displayName: displayName ?? _currentUser!.displayName,
         email: email ?? _currentUser!.email,
       );
-      
+
       await _saveUserData();
-      
+
       _logger.info('Profile updated');
       return true;
     } catch (e) {

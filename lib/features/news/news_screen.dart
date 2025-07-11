@@ -27,7 +27,7 @@ class _NewsScreenState extends State<NewsScreen> with TickerProviderStateMixin {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _searchController = TextEditingController();
-    
+
     // Load initial data
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<NewsController>().loadNews();
@@ -83,7 +83,9 @@ class _NewsScreenState extends State<NewsScreen> with TickerProviderStateMixin {
             return IconButton(
               icon: Icon(
                 _showFilters ? Icons.filter_list : Icons.filter_list_outlined,
-                color: _showFilters ? AppColors.goldPrimary : AppColors.textSecondary,
+                color: _showFilters
+                    ? AppColors.goldPrimary
+                    : AppColors.textSecondary,
               ),
               onPressed: () {
                 setState(() {
@@ -259,7 +261,8 @@ class _NewsScreenState extends State<NewsScreen> with TickerProviderStateMixin {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: newsController.categories.map((category) {
-                          final isSelected = newsController.selectedCategory == category;
+                          final isSelected =
+                              newsController.selectedCategory == category;
                           return Padding(
                             padding: const EdgeInsets.only(right: 8),
                             child: FilterChip(
@@ -271,7 +274,9 @@ class _NewsScreenState extends State<NewsScreen> with TickerProviderStateMixin {
                               selectedColor: AppColors.goldPrimary,
                               backgroundColor: AppColors.surfaceDark,
                               labelStyle: TextStyle(
-                                color: isSelected ? AppColors.primaryDark : AppColors.textPrimary,
+                                color: isSelected
+                                    ? AppColors.primaryDark
+                                    : AppColors.textPrimary,
                               ),
                             ),
                           );
@@ -340,9 +345,12 @@ class _NewsScreenState extends State<NewsScreen> with TickerProviderStateMixin {
                               }
                             },
                             items: const [
-                              DropdownMenuItem(value: 'date', child: Text('Date')),
-                              DropdownMenuItem(value: 'source', child: Text('Source')),
-                              DropdownMenuItem(value: 'title', child: Text('Title')),
+                              DropdownMenuItem(
+                                  value: 'date', child: Text('Date')),
+                              DropdownMenuItem(
+                                  value: 'source', child: Text('Source')),
+                              DropdownMenuItem(
+                                  value: 'title', child: Text('Title')),
                             ],
                           ),
                         ),
@@ -387,7 +395,8 @@ class _NewsScreenState extends State<NewsScreen> with TickerProviderStateMixin {
             if (user?.subscriptionTier == 'free') {
               return Consumer<SubscriptionService>(
                 builder: (context, subscription, child) {
-                  if (subscription.isBannerAdReady && subscription.bannerAd != null) {
+                  if (subscription.isBannerAdReady &&
+                      subscription.bannerAd != null) {
                     return Container(
                       margin: const EdgeInsets.all(16),
                       height: 60,
@@ -408,7 +417,7 @@ class _NewsScreenState extends State<NewsScreen> with TickerProviderStateMixin {
             return const SizedBox.shrink();
           },
         ),
-        
+
         Expanded(
           child: Consumer<NewsController>(
             builder: (context, newsController, child) {
@@ -478,7 +487,9 @@ class _NewsScreenState extends State<NewsScreen> with TickerProviderStateMixin {
             ),
             const SizedBox(height: 16),
             Text(
-              newsController.searchQuery.isNotEmpty ? 'No search results' : 'No news available',
+              newsController.searchQuery.isNotEmpty
+                  ? 'No search results'
+                  : 'No news available',
               style: TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 18,
@@ -486,7 +497,7 @@ class _NewsScreenState extends State<NewsScreen> with TickerProviderStateMixin {
             ),
             const SizedBox(height: 8),
             Text(
-              newsController.searchQuery.isNotEmpty 
+              newsController.searchQuery.isNotEmpty
                   ? 'Try a different search term'
                   : 'Pull to refresh for latest updates',
               style: TextStyle(color: AppColors.textSecondary),
@@ -568,9 +579,11 @@ class _NewsScreenState extends State<NewsScreen> with TickerProviderStateMixin {
       builder: (context, newsController, child) {
         return ListView.builder(
           padding: const EdgeInsets.all(16),
-          itemCount: newsController.categories.where((cat) => cat != 'All').length,
+          itemCount:
+              newsController.categories.where((cat) => cat != 'All').length,
           itemBuilder: (context, index) {
-            final categories = newsController.categories.where((cat) => cat != 'All').toList();
+            final categories =
+                newsController.categories.where((cat) => cat != 'All').toList();
             final category = categories[index];
             return _buildCategoryCard(category, newsController);
           },
@@ -594,7 +607,8 @@ class _NewsScreenState extends State<NewsScreen> with TickerProviderStateMixin {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.goldPrimary,
                       borderRadius: BorderRadius.circular(4),
@@ -646,7 +660,8 @@ class _NewsScreenState extends State<NewsScreen> with TickerProviderStateMixin {
                   runSpacing: 4,
                   children: article.tags.take(3).map((tag) {
                     return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: AppColors.primaryDark,
                         borderRadius: BorderRadius.circular(4),
@@ -717,7 +732,8 @@ class _NewsScreenState extends State<NewsScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildTrendingCard(String topic, int rank, NewsController newsController) {
+  Widget _buildTrendingCard(
+      String topic, int rank, NewsController newsController) {
     return Card(
       color: AppColors.surfaceDark,
       margin: const EdgeInsets.only(bottom: 12),
@@ -886,7 +902,7 @@ class _NewsScreenState extends State<NewsScreen> with TickerProviderStateMixin {
   String _formatTime(DateTime time) {
     final now = DateTime.now();
     final difference = now.difference(time);
-    
+
     if (difference.inDays > 0) {
       return '${difference.inDays}d ago';
     } else if (difference.inHours > 0) {
@@ -898,9 +914,10 @@ class _NewsScreenState extends State<NewsScreen> with TickerProviderStateMixin {
     }
   }
 
-  Future<void> _openArticle(NewsArticle article, NewsController newsController) async {
+  Future<void> _openArticle(
+      NewsArticle article, NewsController newsController) async {
     newsController.markAsRead(article.url);
-    
+
     // Navigate to detail screen
     Navigator.of(context).push(
       MaterialPageRoute(

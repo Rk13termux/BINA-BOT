@@ -94,7 +94,7 @@ class AlertsController extends ChangeNotifier {
 
     _isMonitoring = true;
     notifyListeners();
-    
+
     // Start periodic checking (every 30 seconds)
     _startPeriodicCheck();
     _logger.info('Alert monitoring started');
@@ -125,8 +125,9 @@ class AlertsController extends ChangeNotifier {
 
     _alerts.add(alert);
     notifyListeners();
-    
-    _logger.info('Price alert added: ${alert.symbol} ${_getConditionText(condition)} ${value}');
+
+    _logger.info(
+        'Price alert added: ${alert.symbol} ${_getConditionText(condition)} ${value}');
   }
 
   /// Remove an alert
@@ -149,17 +150,17 @@ class AlertsController extends ChangeNotifier {
   /// Add a trading signal
   void addSignal(Signal signal) {
     _signals.insert(0, signal);
-    
+
     // Keep only recent signals (last 100)
     if (_signals.length > 100) {
       _signals.removeRange(100, _signals.length);
     }
-    
+
     notifyListeners();
-    
+
     // Send notification for the signal
     _notificationService.showTradingSignal(signal);
-    
+
     _logger.info('Signal added: ${signal.type.name} for ${signal.symbol}');
   }
 
@@ -176,7 +177,8 @@ class AlertsController extends ChangeNotifier {
   }
 
   /// Generate RSI signals
-  Future<void> generateRSISignals(String symbol, List<double> closePrices) async {
+  Future<void> generateRSISignals(
+      String symbol, List<double> closePrices) async {
     try {
       final rsi = _calculateRSI(closePrices);
       if (rsi == null) return;
@@ -220,11 +222,12 @@ class AlertsController extends ChangeNotifier {
   }
 
   /// Generate EMA crossover signals
-  Future<void> generateEMASignals(String symbol, List<double> closePrices) async {
+  Future<void> generateEMASignals(
+      String symbol, List<double> closePrices) async {
     try {
       final ema12 = _calculateEMA(closePrices, 12);
       final ema26 = _calculateEMA(closePrices, 26);
-      
+
       if (ema12 == null || ema26 == null) return;
 
       // Get previous EMAs to detect crossover
@@ -233,7 +236,7 @@ class AlertsController extends ChangeNotifier {
       final prevClosePrices = closePrices.sublist(0, closePrices.length - 1);
       final prevEma12 = _calculateEMA(prevClosePrices, 12);
       final prevEma26 = _calculateEMA(prevClosePrices, 26);
-      
+
       if (prevEma12 == null || prevEma26 == null) return;
 
       Signal? signal;
@@ -293,7 +296,8 @@ class AlertsController extends ChangeNotifier {
 
     // Group alerts by symbol to minimize API calls
     final symbolGroups = <String, List<PriceAlert>>{};
-    for (final alert in _alerts.where((a) => a.isEnabled && a.triggeredAt == null)) {
+    for (final alert
+        in _alerts.where((a) => a.isEnabled && a.triggeredAt == null)) {
       symbolGroups.putIfAbsent(alert.symbol, () => []).add(alert);
     }
 
@@ -303,10 +307,11 @@ class AlertsController extends ChangeNotifier {
   }
 
   /// Check alerts for a specific symbol
-  Future<void> _checkAlertsForSymbol(String symbol, List<PriceAlert> symbolAlerts) async {
+  Future<void> _checkAlertsForSymbol(
+      String symbol, List<PriceAlert> symbolAlerts) async {
     try {
       final currentPrice = await _binanceService.getCurrentPrice(symbol);
-      
+
       for (final alert in symbolAlerts) {
         bool triggered = false;
 
@@ -352,10 +357,12 @@ class AlertsController extends ChangeNotifier {
       symbol: alert.symbol,
       currentPrice: currentPrice,
       targetPrice: alert.value,
-      condition: alert.condition == AlertCondition.priceAbove ? 'above' : 'below',
+      condition:
+          alert.condition == AlertCondition.priceAbove ? 'above' : 'below',
     );
 
-    _logger.info('Alert triggered: ${alert.symbol} ${_getConditionText(alert.condition)} ${alert.value}');
+    _logger.info(
+        'Alert triggered: ${alert.symbol} ${_getConditionText(alert.condition)} ${alert.value}');
   }
 
   /// Calculate RSI
@@ -422,7 +429,8 @@ class AlertsController extends ChangeNotifier {
   /// Get alert statistics
   Map<String, dynamic> getAlertStats() {
     final totalAlerts = _alerts.length;
-    final activeAlerts = _alerts.where((a) => a.isEnabled && a.triggeredAt == null).length;
+    final activeAlerts =
+        _alerts.where((a) => a.isEnabled && a.triggeredAt == null).length;
     final triggeredAlerts = _alerts.where((a) => a.triggeredAt != null).length;
 
     return {

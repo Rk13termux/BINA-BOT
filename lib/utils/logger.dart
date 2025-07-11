@@ -1,9 +1,9 @@
 /// Sistema de logging centralizado para la aplicación
 class AppLogger {
   static final AppLogger _instance = AppLogger._internal();
-  
+
   factory AppLogger() => _instance;
-  
+
   AppLogger._internal();
 
   /// Log de información
@@ -30,7 +30,7 @@ class AppLogger {
   void _log(String level, String message) {
     final timestamp = DateTime.now().toIso8601String();
     print('[$timestamp] [$level] $message');
-    
+
     // TODO: Implementar almacenamiento de logs para producción
     // Podría guardar en archivo local o enviar a servicio de logs
   }

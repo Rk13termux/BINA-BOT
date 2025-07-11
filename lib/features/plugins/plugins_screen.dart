@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../ui/theme/colors.dart';
 import '../../models/plugin.dart';
 import '../../services/plugin_service.dart';
-import '../../services/auth_service.dart';
 
 class PluginsScreen extends StatefulWidget {
   const PluginsScreen({super.key});
@@ -12,11 +10,12 @@ class PluginsScreen extends StatefulWidget {
   State<PluginsScreen> createState() => _PluginsScreenState();
 }
 
-class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateMixin {
+class _PluginsScreenState extends State<PluginsScreen>
+    with TickerProviderStateMixin {
   late TabController _tabController;
   final PluginService _pluginService = PluginService();
   final TextEditingController _searchController = TextEditingController();
-  
+
   List<Plugin> _installedPlugins = [];
   List<Plugin> _availablePlugins = [];
   List<Plugin> _filteredInstalled = [];
@@ -72,7 +71,7 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
     try {
       final installed = await _pluginService.getInstalledPlugins();
       final available = _generateAvailablePlugins();
-      
+
       setState(() {
         _installedPlugins = installed;
         _availablePlugins = available;
@@ -83,7 +82,7 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
       setState(() {
         _isLoading = false;
       });
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -103,11 +102,17 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
         name: 'RSI Trading Strategy',
         version: '1.0.0',
         author: 'TradingBot Inc.',
-        description: 'Advanced RSI-based trading strategy with customizable parameters',
-        code: '',
+        description:
+            'Advanced RSI-based trading strategy with customizable parameters',
+        code: 'def rsi_strategy(): pass',
+        type: PluginType.strategy,
         status: PluginStatus.available,
-        permissions: ['trading', 'market_data'],
-        category: 'Trading Strategy',
+        createdAt: DateTime.now().subtract(const Duration(days: 30)),
+        category: PluginCategory.trading,
+        permissions: [
+          PluginPermission.readMarketData,
+          PluginPermission.executeTrades
+        ],
       ),
       Plugin(
         id: 'macd_indicator',
@@ -115,21 +120,26 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
         version: '2.1.0',
         author: 'IndicatorPro',
         description: 'Professional MACD indicator with signal line crossovers',
-        code: '',
+        code: 'def macd_indicator(): pass',
+        type: PluginType.indicator,
         status: PluginStatus.available,
-        permissions: ['market_data'],
-        category: 'Indicator',
+        createdAt: DateTime.now().subtract(const Duration(days: 25)),
+        category: PluginCategory.indicators,
+        permissions: [PluginPermission.readMarketData],
       ),
       Plugin(
         id: 'bollinger_bands',
         name: 'Bollinger Bands',
         version: '1.5.2',
         author: 'ChartAnalytics',
-        description: 'Classic Bollinger Bands indicator for volatility analysis',
-        code: '',
+        description:
+            'Classic Bollinger Bands indicator for volatility analysis',
+        code: 'def bollinger_bands(): pass',
+        type: PluginType.indicator,
         status: PluginStatus.available,
-        permissions: ['market_data'],
-        category: 'Indicator',
+        createdAt: DateTime.now().subtract(const Duration(days: 20)),
+        category: PluginCategory.indicators,
+        permissions: [PluginPermission.readMarketData],
       ),
       Plugin(
         id: 'fibonacci_retracement',
@@ -137,10 +147,12 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
         version: '1.2.1',
         author: 'TechnicalTools',
         description: 'Automatic Fibonacci retracement levels calculator',
-        code: '',
+        code: 'def fibonacci_retracement(): pass',
+        type: PluginType.indicator,
         status: PluginStatus.available,
-        permissions: ['market_data'],
-        category: 'Tool',
+        createdAt: DateTime.now().subtract(const Duration(days: 15)),
+        category: PluginCategory.analysis,
+        permissions: [PluginPermission.readMarketData],
       ),
       Plugin(
         id: 'volume_profile',
@@ -148,10 +160,12 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
         version: '3.0.0',
         author: 'VolumeAnalytics',
         description: 'Advanced volume profile analysis tool',
-        code: '',
+        code: 'def volume_profile(): pass',
+        type: PluginType.indicator,
         status: PluginStatus.available,
-        permissions: ['market_data'],
-        category: 'Indicator',
+        createdAt: DateTime.now().subtract(const Duration(days: 10)),
+        category: PluginCategory.indicators,
+        permissions: [PluginPermission.readMarketData],
       ),
       Plugin(
         id: 'smart_alerts',
@@ -159,10 +173,15 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
         version: '2.5.0',
         author: 'AlertMaster',
         description: 'AI-powered alert system with pattern recognition',
-        code: '',
+        code: 'def smart_alerts(): pass',
+        type: PluginType.alert,
         status: PluginStatus.available,
-        permissions: ['notifications', 'market_data'],
-        category: 'Alert',
+        createdAt: DateTime.now().subtract(const Duration(days: 5)),
+        category: PluginCategory.alerts,
+        permissions: [
+          PluginPermission.sendNotifications,
+          PluginPermission.readMarketData
+        ],
       ),
     ];
   }
@@ -212,7 +231,8 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
                   children: [
                     Icon(Icons.add, color: AppColors.goldPrimary),
                     const SizedBox(width: 8),
-                    Text('Create Plugin', style: TextStyle(color: AppColors.textPrimary)),
+                    Text('Create Plugin',
+                        style: TextStyle(color: AppColors.textPrimary)),
                   ],
                 ),
               ),
@@ -222,7 +242,8 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
                   children: [
                     Icon(Icons.upload, color: AppColors.goldPrimary),
                     const SizedBox(width: 8),
-                    Text('Import Plugin', style: TextStyle(color: AppColors.textPrimary)),
+                    Text('Import Plugin',
+                        style: TextStyle(color: AppColors.textPrimary)),
                   ],
                 ),
               ),
@@ -232,7 +253,8 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
                   children: [
                     Icon(Icons.settings, color: AppColors.goldPrimary),
                     const SizedBox(width: 8),
-                    Text('Plugin Settings', style: TextStyle(color: AppColors.textPrimary)),
+                    Text('Plugin Settings',
+                        style: TextStyle(color: AppColors.textPrimary)),
                   ],
                 ),
               ),
@@ -251,10 +273,12 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
                   decoration: InputDecoration(
                     hintText: 'Search plugins...',
                     hintStyle: TextStyle(color: AppColors.textSecondary),
-                    prefixIcon: Icon(Icons.search, color: AppColors.goldPrimary),
+                    prefixIcon:
+                        Icon(Icons.search, color: AppColors.goldPrimary),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
-                            icon: Icon(Icons.clear, color: AppColors.textSecondary),
+                            icon: Icon(Icons.clear,
+                                color: AppColors.textSecondary),
                             onPressed: () {
                               _searchController.clear();
                             },
@@ -328,7 +352,9 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
             ),
             const SizedBox(height: 16),
             Text(
-              _searchQuery.isEmpty ? 'No plugins installed' : 'No matching plugins',
+              _searchQuery.isEmpty
+                  ? 'No plugins installed'
+                  : 'No matching plugins',
               style: TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 18,
@@ -336,7 +362,7 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
             ),
             const SizedBox(height: 8),
             Text(
-              _searchQuery.isEmpty 
+              _searchQuery.isEmpty
                   ? 'Browse available plugins to get started'
                   : 'Try a different search term',
               style: TextStyle(color: AppColors.textSecondary),
@@ -374,7 +400,8 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
   }
 
   Widget _buildMyPluginsTab() {
-    final myPlugins = _filteredInstalled.where((p) => p.author == 'You').toList();
+    final myPlugins =
+        _filteredInstalled.where((p) => p.author == 'You').toList();
 
     if (myPlugins.isEmpty) {
       return Center(
@@ -424,7 +451,8 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
     );
   }
 
-  Widget _buildPluginCard(Plugin plugin, {required bool isInstalled, bool isOwned = false}) {
+  Widget _buildPluginCard(Plugin plugin,
+      {required bool isInstalled, bool isOwned = false}) {
     return Card(
       color: AppColors.surfaceDark,
       margin: const EdgeInsets.only(bottom: 16),
@@ -467,13 +495,18 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
                           ),
                           if (isInstalled) ...[
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: plugin.isActive ? AppColors.success : AppColors.warning,
+                                color: plugin.status == PluginStatus.active
+                                    ? AppColors.success
+                                    : AppColors.warning,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                plugin.isActive ? 'ACTIVE' : 'INACTIVE',
+                                plugin.status == PluginStatus.active
+                                    ? 'ACTIVE'
+                                    : 'INACTIVE',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 10,
@@ -504,13 +537,14 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
                           ),
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 1),
                             decoration: BoxDecoration(
                               color: AppColors.goldPrimary.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
-                              plugin.category,
+                              plugin.category.name.toUpperCase(),
                               style: TextStyle(
                                 color: AppColors.goldPrimary,
                                 fontSize: 10,
@@ -542,14 +576,15 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
                 runSpacing: 6,
                 children: plugin.permissions.map((permission) {
                   return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: AppColors.primaryDark,
                       borderRadius: BorderRadius.circular(4),
                       border: Border.all(color: AppColors.borderColor),
                     ),
                     child: Text(
-                      permission,
+                      permission.name.toUpperCase(),
                       style: TextStyle(
                         color: AppColors.textSecondary,
                         fontSize: 10,
@@ -566,10 +601,16 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () => _togglePlugin(plugin),
-                      icon: Icon(plugin.isActive ? Icons.pause : Icons.play_arrow),
-                      label: Text(plugin.isActive ? 'Deactivate' : 'Activate'),
+                      icon: Icon(plugin.status == PluginStatus.active
+                          ? Icons.pause
+                          : Icons.play_arrow),
+                      label: Text(plugin.status == PluginStatus.active
+                          ? 'Deactivate'
+                          : 'Activate'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: plugin.isActive ? AppColors.warning : AppColors.success,
+                        backgroundColor: plugin.status == PluginStatus.active
+                            ? AppColors.warning
+                            : AppColors.success,
                         foregroundColor: Colors.white,
                       ),
                     ),
@@ -607,7 +648,8 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
                   const SizedBox(width: 8),
                   IconButton(
                     onPressed: () => _showPluginDetails(plugin),
-                    icon: Icon(Icons.info_outline, color: AppColors.goldPrimary),
+                    icon:
+                        Icon(Icons.info_outline, color: AppColors.goldPrimary),
                     tooltip: 'Details',
                   ),
                 ],
@@ -619,41 +661,46 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
     );
   }
 
-  Color _getCategoryColor(String category) {
-    switch (category.toLowerCase()) {
-      case 'trading strategy':
+  Color _getCategoryColor(PluginCategory category) {
+    switch (category) {
+      case PluginCategory.trading:
+      case PluginCategory.strategies:
         return AppColors.goldPrimary;
-      case 'indicator':
+      case PluginCategory.indicators:
+      case PluginCategory.analysis:
         return AppColors.bullish;
-      case 'tool':
-        return AppColors.info;
-      case 'alert':
+      case PluginCategory.alerts:
         return AppColors.warning;
-      default:
-        return AppColors.textSecondary;
+      case PluginCategory.automation:
+        return AppColors.info;
     }
   }
 
-  IconData _getCategoryIcon(String category) {
-    switch (category.toLowerCase()) {
-      case 'trading strategy':
+  IconData _getCategoryIcon(PluginCategory category) {
+    switch (category) {
+      case PluginCategory.trading:
+      case PluginCategory.strategies:
         return Icons.trending_up;
-      case 'indicator':
+      case PluginCategory.indicators:
+      case PluginCategory.analysis:
         return Icons.show_chart;
-      case 'tool':
+      case PluginCategory.automation:
         return Icons.build;
-      case 'alert':
+      case PluginCategory.alerts:
         return Icons.notification_important;
-      default:
-        return Icons.extension;
     }
   }
 
   Future<void> _installPlugin(Plugin plugin) async {
     try {
-      await _pluginService.installPlugin(plugin);
+      await _pluginService.installPlugin(
+        name: plugin.name,
+        code: plugin.code,
+        description: plugin.description,
+        author: plugin.author,
+      );
       await _loadPlugins();
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -690,11 +737,13 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
+            child: Text('Cancel',
+                style: TextStyle(color: AppColors.textSecondary)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Uninstall', style: TextStyle(color: AppColors.bearish)),
+            child:
+                Text('Uninstall', style: TextStyle(color: AppColors.bearish)),
           ),
         ],
       ),
@@ -704,7 +753,7 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
       try {
         await _pluginService.uninstallPlugin(plugin.id);
         await _loadPlugins();
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -728,7 +777,7 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
 
   Future<void> _togglePlugin(Plugin plugin) async {
     try {
-      if (plugin.isActive) {
+      if (plugin.status == PluginStatus.active) {
         await _pluginService.deactivatePlugin(plugin.id);
       } else {
         await _pluginService.activatePlugin(plugin.id);
@@ -797,7 +846,8 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
               const SizedBox(height: 16),
               Text(
                 'Description:',
-                style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    color: AppColors.textPrimary, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
@@ -808,22 +858,25 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
                 const SizedBox(height: 16),
                 Text(
                   'Permissions:',
-                  style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 ...plugin.permissions.map((permission) => Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Row(
-                    children: [
-                      Icon(Icons.check, color: AppColors.goldPrimary, size: 16),
-                      const SizedBox(width: 8),
-                      Text(
-                        permission,
-                        style: TextStyle(color: AppColors.textSecondary),
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Row(
+                        children: [
+                          Icon(Icons.check,
+                              color: AppColors.goldPrimary, size: 16),
+                          const SizedBox(width: 8),
+                          Text(
+                            permission.name.toUpperCase(),
+                            style: TextStyle(color: AppColors.textSecondary),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                )),
+                    )),
               ],
             ],
           ),
@@ -831,7 +884,8 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Close', style: TextStyle(color: AppColors.goldPrimary)),
+            child:
+                Text('Close', style: TextStyle(color: AppColors.goldPrimary)),
           ),
         ],
       ),
@@ -923,11 +977,13 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
+              child: Text('Cancel',
+                  style: TextStyle(color: AppColors.textSecondary)),
             ),
             ElevatedButton(
               onPressed: () async {
-                if (nameController.text.isNotEmpty && descriptionController.text.isNotEmpty) {
+                if (nameController.text.isNotEmpty &&
+                    descriptionController.text.isNotEmpty) {
                   Navigator.pop(context);
                   await _createPlugin(
                     nameController.text,
@@ -948,17 +1004,18 @@ class _PluginsScreenState extends State<PluginsScreen> with TickerProviderStateM
     );
   }
 
-  Future<void> _createPlugin(String name, String description, String category) async {
+  Future<void> _createPlugin(
+      String name, String description, String category) async {
     try {
       await _pluginService.createPlugin(
-        name: name,
-        description: description,
-        category: category,
-        code: _getTemplateCode(category),
+        name,
+        description,
+        _getTemplateCode(category),
+        PluginType.strategy, // Default to strategy type
       );
-      
+
       await _loadPlugins();
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

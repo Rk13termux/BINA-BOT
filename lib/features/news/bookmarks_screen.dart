@@ -36,7 +36,7 @@ class BookmarksScreen extends StatelessWidget {
         builder: (context, newsController, child) {
           // In a real app, this would get bookmarked articles from local storage
           final bookmarkedArticles = _getBookmarkedArticles(newsController);
-          
+
           if (bookmarkedArticles.isEmpty) {
             return Center(
               child: Column(
@@ -65,13 +65,14 @@ class BookmarksScreen extends StatelessWidget {
               ),
             );
           }
-          
+
           return ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: bookmarkedArticles.length,
             itemBuilder: (context, index) {
               final article = bookmarkedArticles[index];
-              return _buildBookmarkedArticleCard(context, article, newsController);
+              return _buildBookmarkedArticleCard(
+                  context, article, newsController);
             },
           );
         },
@@ -104,7 +105,8 @@ class BookmarksScreen extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.goldPrimary,
                       borderRadius: BorderRadius.circular(4),
@@ -128,7 +130,8 @@ class BookmarksScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   IconButton(
-                    onPressed: () => _removeBookmark(context, article, newsController),
+                    onPressed: () =>
+                        _removeBookmark(context, article, newsController),
                     icon: Icon(
                       Icons.bookmark,
                       color: AppColors.goldPrimary,
@@ -167,7 +170,8 @@ class BookmarksScreen extends StatelessWidget {
                   runSpacing: 4,
                   children: article.tags.take(3).map((tag) {
                     return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: AppColors.primaryDark,
                         borderRadius: BorderRadius.circular(4),
@@ -273,7 +277,7 @@ class BookmarksScreen extends StatelessWidget {
   String _formatTime(DateTime time) {
     final now = DateTime.now();
     final difference = now.difference(time);
-    
+
     if (difference.inDays > 0) {
       return '${difference.inDays}d ago';
     } else if (difference.inHours > 0) {

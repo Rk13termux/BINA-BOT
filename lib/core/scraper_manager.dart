@@ -9,7 +9,7 @@ import '../utils/logger.dart';
 class ScraperManager {
   final AppLogger _logger = AppLogger();
   final Map<String, Timer> _scheduledScrapers = {};
-  
+
   // URLs de fuentes de noticias
   static const Map<String, String> _newsSources = {
     'coindesk': 'https://www.coindesk.com/tag/markets/',
@@ -21,18 +21,20 @@ class ScraperManager {
   /// Scraping de CoinDesk
   Future<List<NewsArticle>> scrapeCoinDesk() async {
     final List<NewsArticle> articles = [];
-    
+
     try {
       final response = await http.get(
         Uri.parse(_newsSources['coindesk']!),
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         },
       );
 
       if (response.statusCode == 200) {
         final document = html_parser.parse(response.body);
-        final articleElements = document.querySelectorAll('.card-title, .article-card, .headline');
+        final articleElements =
+            document.querySelectorAll('.card-title, .article-card, .headline');
 
         for (final element in articleElements.take(10)) {
           final title = _extractText(element, 'a, h2, h3, .title');
@@ -60,21 +62,24 @@ class ScraperManager {
   /// Scraping de CoinTelegraph
   Future<List<NewsArticle>> scrapeCoinTelegraph() async {
     final List<NewsArticle> articles = [];
-    
+
     try {
       final response = await http.get(
         Uri.parse(_newsSources['cointelegraph']!),
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         },
       );
 
       if (response.statusCode == 200) {
         final document = html_parser.parse(response.body);
-        final articleElements = document.querySelectorAll('.post-card, .news-item, .article');
+        final articleElements =
+            document.querySelectorAll('.post-card, .news-item, .article');
 
         for (final element in articleElements.take(10)) {
-          final title = _extractText(element, '.post-card__title, .title, h2, h3');
+          final title =
+              _extractText(element, '.post-card__title, .title, h2, h3');
           final link = _extractAttribute(element, 'a', 'href');
           final time = _extractText(element, '.post-card__date, .date, time');
 
@@ -99,18 +104,20 @@ class ScraperManager {
   /// Scraping de CryptoNews
   Future<List<NewsArticle>> scrapeCryptoNews() async {
     final List<NewsArticle> articles = [];
-    
+
     try {
       final response = await http.get(
         Uri.parse(_newsSources['cryptonews']!),
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         },
       );
 
       if (response.statusCode == 200) {
         final document = html_parser.parse(response.body);
-        final articleElements = document.querySelectorAll('.news-item, .article-card, .post');
+        final articleElements =
+            document.querySelectorAll('.news-item, .article-card, .post');
 
         for (final element in articleElements.take(10)) {
           final title = _extractText(element, '.title, h2, h3, a');
@@ -138,18 +145,20 @@ class ScraperManager {
   /// Scraping de Decrypt
   Future<List<NewsArticle>> scrapeDecrypt() async {
     final List<NewsArticle> articles = [];
-    
+
     try {
       final response = await http.get(
         Uri.parse(_newsSources['decrypt']!),
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         },
       );
 
       if (response.statusCode == 200) {
         final document = html_parser.parse(response.body);
-        final articleElements = document.querySelectorAll('.post, .article, .news-card');
+        final articleElements =
+            document.querySelectorAll('.post, .article, .news-card');
 
         for (final element in articleElements.take(10)) {
           final title = _extractText(element, '.post-title, .title, h2, h3');
@@ -177,7 +186,7 @@ class ScraperManager {
   /// Obtiene noticias de todas las fuentes
   Future<List<NewsArticle>> scrapeAllSources() async {
     final List<NewsArticle> allArticles = [];
-    
+
     final futures = [
       scrapeCoinDesk(),
       scrapeCoinTelegraph(),
@@ -186,21 +195,20 @@ class ScraperManager {
     ];
 
     final results = await Future.wait(futures);
-    
+
     for (final articles in results) {
       allArticles.addAll(articles);
     }
 
     // Ordenar por fecha (más recientes primero)
     allArticles.sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
-    
+
     // Remover duplicados basados en título similar
     final uniqueArticles = <NewsArticle>[];
     for (final article in allArticles) {
-      final isDuplicate = uniqueArticles.any((existing) => 
-        _calculateSimilarity(existing.title, article.title) > 0.8
-      );
-      
+      final isDuplicate = uniqueArticles.any((existing) =>
+          _calculateSimilarity(existing.title, article.title) > 0.8);
+
       if (!isDuplicate) {
         uniqueArticles.add(article);
       }
@@ -215,7 +223,7 @@ class ScraperManager {
     _scheduledScrapers['auto'] = Timer.periodic(interval, (timer) {
       scrapeAllSources();
     });
-    
+
     _logger.info('Auto scraping scheduled every ${interval.inMinutes} minutes');
   }
 
@@ -229,31 +237,33 @@ class ScraperManager {
   /// Scraping específico de un término de búsqueda
   Future<List<NewsArticle>> scrapeByKeyword(String keyword) async {
     final allArticles = await scrapeAllSources();
-    
-    final filteredArticles = allArticles.where((article) =>
-      article.title.toLowerCase().contains(keyword.toLowerCase()) ||
-      article.summary.toLowerCase().contains(keyword.toLowerCase())
-    ).toList();
 
-    _logger.info('Found ${filteredArticles.length} articles for keyword: $keyword');
+    final filteredArticles = allArticles
+        .where((article) =>
+            article.title.toLowerCase().contains(keyword.toLowerCase()) ||
+            article.summary.toLowerCase().contains(keyword.toLowerCase()))
+        .toList();
+
+    _logger.info(
+        'Found ${filteredArticles.length} articles for keyword: $keyword');
     return filteredArticles;
   }
 
   /// Extrae texto de un elemento
   String _extractText(Element? element, String selector) {
     if (element == null) return '';
-    
-    final targetElement = selector.isEmpty 
-        ? element 
-        : element.querySelector(selector);
-    
+
+    final targetElement =
+        selector.isEmpty ? element : element.querySelector(selector);
+
     return targetElement?.text.trim() ?? '';
   }
 
   /// Extrae atributo de un elemento
-  String _extractAttribute(Element? element, String selector, String attribute) {
+  String _extractAttribute(
+      Element? element, String selector, String attribute) {
     if (element == null) return '';
-    
+
     final targetElement = element.querySelector(selector);
     return targetElement?.attributes[attribute] ?? '';
   }
@@ -268,21 +278,21 @@ class ScraperManager {
   /// Parsea fecha y hora
   DateTime _parseTime(String timeStr) {
     if (timeStr.isEmpty) return DateTime.now();
-    
+
     try {
       // Intentar varios formatos de fecha comunes
       final now = DateTime.now();
-      
+
       // Si contiene "ago", calcular tiempo relativo
       if (timeStr.toLowerCase().contains('ago')) {
         return _parseRelativeTime(timeStr);
       }
-      
+
       // Intentar parsear fecha ISO
       if (timeStr.contains('T')) {
         return DateTime.parse(timeStr);
       }
-      
+
       return now;
     } catch (e) {
       return DateTime.now();
@@ -293,7 +303,7 @@ class ScraperManager {
   DateTime _parseRelativeTime(String timeStr) {
     final now = DateTime.now();
     final lower = timeStr.toLowerCase();
-    
+
     if (lower.contains('hour')) {
       final match = RegExp(r'(\d+)').firstMatch(lower);
       if (match != null) {
@@ -301,7 +311,7 @@ class ScraperManager {
         return now.subtract(Duration(hours: hours));
       }
     }
-    
+
     if (lower.contains('minute')) {
       final match = RegExp(r'(\d+)').firstMatch(lower);
       if (match != null) {
@@ -309,7 +319,7 @@ class ScraperManager {
         return now.subtract(Duration(minutes: minutes));
       }
     }
-    
+
     if (lower.contains('day')) {
       final match = RegExp(r'(\d+)').firstMatch(lower);
       if (match != null) {
@@ -317,22 +327,23 @@ class ScraperManager {
         return now.subtract(Duration(days: days));
       }
     }
-    
+
     return now;
   }
 
   /// Calcula similitud entre dos strings
   double _calculateSimilarity(String str1, String str2) {
     if (str1 == str2) return 1.0;
-    
+
     final len1 = str1.length;
     final len2 = str2.length;
-    
+
     if (len1 == 0 || len2 == 0) return 0.0;
-    
+
     final maxLen = len1 > len2 ? len1 : len2;
-    final distance = _levenshteinDistance(str1.toLowerCase(), str2.toLowerCase());
-    
+    final distance =
+        _levenshteinDistance(str1.toLowerCase(), str2.toLowerCase());
+
     return 1.0 - (distance / maxLen);
   }
 
