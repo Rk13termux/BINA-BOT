@@ -6,7 +6,7 @@ A professional Flutter trading application for cryptocurrency trading with Binan
 ![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20Web%20%7C%20Desktop-brightgreen.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-## 🚀 Features
+## 🚀 Features.
 
 ### Core Features
 - **Real-time Trading**: Live cryptocurrency market data via Binance WebSocket
