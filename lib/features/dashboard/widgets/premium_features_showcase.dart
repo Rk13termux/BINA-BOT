@@ -14,15 +14,15 @@ class PremiumFeaturesShowcase extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.goldPrimary.withValues(alpha: 0.1),
-            AppColors.goldSecondary.withValues(alpha: 0.05),
+            AppColors.goldPrimary.withOpacity(0.1),
+            AppColors.goldSecondary.withOpacity(0.05),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.goldPrimary.withValues(alpha: 0.3),
+          color: AppColors.goldPrimary.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -62,7 +62,7 @@ class PremiumFeaturesShowcase extends StatelessWidget {
                       'Datos en tiempo real • IA • Análisis avanzado',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white.withOpacity(0.7),
                       ),
                     ),
                   ],
@@ -159,7 +159,7 @@ class PremiumFeaturesShowcase extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.cardBackground.withValues(alpha: 0.5),
+        color: AppColors.cardBackground.withOpacity(0.5),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.borderColor,
@@ -172,8 +172,8 @@ class PremiumFeaturesShowcase extends StatelessWidget {
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: isActive 
-                  ? AppColors.goldPrimary.withValues(alpha: 0.2)
-                  : AppColors.textDisabled.withValues(alpha: 0.2),
+                  ? AppColors.goldPrimary.withOpacity(0.2)
+                  : AppColors.textDisabled.withOpacity(0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -199,7 +199,7 @@ class PremiumFeaturesShowcase extends StatelessWidget {
                   description,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white.withValues(alpha: 0.6),
+                    color: Colors.white.withOpacity(0.6),
                   ),
                 ),
               ],

@@ -38,8 +38,8 @@ class AppTheme {
         ),
       ),
 
-      // Tema de tarjetas
-      cardTheme: const CardThemeData(
+      // Tema de tarjetas  
+      cardTheme: const CardTheme(
         color: AppColors.cardBackground,
         elevation: 4,
         shape: RoundedRectangleBorder(
@@ -148,7 +148,7 @@ class AppTheme {
       ),
 
       // Tema de diálogos
-      dialogTheme: const DialogThemeData(
+      dialogTheme: const DialogTheme(
         backgroundColor: AppColors.cardBackground,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -184,7 +184,7 @@ class AppTheme {
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.goldSecondary.withValues(alpha: 0.5);
+            return AppColors.goldSecondary.withOpacity(0.5);
           }
           return AppColors.borderColor;
         }),

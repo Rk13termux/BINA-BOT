@@ -54,12 +54,12 @@ android {
 
     buildTypes {
         release {
-            // Optimizations for production builds
-            isMinifyEnabled = true
-            isShrinkResources = true
+            // Temporarily disable minification for stable builds
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             
-            // Performance optimizations
+            // Performance optimizations (safe ones)
             isDebuggable = false
             isJniDebuggable = false
             isRenderscriptDebuggable = false
