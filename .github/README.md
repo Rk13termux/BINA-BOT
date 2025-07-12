@@ -1,64 +1,69 @@
-# BINA-BOT GitHub Actions CI/CD
+# Invictus Trader Pro - GitHub Actions CI/CD
 
-Este proyecto utiliza GitHub Actions para compilar automáticamente las versiones de Android (APK) y Windows (EXE).
+Professional cryptocurrency trading application with automated build pipeline for Android and Windows platforms.
 
-## 🔄 Workflows Disponibles.
+## 🚀 Quick Start
+
+### Manual Build Trigger
+1. Go to **Actions** in your GitHub repository
+2. Select **"Build Invictus Trader Pro (APK & EXE)"**
+3. Click **"Run workflow"**
+4. Select build type (release/debug)
+5. Click **"Run workflow"**
+
+### Local Build Scripts
+```bash
+# Windows Batch Script
+./scripts/build-release.bat
+
+# PowerShell Script (Enhanced)
+./scripts/build-release.ps1
+
+# With options
+./scripts/build-release.ps1 -Debug -SkipTests
+```
+
+## 🔄 Automated Workflows
 
 ### 1. **Build Workflow** (`build.yml`)
-- **Trigger**: Push a `main` o `develop`, Pull Requests, Manual
-- **Función**: Compila APK y EXE automáticamente
+- **Triggers**: Push to `main`/`develop`, Pull Requests, Manual
+- **Platforms**: Android (APK) + Windows (EXE)
 - **Outputs**: 
-  - Android APKs (arm64, armv7, x86_64)
-  - Windows EXE (comprimido en ZIP)
+  - `invictus-trader-android-apk` - ARM64 optimized APK
+  - `invictus-trader-windows-exe` - x64 desktop application
 
-### 2. **Test Workflow** (`test.yml`)
-- **Trigger**: Push y Pull Requests
-- **Función**: Ejecuta tests y análisis de código
-- **Outputs**: Reportes de cobertura
+### 2. **Multi-Platform Support**
+- **Android**: API 26+ (Android 8.0 to 15)
+- **Windows**: Windows 10/11 (64-bit)
+- **Architecture**: ARM64 (Android), x64 (Windows)
+## 📱 Application Features
 
-### 3. **Release Workflow** (`release.yml`)
-- **Trigger**: Tags `v*` o manual
-- **Función**: Crea releases automáticos con artefactos
+### � Monetization Model
+- **Monthly Subscription**: $5.00/month
+- **Yearly Subscription**: $100.00/year (50% savings)
+- **No Ads**: Premium experience only
+- **Features**: Advanced trading tools, AI analysis, real-time data
 
-## 🚀 Cómo Usar
+### 🔐 Security & Compatibility
+- **Android 14 Ready**: Full compatibility with latest Android versions
+- **Secure Storage**: Encrypted subscription and user data
+- **Network Security**: Configured for Binance API communications
+- **Backup Rules**: Android-compliant data backup policies
 
-### Compilar Manualmente
-1. Ve a **Actions** en tu repositorio de GitHub
-2. Selecciona **"Build BINA-BOT APK & EXE"**
-3. Haz click en **"Run workflow"**
-4. Selecciona el tipo de build (debug/release)
-5. Haz click en **"Run workflow"**
+## 🎯 Build Artifacts
 
-### Crear Release Automático
-1. Ejecuta el script de preparación:
-   ```bash
-   # Linux/Mac
-   ./scripts/prepare-release.sh
-   
-   # Windows
-   ./scripts/prepare-release.bat
-   ```
+### Android APK
+- **File**: `InvictusTraderPro-Android-vX.X.X.apk`
+- **Size**: ~88 MB (optimized)
+- **Target**: ARM64 devices (recommended)
+- **Compatibility**: Android 8.0+ (API 26 to 34)
+- **Features**: Production-ready, signed, optimized
 
-2. Sigue las instrucciones del script para:
-   - Actualizar la versión
-   - Ejecutar tests
-   - Crear tag de Git
-   - Push al repositorio
-
-3. GitHub Actions creará automáticamente:
-   - Compilación de APK y EXE
-   - Release con archivos adjuntos
-   - Changelog automático
-
-## 📱 Artefactos Generados
-
-### Android APKs
-- `app-arm64-v8a-release.apk` - Para dispositivos ARM64 (recomendado)
-- `app-armeabi-v7a-release.apk` - Para dispositivos ARM más antiguos
-- `app-x86_64-release.apk` - Para emuladores x86
-
-### Windows EXE
-- `bina-bot-windows-release-vX.X.X.zip` - Aplicación Windows completa
+### Windows EXE  
+- **File**: `InvictusTraderPro-Windows-vX.X.X.zip`
+- **Size**: ~150 MB (compressed)
+- **Target**: Windows 10/11 (64-bit)
+- **Features**: Desktop app, no installation required
 
 ## 🔧 Configuración de Secrets
 

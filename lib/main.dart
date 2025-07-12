@@ -17,6 +17,8 @@ import 'features/alerts/alerts_controller.dart';
 import 'services/auth_service.dart';
 import 'services/subscription_service.dart';
 import 'services/initialization_service.dart';
+import 'services/binance_websocket_service.dart';
+import 'core/api_manager.dart';
 
 // Utils
 import 'utils/logger.dart';
@@ -75,6 +77,8 @@ class InvictusTraderApp extends StatelessWidget {
         // Services
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => SubscriptionService()),
+        ChangeNotifierProvider(create: (_) => BinanceWebSocketService()),
+        Provider(create: (_) => ApiManager()),
       ],
       child: MaterialApp(
         title: 'Invictus Trader Pro',

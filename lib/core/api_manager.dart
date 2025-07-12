@@ -182,6 +182,60 @@ class ApiManager {
     }
   }
 
+  /// Testa la conexión con la API de Binance
+  Future<bool> testConnection() async {
+    try {
+      _logger.info('Testing Binance API connection...');
+
+      // Test endpoint simple sin autenticación
+      final url = '${_getBaseUrl()}$_binanceSpotUrl/ping';
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        _logger.info('Binance API connection successful');
+
+        // Test adicional con precio de BTC
+        final btcPrice = await getSymbolPrice('BTCUSDT');
+        if (btcPrice != null) {
+          _logger.info('BTC price test successful: \$${btcPrice['price']}');
+          return true;
+        } else {
+          _logger.warning('API ping successful but price test failed');
+          return false;
+        }
+      } else {
+        _logger.error('Binance API connection failed: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      _logger.error('Binance API connection test failed: $e');
+      return false;
+    }
+  }
+
+  /// Verifica el estado del servidor de Binance
+  Future<Map<String, dynamic>?> getServerStatus() async {
+    try {
+      final url = '${_getBaseUrl()}$_binanceSpotUrl/system/status';
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        _logger.info('Server status: ${data['status']} - ${data['msg']}');
+        return data;
+      } else {
+        _logger.error('Error getting server status: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      _logger.error('Exception getting server status: $e');
+      return null;
+    }
+  }
+
   /// Genera la firma HMAC SHA256 requerida por Binance
   String _generateSignature(String queryString) {
     final key = utf8.encode(_secretKey!);
