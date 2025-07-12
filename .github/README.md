@@ -2,7 +2,7 @@
 
 Este proyecto utiliza GitHub Actions para compilar automáticamente las versiones de Android (APK) y Windows (EXE).
 
-## 🔄 Workflows Disponibles
+## 🔄 Workflows Disponibles.
 
 ### 1. **Build Workflow** (`build.yml`)
 - **Trigger**: Push a `main` o `develop`, Pull Requests, Manual
