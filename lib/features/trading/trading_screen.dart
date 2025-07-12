@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:candlesticks/candlesticks.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../../ui/theme/colors.dart';
 import '../../../services/subscription_service.dart';
 import '../../../services/auth_service.dart';
@@ -203,12 +202,12 @@ class _TradingScreenState extends State<TradingScreen>
           // Account balance
           Consumer<AuthService>(
             builder: (context, auth, child) {
-              final user = auth.currentUser;
-              final showAds = user?.subscriptionTier == 'free';
+              final subscription = context.watch<SubscriptionService>();
+              final showSubscriptionBanner = !subscription.isSubscribed;
 
               return Column(
                 children: [
-                  if (showAds) _buildAdBanner(),
+                  if (showSubscriptionBanner) _buildSubscriptionBanner(),
                   _buildBalanceCard(),
                 ],
               );
@@ -383,14 +382,63 @@ class _TradingScreenState extends State<TradingScreen>
     );
   }
 
-  Widget _buildAdBanner() {
+  Widget _buildSubscriptionBanner() {
     return Consumer<SubscriptionService>(
       builder: (context, subscription, child) {
-        if (subscription.isBannerAdReady && subscription.bannerAd != null) {
+        if (!subscription.isSubscribed) {
           return Container(
             margin: const EdgeInsets.only(bottom: 16),
-            height: 60,
-            child: AdWidget(ad: subscription.bannerAd!),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFD700).withValues(alpha: 0.1),
+              border: Border.all(color: const Color(0xFFFFD700)),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.star,
+                  color: Color(0xFFFFD700),
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Upgrade to Premium',
+                        style: TextStyle(
+                          color: Color(0xFFFFD700),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        'Unlock advanced trading features & AI analysis',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // Navigate to subscription screen
+                  },
+                  child: const Text(
+                    'Subscribe',
+                    style: TextStyle(
+                      color: Color(0xFFFFD700),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           );
         }
         return const SizedBox.shrink();

@@ -757,7 +757,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onPressed: () {
               Navigator.pop(context);
               // TODO: Implement subscription upgrade
-              context.read<SubscriptionService>().purchasePremium();
+              context.read<SubscriptionService>().purchaseSubscription(SubscriptionService.monthlySubscriptionId);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.goldPrimary,

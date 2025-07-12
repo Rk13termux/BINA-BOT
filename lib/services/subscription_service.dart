@@ -1,66 +1,66 @@
 import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'dart:io';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../utils/logger.dart';
-import '../utils/constants.dart';
 
 class SubscriptionService extends ChangeNotifier {
   final InAppPurchase _inAppPurchase = InAppPurchase.instance;
   final AppLogger _logger = AppLogger();
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
-  // Subscription product IDs (these should match your Play Store/App Store IDs)
-  static const String premiumMonthlyId = 'invictus_premium_monthly';
-  static const String premiumYearlyId = 'invictus_premium_yearly';
-  static const String proMonthlyId = 'invictus_pro_monthly';
-  static const String proYearlyId = 'invictus_pro_yearly';
+  // Subscription product IDs - Dos planes únicos
+  static const String monthlySubscriptionId = 'invictus_monthly_5usd';
+  static const String yearlySubscriptionId = 'invictus_yearly_100usd';
 
   static const Set<String> _kProductIds = {
-    premiumMonthlyId,
-    premiumYearlyId,
-    proMonthlyId,
-    proYearlyId,
+    monthlySubscriptionId,
+    yearlySubscriptionId,
   };
 
   List<ProductDetails> _products = [];
-  List<PurchaseDetails> _purchases = [];
+  final List<PurchaseDetails> _purchases = [];
   bool _isAvailable = false;
   bool _loading = false;
-
-  // AdMob
-  BannerAd? _bannerAd;
-  InterstitialAd? _interstitialAd;
-  RewardedAd? _rewardedAd;
-  bool _isBannerAdReady = false;
-  bool _isInterstitialAdReady = false;
-  bool _isRewardedAdReady = false;
+  bool _isSubscribed = false;
+  String? _activeSubscriptionId;
+  DateTime? _subscriptionExpiry;
 
   // Getters
   List<ProductDetails> get products => _products;
   bool get isAvailable => _isAvailable;
   bool get isLoading => _loading;
-  BannerAd? get bannerAd => _bannerAd;
-  bool get isBannerAdReady => _isBannerAdReady;
+  bool get isSubscribed => _isSubscribed;
+  String? get activeSubscriptionId => _activeSubscriptionId;
+  DateTime? get subscriptionExpiry => _subscriptionExpiry;
+  
+  // Pricing information
+  String get monthlyPrice => '\$5.00/month';
+  String get yearlyPrice => '\$100.00/year';
+  String get yearlySavings => 'Save \$60 (50% off)';
+  String get monthlyDescription => 'Full access to all premium features';
+  String get yearlyDescription => 'Best value! All premium features + priority support';
 
   // Initialize subscription service
   Future<void> initialize() async {
     try {
       _loading = true;
+      notifyListeners();
 
       // Initialize In-App Purchase
       _isAvailable = await _inAppPurchase.isAvailable();
+      
       if (_isAvailable) {
         await _loadProducts();
         await _loadPurchases();
+        await _checkSubscriptionStatus();
       }
 
-      // Initialize AdMob
-      await _initializeAdMob();
-
       _loading = false;
+      notifyListeners();
       _logger.info('Subscription service initialized successfully');
     } catch (e) {
       _loading = false;
+      notifyListeners();
       _logger.error('Failed to initialize subscription service: $e');
     }
   }
@@ -82,15 +82,51 @@ class SubscriptionService extends ChangeNotifier {
     }
   }
 
-  // Load existing purchases (simplified for demo)
+  // Load existing purchases
   Future<void> _loadPurchases() async {
     try {
-      // For demo purposes, we'll simulate past purchases
-      // In a real app, you would query actual purchase history
-      _purchases = [];
-      _logger.info('Loaded ${_purchases.length} past purchases');
+      await _inAppPurchase.restorePurchases();
+      // Note: Purchase updates are received through the purchaseStream
+      _logger.info('Restore purchases initiated');
     } catch (e) {
       _logger.error('Failed to load purchases: $e');
+    }
+  }
+
+  // Check subscription status
+  Future<void> _checkSubscriptionStatus() async {
+    try {
+      // Check stored subscription data
+      final storedSubscription = await _secureStorage.read(key: 'active_subscription');
+      final storedExpiry = await _secureStorage.read(key: 'subscription_expiry');
+      
+      if (storedSubscription != null && storedExpiry != null) {
+        _activeSubscriptionId = storedSubscription;
+        _subscriptionExpiry = DateTime.parse(storedExpiry);
+        
+        // Check if subscription is still valid
+        if (_subscriptionExpiry!.isAfter(DateTime.now())) {
+          _isSubscribed = true;
+        } else {
+          // Subscription expired
+          await _clearSubscriptionData();
+        }
+      }
+
+      // Also check active purchases
+      for (final purchase in _purchases) {
+        if (purchase.status == PurchaseStatus.purchased && 
+            _kProductIds.contains(purchase.productID)) {
+          _isSubscribed = true;
+          _activeSubscriptionId = purchase.productID;
+          await _saveSubscriptionData(purchase.productID);
+          break;
+        }
+      }
+      
+      notifyListeners();
+    } catch (e) {
+      _logger.error('Failed to check subscription status: $e');
     }
   }
 
@@ -102,11 +138,12 @@ class SubscriptionService extends ChangeNotifier {
         return false;
       }
 
-      final ProductDetails? productDetails =
-          _products.cast<ProductDetails?>().firstWhere(
-                (product) => product?.id == productId,
-                orElse: () => null,
-              );
+      final ProductDetails? productDetails = _products
+          .cast<ProductDetails?>()
+          .firstWhere(
+            (product) => product?.id == productId,
+            orElse: () => null,
+          );
 
       if (productDetails == null) {
         _logger.error('Product not found: $productId');
@@ -117,219 +154,116 @@ class SubscriptionService extends ChangeNotifier {
         productDetails: productDetails,
       );
 
+      _loading = true;
+      notifyListeners();
+
       final bool success = await _inAppPurchase.buyNonConsumable(
         purchaseParam: purchaseParam,
       );
 
+      _loading = false;
+      notifyListeners();
+
       if (success) {
         _logger.info('Purchase initiated for: $productId');
+        return true;
+      } else {
+        _logger.error('Failed to initiate purchase for: $productId');
+        return false;
       }
-
-      return success;
     } catch (e) {
+      _loading = false;
+      notifyListeners();
       _logger.error('Purchase failed: $e');
       return false;
     }
   }
 
-  // Purchase premium subscription (convenience method)
-  Future<bool> purchasePremium({bool yearly = false}) async {
-    final productId = yearly ? premiumYearlyId : premiumMonthlyId;
-    return await purchaseSubscription(productId);
+  // Save subscription data securely
+  Future<void> _saveSubscriptionData(String subscriptionId) async {
+    try {
+      await _secureStorage.write(key: 'active_subscription', value: subscriptionId);
+      
+      // Calculate expiry date
+      DateTime expiry;
+      if (subscriptionId == monthlySubscriptionId) {
+        expiry = DateTime.now().add(const Duration(days: 30));
+      } else {
+        expiry = DateTime.now().add(const Duration(days: 365));
+      }
+      
+      await _secureStorage.write(key: 'subscription_expiry', value: expiry.toIso8601String());
+      _subscriptionExpiry = expiry;
+      _activeSubscriptionId = subscriptionId;
+      _isSubscribed = true;
+      
+      notifyListeners();
+    } catch (e) {
+      _logger.error('Failed to save subscription data: $e');
+    }
   }
 
-  // Purchase pro subscription (convenience method)
-  Future<bool> purchasePro({bool yearly = false}) async {
-    final productId = yearly ? proYearlyId : proMonthlyId;
-    return await purchaseSubscription(productId);
+  // Clear subscription data
+  Future<void> _clearSubscriptionData() async {
+    try {
+      await _secureStorage.delete(key: 'active_subscription');
+      await _secureStorage.delete(key: 'subscription_expiry');
+      _activeSubscriptionId = null;
+      _subscriptionExpiry = null;
+      _isSubscribed = false;
+      notifyListeners();
+    } catch (e) {
+      _logger.error('Failed to clear subscription data: $e');
+    }
   }
 
   // Restore purchases
-  Future<void> restorePurchases() async {
+  Future<bool> restorePurchases() async {
     try {
+      _loading = true;
+      notifyListeners();
+
       await _inAppPurchase.restorePurchases();
       await _loadPurchases();
-      _logger.info('Purchases restored');
+      await _checkSubscriptionStatus();
+
+      _loading = false;
+      notifyListeners();
+      
+      _logger.info('Purchases restored successfully');
+      return true;
     } catch (e) {
+      _loading = false;
+      notifyListeners();
       _logger.error('Failed to restore purchases: $e');
+      return false;
     }
   }
 
-  // Check if user has active subscription
-  bool hasActiveSubscription(String tier) {
-    for (final purchase in _purchases) {
-      if (purchase.status == PurchaseStatus.purchased) {
-        switch (tier) {
-          case 'premium':
-            return purchase.productID == premiumMonthlyId ||
-                purchase.productID == premiumYearlyId;
-          case 'pro':
-            return purchase.productID == proMonthlyId ||
-                purchase.productID == proYearlyId;
-        }
-      }
-    }
-    return false;
-  }
-
-  // Get subscription expiry date (simplified - in real app you'd need server verification)
-  DateTime? getSubscriptionExpiry(String tier) {
-    for (final purchase in _purchases) {
-      if (purchase.status == PurchaseStatus.purchased) {
-        bool isCorrectTier = false;
-        bool isYearly = false;
-
-        switch (tier) {
-          case 'premium':
-            isCorrectTier = purchase.productID == premiumMonthlyId ||
-                purchase.productID == premiumYearlyId;
-            isYearly = purchase.productID == premiumYearlyId;
-            break;
-          case 'pro':
-            isCorrectTier = purchase.productID == proMonthlyId ||
-                purchase.productID == proYearlyId;
-            isYearly = purchase.productID == proYearlyId;
-            break;
-        }
-
-        if (isCorrectTier) {
-          // In a real app, you'd get this from receipt verification
-          final purchaseDate = DateTime.fromMillisecondsSinceEpoch(
-              int.tryParse(purchase.transactionDate ?? '0') ?? 0);
-
-          return isYearly
-              ? purchaseDate.add(const Duration(days: 365))
-              : purchaseDate.add(const Duration(days: 30));
-        }
-      }
-    }
-    return null;
-  }
-
-  // AdMob methods
-  Future<void> _initializeAdMob() async {
+  // Get product details by ID
+  ProductDetails? getProductById(String productId) {
     try {
-      await MobileAds.instance.initialize();
-      await _loadBannerAd();
-      await _loadInterstitialAd();
-      await _loadRewardedAd();
-
-      _logger.info('AdMob initialized successfully');
+      return _products.firstWhere((product) => product.id == productId);
     } catch (e) {
-      _logger.error('Failed to initialize AdMob: $e');
+      return null;
     }
   }
 
-  Future<void> _loadBannerAd() async {
-    _bannerAd = BannerAd(
-      adUnitId: Platform.isAndroid
-          ? AppConstants.adMobBannerAndroid
-          : AppConstants.adMobBannerIOS,
-      request: const AdRequest(),
-      size: AdSize.banner,
-      listener: BannerAdListener(
-        onAdLoaded: (_) {
-          _isBannerAdReady = true;
-          _logger.info('Banner ad loaded');
-        },
-        onAdFailedToLoad: (ad, err) {
-          _logger.error('Banner ad failed to load: $err');
-          _isBannerAdReady = false;
-          ad.dispose();
-        },
-      ),
-    );
+  // Check if user has premium features
+  bool get hasPremiumFeatures => _isSubscribed;
 
-    await _bannerAd!.load();
+  // Get subscription type
+  String get subscriptionType {
+    if (!_isSubscribed) return 'Free';
+    if (_activeSubscriptionId == monthlySubscriptionId) return 'Monthly Premium';
+    if (_activeSubscriptionId == yearlySubscriptionId) return 'Yearly Premium';
+    return 'Premium';
   }
 
-  Future<void> _loadInterstitialAd() async {
-    await InterstitialAd.load(
-      adUnitId: Platform.isAndroid
-          ? AppConstants.adMobInterstitialAndroid
-          : AppConstants.adMobInterstitialIOS,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (InterstitialAd ad) {
-          _interstitialAd = ad;
-          _isInterstitialAdReady = true;
-          _logger.info('Interstitial ad loaded');
-
-          _interstitialAd!.setImmersiveMode(true);
-        },
-        onAdFailedToLoad: (LoadAdError error) {
-          _logger.error('Interstitial ad failed to load: $error');
-          _isInterstitialAdReady = false;
-        },
-      ),
-    );
-  }
-
-  Future<void> _loadRewardedAd() async {
-    await RewardedAd.load(
-      adUnitId: Platform.isAndroid
-          ? AppConstants.adMobRewardedAndroid
-          : AppConstants.adMobRewardedIOS,
-      request: const AdRequest(),
-      rewardedAdLoadCallback: RewardedAdLoadCallback(
-        onAdLoaded: (RewardedAd ad) {
-          _rewardedAd = ad;
-          _isRewardedAdReady = true;
-          _logger.info('Rewarded ad loaded');
-        },
-        onAdFailedToLoad: (LoadAdError error) {
-          _logger.error('Rewarded ad failed to load: $error');
-          _isRewardedAdReady = false;
-        },
-      ),
-    );
-  }
-
-  void showInterstitialAd() {
-    if (_isInterstitialAdReady && _interstitialAd != null) {
-      _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-        onAdDismissedFullScreenContent: (InterstitialAd ad) {
-          ad.dispose();
-          _loadInterstitialAd();
-        },
-        onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
-          _logger.error('Interstitial ad failed to show: $error');
-          ad.dispose();
-          _loadInterstitialAd();
-        },
-      );
-
-      _interstitialAd!.show();
-      _isInterstitialAdReady = false;
-    }
-  }
-
-  void showRewardedAd(
-      {required Function(AdWithoutView, RewardItem) onRewarded}) {
-    if (_isRewardedAdReady && _rewardedAd != null) {
-      _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
-        onAdDismissedFullScreenContent: (RewardedAd ad) {
-          ad.dispose();
-          _loadRewardedAd();
-        },
-        onAdFailedToShowFullScreenContent: (RewardedAd ad, AdError error) {
-          _logger.error('Rewarded ad failed to show: $error');
-          ad.dispose();
-          _loadRewardedAd();
-        },
-      );
-
-      _rewardedAd!.show(onUserEarnedReward: onRewarded);
-      _isRewardedAdReady = false;
-    }
-  }
-
-  // Dispose resources
-  @override
-  void dispose() {
-    _bannerAd?.dispose();
-    _interstitialAd?.dispose();
-    _rewardedAd?.dispose();
-    super.dispose();
+  // Get days remaining
+  int get daysRemaining {
+    if (!_isSubscribed || _subscriptionExpiry == null) return 0;
+    final difference = _subscriptionExpiry!.difference(DateTime.now());
+    return difference.inDays.clamp(0, 365);
   }
 }

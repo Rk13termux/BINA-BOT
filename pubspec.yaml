@@ -42,8 +42,7 @@ dependencies:
   # AI & Machine Learning
   tflite_flutter: ^0.10.4
   
-  # Monetization
-  google_mobile_ads: ^5.1.0
+  # Monetization (Solo suscripciones)
   in_app_purchase: ^3.1.13
   
   # UI Components
