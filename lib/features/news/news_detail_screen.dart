@@ -130,10 +130,10 @@ class NewsDetailScreen extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: AppColors.goldPrimary.withOpacity(0.2),
+                      color: AppColors.goldPrimary.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                          color: AppColors.goldPrimary.withOpacity(0.5)),
+                          color: AppColors.goldPrimary.withValues(alpha: 0.5)),
                     ),
                     child: Text(
                       tag,
@@ -284,10 +284,14 @@ class NewsDetailScreen extends StatelessWidget {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        _showSnackBar(context, 'Could not open article URL');
+        if (context.mounted) {
+          _showSnackBar(context, 'Could not open article URL');
+        }
       }
     } catch (e) {
-      _showSnackBar(context, 'Error opening article: $e');
+      if (context.mounted) {
+        _showSnackBar(context, 'Error opening article: $e');
+      }
     }
   }
 

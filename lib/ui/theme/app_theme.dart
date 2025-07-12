@@ -39,7 +39,7 @@ class AppTheme {
       ),
 
       // Tema de tarjetas  
-      cardTheme: const CardTheme(
+      cardTheme: const CardThemeData(
         color: AppColors.cardBackground,
         elevation: 4,
         shape: RoundedRectangleBorder(
@@ -148,7 +148,7 @@ class AppTheme {
       ),
 
       // Tema de diálogos
-      dialogTheme: const DialogTheme(
+      dialogTheme: const DialogThemeData(
         backgroundColor: AppColors.cardBackground,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -184,7 +184,7 @@ class AppTheme {
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.goldSecondary.withOpacity(0.5);
+            return AppColors.goldSecondary.withValues(alpha: 0.5);
           }
           return AppColors.borderColor;
         }),

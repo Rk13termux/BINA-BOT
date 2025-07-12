@@ -11,7 +11,7 @@ class NewsController extends ChangeNotifier {
   List<NewsArticle> _allArticles = [];
   List<NewsArticle> _filteredArticles = [];
   List<String> _trendingTopics = [];
-  List<String> _searchHistory = [];
+  final List<String> _searchHistory = [];
   bool _isLoading = false;
   bool _isSearching = false;
   String? _error;

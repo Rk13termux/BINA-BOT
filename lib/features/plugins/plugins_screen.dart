@@ -540,7 +540,7 @@ class _PluginsScreenState extends State<PluginsScreen>
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 4, vertical: 1),
                             decoration: BoxDecoration(
-                              color: AppColors.goldPrimary.withOpacity(0.2),
+                              color: AppColors.goldPrimary.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(

@@ -191,7 +191,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             labelStyle: TextStyle(color: AppColors.textSecondary),
             hintText: 'Enter your Binance API key',
             hintStyle:
-                TextStyle(color: AppColors.textSecondary.withOpacity(0.7)),
+                TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.7)),
             prefixIcon: Icon(Icons.key, color: AppColors.goldPrimary),
             border: OutlineInputBorder(
               borderSide: BorderSide(color: AppColors.borderColor),
@@ -214,7 +214,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             labelStyle: TextStyle(color: AppColors.textSecondary),
             hintText: 'Enter your Binance secret key',
             hintStyle:
-                TextStyle(color: AppColors.textSecondary.withOpacity(0.7)),
+                TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.7)),
             prefixIcon: Icon(Icons.security, color: AppColors.goldPrimary),
             border: OutlineInputBorder(
               borderSide: BorderSide(color: AppColors.borderColor),

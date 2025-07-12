@@ -85,7 +85,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                       margin: const EdgeInsets.all(16),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppColors.warning.withOpacity(0.1),
+                        color: AppColors.warning.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: AppColors.warning),
                       ),
@@ -350,7 +350,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.goldPrimary.withOpacity(0.1),
+                  color: AppColors.goldPrimary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(color: AppColors.goldPrimary),
                 ),

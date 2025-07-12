@@ -29,6 +29,7 @@ class AppLogger {
   /// Log interno
   void _log(String level, String message) {
     final timestamp = DateTime.now().toIso8601String();
+    // ignore: avoid_print
     print('[$timestamp] [$level] $message');
 
     // TODO: Implementar almacenamiento de logs para producción

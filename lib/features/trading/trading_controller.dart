@@ -24,10 +24,10 @@ class TradingController extends ChangeNotifier {
   String _selectedInterval = '1h';
   double _currentPrice = 0.0;
   List<Candle> _candleData = [];
-  List<Trade> _tradeHistory = [];
+  final List<Trade> _tradeHistory = [];
   List<Signal> _activeSignals = [];
   Map<String, dynamic> _marketStats = {};
-  Map<String, dynamic> _premiumData = {};
+  final Map<String, dynamic> _premiumData = {};
   bool _isConnected = false;
 
   // Getters
@@ -441,10 +441,5 @@ class TradingController extends ChangeNotifier {
   void clearError() {
     _error = null;
     notifyListeners();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }

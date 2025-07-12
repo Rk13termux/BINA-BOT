@@ -123,12 +123,12 @@ class QuickActionsWidget extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed ?? () {},
       style: ElevatedButton.styleFrom(
-        backgroundColor: color.withOpacity(0.1),
+        backgroundColor: color.withValues(alpha: 0.1),
         foregroundColor: color,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          side: BorderSide(color: color.withOpacity(0.3)),
+          side: BorderSide(color: color.withValues(alpha: 0.3)),
         ),
         padding: const EdgeInsets.symmetric(vertical: 12),
       ),

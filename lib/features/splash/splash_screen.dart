@@ -71,6 +71,7 @@ class _SplashScreenState extends State<SplashScreen>
     _progressController.forward();
     
     // Inicializar la aplicación
+    // ignore: use_build_context_synchronously
     final initService = context.read<InitializationService>();
     final success = await initService.initialize();
     
@@ -113,14 +114,14 @@ class _SplashScreenState extends State<SplashScreen>
                             gradient: LinearGradient(
                               colors: [
                                 AppColors.goldPrimary,
-                                AppColors.goldPrimary.withOpacity(0.8),
+                                AppColors.goldPrimary.withValues(alpha: 0.8),
                               ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.goldPrimary.withOpacity(0.3),
+                                color: AppColors.goldPrimary.withValues(alpha: 0.3),
                                 blurRadius: 20,
                                 spreadRadius: 5,
                               ),
@@ -155,7 +156,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 letterSpacing: 4,
                                 shadows: [
                                   Shadow(
-                                    color: AppColors.goldPrimary.withOpacity(0.5),
+                                    color: AppColors.goldPrimary.withValues(alpha: 0.5),
                                     blurRadius: 10,
                                   ),
                                 ],
@@ -166,7 +167,7 @@ class _SplashScreenState extends State<SplashScreen>
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w300,
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withValues(alpha: 0.8),
                                 letterSpacing: 2,
                               ),
                             ),
@@ -191,7 +192,7 @@ class _SplashScreenState extends State<SplashScreen>
                               width: double.infinity,
                               height: 4,
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.1),
+                                color: Colors.white.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(2),
                               ),
                               child: AnimatedContainer(
@@ -204,7 +205,7 @@ class _SplashScreenState extends State<SplashScreen>
                                   gradient: LinearGradient(
                                     colors: [
                                       AppColors.goldPrimary,
-                                      AppColors.goldPrimary.withOpacity(0.6),
+                                      AppColors.goldPrimary.withValues(alpha: 0.6),
                                     ],
                                   ),
                                   borderRadius: BorderRadius.circular(2),
@@ -219,7 +220,7 @@ class _SplashScreenState extends State<SplashScreen>
                               initService.initStatus,
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.white.withOpacity(0.7),
+                                color: Colors.white.withValues(alpha: 0.7),
                                 fontWeight: FontWeight.w300,
                               ),
                               textAlign: TextAlign.center,
@@ -231,10 +232,10 @@ class _SplashScreenState extends State<SplashScreen>
                               Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(0.1),
+                                  color: Colors.red.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: Colors.red.withOpacity(0.3),
+                                    color: Colors.red.withValues(alpha: 0.3),
                                   ),
                                 ),
                                 child: Column(
@@ -286,7 +287,7 @@ class _SplashScreenState extends State<SplashScreen>
                               'Versión 1.0.0',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.white.withOpacity(0.5),
+                                color: Colors.white.withValues(alpha: 0.5),
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -294,7 +295,7 @@ class _SplashScreenState extends State<SplashScreen>
                               '© 2025 Invictus Trading Solutions',
                               style: TextStyle(
                                 fontSize: 10,
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                               ),
                             ),
                           ],

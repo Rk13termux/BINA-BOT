@@ -95,7 +95,7 @@ class RecentAlertsWidget extends StatelessWidget {
         color: AppColors.primaryDark,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -104,7 +104,7 @@ class RecentAlertsWidget extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Icon(
@@ -140,7 +140,7 @@ class RecentAlertsWidget extends StatelessWidget {
                 Text(
                   time,
                   style: TextStyle(
-                    color: AppColors.textSecondary.withOpacity(0.7),
+                    color: AppColors.textSecondary.withValues(alpha: 0.7),
                     fontSize: 10,
                   ),
                 ),

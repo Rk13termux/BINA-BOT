@@ -200,6 +200,7 @@ class InitializationService extends ChangeNotifier {
   }
 
   /// Libera recursos
+  @override
   void dispose() {
     _webSocketManager?.dispose();
     super.dispose();

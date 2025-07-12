@@ -50,15 +50,15 @@ class PortfolioWidget extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppColors.goldPrimary.withOpacity(0.1),
-                    AppColors.goldPrimary.withOpacity(0.05),
+                    AppColors.goldPrimary.withValues(alpha: 0.1),
+                    AppColors.goldPrimary.withValues(alpha: 0.05),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: AppColors.goldPrimary.withOpacity(0.3),
+                  color: AppColors.goldPrimary.withValues(alpha: 0.3),
                 ),
               ),
               child: Column(
@@ -133,7 +133,7 @@ class PortfolioWidget extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: AppColors.goldPrimary.withOpacity(0.1),
+            color: AppColors.goldPrimary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Center(

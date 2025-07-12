@@ -18,13 +18,13 @@ class PremiumApiService extends ChangeNotifier {
   
   // Configuración del servicio premium
   bool _isPremiumActive = true; // Para testing, siempre activo
-  String _apiKey = 'PREMIUM_API_KEY_2025';
+  String _apiKey = 'PREMIUM_API_KEY_2025'; // ignore: unused_field // Used in _loadConfiguration
   String _userId = 'premium_user_001';
   
   // URLs de APIs reales gratuitas que usaremos
   static const String _binanceApi = 'https://api.binance.com/api/v3';
-  static const String _coingeckoApi = 'https://api.coingecko.com/api/v3';
-  static const String _newsApi = 'https://api.coindesk.com/v1/bpi/currentprice.json';
+  // static const String _coingeckoApi = 'https://api.coingecko.com/api/v3'; // Not used yet
+  // static const String _newsApi = 'https://api.coindesk.com/v1/bpi/currentprice.json'; // Not used yet
   
   // Datos simulados para servicios premium
   final Map<String, dynamic> _premiumData = {};
