@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 /// Constantes globales de la aplicación Invictus Trader Pro
 class AppConstants {
   // Información de la aplicación
@@ -170,6 +172,43 @@ class AppConstants {
   // Configuración de backup
   static const Duration backupInterval = Duration(hours: 24);
   static const int maxBackupFiles = 7;
+}
+
+// Colores de la aplicación
+class AppColors {
+  // Colores principales
+  static const Color backgroundDark = Color(0xFF1A1A1A);
+  static const Color goldPrimary = Color(0xFFFFD700);
+
+  // Colores de trading
+  static const Color bullishGreen = Color(0xFF00FF88);
+  static const Color bearishRed = Color(0xFFFF4444);
+
+  // Colores de superficie
+  static const Color surfaceDark = Color(0xFF2A2A2A);
+  static const Color cardDark = Color(0xFF212121);
+
+  // Colores de texto
+  static const Color textPrimary = Color(0xFFFFFFFF);
+  static const Color textSecondary = Color(0xFFB0B0B0);
+  static const Color textMuted = Color(0xFF808080);
+
+  // Colores de estado
+  static const Color success = Color(0xFF4CAF50);
+  static const Color warning = Color(0xFFFF9800);
+  static const Color error = Color(0xFFF44336);
+  static const Color info = Color(0xFF2196F3);
+
+  // Colores de gradiente
+  static const List<Color> goldGradient = [
+    Color(0xFFFFD700),
+    Color(0xFFFFA500),
+  ];
+
+  static const List<Color> backgroundGradient = [
+    Color(0xFF1A1A1A),
+    Color(0xFF2A2A2A),
+  ];
 }
 
 /// Claves para almacenamiento seguro

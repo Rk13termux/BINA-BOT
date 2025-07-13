@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../services/free_crypto_service.dart';
-import '../../utils/premium_guard.dart';
 import '../../features/subscription/subscription_screen.dart';
 
 class FreePriceWidget extends StatefulWidget {

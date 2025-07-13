@@ -5,7 +5,6 @@ import '../../ui/widgets/subscription_status_widget.dart';
 import '../../ui/widgets/free_price_widget.dart';
 import '../trading/trading_screen.dart';
 import '../alerts/alerts_screen.dart';
-import '../news/news_screen.dart';
 import '../settings/settings_screen.dart';
 import '../plugins/plugins_screen.dart';
 import 'widgets/price_tile.dart';
@@ -35,6 +34,11 @@ class _DashboardScreenState extends State<DashboardScreen>
       'widget': const _DashboardHomeTab(),
     },
     {
+      'title': 'Analysis',
+      'icon': Icons.analytics,
+      'widget': const _AnalysisTab(),
+    },
+    {
       'title': 'Trading',
       'icon': Icons.show_chart,
       'widget': const TradingScreen(),
@@ -43,11 +47,6 @@ class _DashboardScreenState extends State<DashboardScreen>
       'title': 'Alerts',
       'icon': Icons.notifications,
       'widget': const AlertsScreen(),
-    },
-    {
-      'title': 'News',
-      'icon': Icons.article,
-      'widget': const NewsScreen(),
     },
     {
       'title': 'More',
@@ -565,6 +564,196 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
       SnackBar(
         content: Text('$feature feature coming soon!'),
         backgroundColor: AppColors.info,
+      ),
+    );
+  }
+}
+
+/// Tab de análisis profesional
+class _AnalysisTab extends StatelessWidget {
+  const _AnalysisTab();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          // Header con descripción
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppColors.goldPrimary.withOpacity(0.2),
+                  AppColors.goldPrimary.withOpacity(0.05),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: AppColors.goldPrimary.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.analytics,
+                  size: 48,
+                  color: AppColors.goldPrimary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Análisis Profesional',
+                  style: TextStyle(
+                    color: AppColors.goldPrimary,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Gráficos avanzados, análisis técnico y conexión con Binance API para trading profesional',
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 16,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // Botón principal para acceder al análisis
+          SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pushNamed(context, '/analysis');
+              },
+              icon: Icon(
+                Icons.analytics,
+                size: 24,
+              ),
+              label: Text(
+                'Abrir Dashboard de Análisis',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.goldPrimary,
+                foregroundColor: AppColors.primaryDark,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 4,
+              ),
+            ),
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // Lista de características
+          Expanded(
+            child: ListView(
+              children: [
+                _buildFeatureCard(
+                  'Gráficos de Velas Profesionales',
+                  'Visualización avanzada con múltiples intervalos de tiempo',
+                  Icons.candlestick_chart,
+                ),
+                const SizedBox(height: 12),
+                _buildFeatureCard(
+                  'Conexión Binance API',
+                  'Datos en tiempo real y gestión de cuenta',
+                  Icons.api,
+                ),
+                const SizedBox(height: 12),
+                _buildFeatureCard(
+                  'Order Book en Tiempo Real',
+                  'Profundidad de mercado y análisis de liquidez',
+                  Icons.list_alt,
+                ),
+                const SizedBox(height: 12),
+                _buildFeatureCard(
+                  'Análisis Técnico',
+                  'Indicadores y herramientas de análisis avanzadas',
+                  Icons.insights,
+                ),
+                const SizedBox(height: 12),
+                _buildFeatureCard(
+                  'Portfolio Tracking',
+                  'Seguimiento de balances y rendimiento',
+                  Icons.account_balance_wallet,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildFeatureCard(String title, String description, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceDark,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.goldPrimary.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: AppColors.goldPrimary.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: AppColors.goldPrimary,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

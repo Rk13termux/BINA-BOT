@@ -9,6 +9,7 @@ import 'ui/theme/app_theme.dart';
 // Feature imports
 import 'features/splash/splash_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
+import 'features/dashboard/simple_professional_dashboard.dart';
 import 'features/subscription/subscription_screen.dart';
 import 'features/news/news_controller.dart';
 import 'features/trading/trading_controller.dart';
@@ -19,6 +20,7 @@ import 'services/auth_service.dart';
 import 'services/subscription_service.dart';
 import 'services/initialization_service.dart';
 import 'services/binance_websocket_service.dart';
+import 'services/free_crypto_service.dart';
 import 'core/api_manager.dart';
 
 // Utils
@@ -79,6 +81,7 @@ class InvictusTraderApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => SubscriptionService()),
         ChangeNotifierProvider(create: (_) => BinanceWebSocketService()),
+        Provider(create: (_) => FreeCryptoService()),
         Provider(create: (_) => ApiManager()),
       ],
       child: MaterialApp(
@@ -93,6 +96,7 @@ class InvictusTraderApp extends StatelessWidget {
         routes: {
           '/splash': (context) => const SplashScreen(),
           '/dashboard': (context) => const DashboardScreen(),
+          '/analysis': (context) => const SimpleProfessionalDashboard(),
           '/subscription': (context) => const SubscriptionScreen(),
           // TODO: Agregar más rutas cuando las pantallas estén implementadas
           // '/trading': (context) => const TradingScreen(),
