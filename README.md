@@ -8,7 +8,7 @@ A professional Flutter trading application for cryptocurrency trading with Binan
 
 ## 🚀 Features.
 
-### Core Features
+### Core Features.
 - **Real-time Trading**: Live cryptocurrency market data via Binance WebSocket
 - **Professional Charts**: Advanced candlestick charts with technical indicators
 - **News Integration**: Real-time crypto news from multiple sources (CoinDesk, CoinTelegraph, etc.)

@@ -47,6 +47,7 @@ jobs:
         <full-backup-content>
             <include domain="sharedpref" path="." />
             <include domain="file" path="." />
+            <include domain="database" path="." />
             <exclude domain="file" path="no_backup/" />
             <exclude domain="sharedpref" path="secure_prefs.xml" />
             <exclude domain="database" path="secure.db" />
@@ -60,11 +61,13 @@ jobs:
         <data-extraction-rules>
             <cloud-backup>
                 <include domain="file" path="." />
+                <include domain="sharedpref" path="." />
                 <exclude domain="file" path="no_backup/" />
                 <exclude domain="sharedpref" path="secure_prefs.xml" />
             </cloud-backup>
             <device-transfer>
                 <include domain="file" path="." />
+                <include domain="sharedpref" path="." />
                 <exclude domain="file" path="no_backup/" />
                 <exclude domain="sharedpref" path="secure_prefs.xml" />
             </device-transfer>
