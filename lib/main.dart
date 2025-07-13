@@ -9,7 +9,7 @@ import 'ui/theme/app_theme.dart';
 // Feature imports
 import 'features/splash/splash_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
-import 'features/dashboard/simple_professional_dashboard.dart';
+import 'features/dashboard/bina_bot_pro_main_dashboard.dart';
 import 'features/subscription/subscription_screen.dart';
 import 'features/news/news_controller.dart';
 import 'features/trading/trading_controller.dart';
@@ -45,25 +45,25 @@ void main() async {
       DeviceOrientation.landscapeRight,
     ]);
 
-    // Configurar barra de estado
+    // Configurar barra de estado para tema negro
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.light,
-        systemNavigationBarColor: Color(0xFF1A1A1A),
+        systemNavigationBarColor: Color(0xFF000000), // Negro puro
         systemNavigationBarIconBrightness: Brightness.light,
       ),
     );
 
-    runApp(const InvictusTraderApp());
+    runApp(const BinaBotProApp());
   }, (error, stack) {
     AppLogger().error('Zone Error: $error');
     AppLogger().error('Zone Stack: $stack');
   });
 }
 
-class InvictusTraderApp extends StatelessWidget {
-  const InvictusTraderApp({super.key});
+class BinaBotProApp extends StatelessWidget {
+  const BinaBotProApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -85,18 +85,18 @@ class InvictusTraderApp extends StatelessWidget {
         Provider(create: (_) => ApiManager()),
       ],
       child: MaterialApp(
-        title: 'Invictus Trader Pro',
+        title: 'BINA-BOT PRO',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
         
-        // Iniciar con SplashScreen
-        home: const SplashScreen(),
+        // Iniciar con el nuevo dashboard principal
+        home: const BinaBotProMainDashboard(),
 
-        // Configuración de rutas
+        // Configuración de rutas actualizadas
         routes: {
           '/splash': (context) => const SplashScreen(),
-          '/dashboard': (context) => const DashboardScreen(),
-          '/analysis': (context) => const SimpleProfessionalDashboard(),
+          '/dashboard': (context) => const BinaBotProMainDashboard(),
+          '/legacy-dashboard': (context) => const DashboardScreen(),
           '/subscription': (context) => const SubscriptionScreen(),
           // TODO: Agregar más rutas cuando las pantallas estén implementadas
           // '/trading': (context) => const TradingScreen(),
@@ -106,20 +106,23 @@ class InvictusTraderApp extends StatelessWidget {
           // '/news': (context) => const NewsScreen(),
         },
 
-        // Configuración del builder para el tema
+        // Configuración del builder para el tema negro
         builder: (context, child) {
           return MediaQuery(
             data: MediaQuery.of(context).copyWith(
               textScaler: const TextScaler.linear(1.0), // Prevenir escalado de texto
             ),
-            child: child!,
+            child: Container(
+              color: const Color(0xFF000000), // Fondo negro garantizado
+              child: child!,
+            ),
           );
         },
         
         // Manejar rutas desconocidas
         onUnknownRoute: (settings) {
           return MaterialPageRoute(
-            builder: (context) => const SplashScreen(),
+            builder: (context) => const BinaBotProMainDashboard(),
           );
         },
       ),
