@@ -59,6 +59,35 @@ jobs:
     - name: Get dependencies
       run: flutter pub get
 
+    - name: Fix XML files for build
+      run: |
+        echo '<?xml version="1.0" encoding="utf-8"?>' > android/app/src/main/res/xml/backup_rules.xml
+        echo '<full-backup-content>' >> android/app/src/main/res/xml/backup_rules.xml
+        echo '    <include domain="sharedpref" path="." />' >> android/app/src/main/res/xml/backup_rules.xml
+        echo '    <include domain="file" path="." />' >> android/app/src/main/res/xml/backup_rules.xml
+        echo '    <include domain="database" path="." />' >> android/app/src/main/res/xml/backup_rules.xml
+        echo '    <exclude domain="file" path="no_backup/" />' >> android/app/src/main/res/xml/backup_rules.xml
+        echo '    <exclude domain="sharedpref" path="secure_prefs.xml" />' >> android/app/src/main/res/xml/backup_rules.xml
+        echo '    <exclude domain="database" path="secure.db" />' >> android/app/src/main/res/xml/backup_rules.xml
+        echo '    <exclude domain="database" path="api_keys.db" />' >> android/app/src/main/res/xml/backup_rules.xml
+        echo '</full-backup-content>' >> android/app/src/main/res/xml/backup_rules.xml
+        
+        echo '<?xml version="1.0" encoding="utf-8"?>' > android/app/src/main/res/xml/data_extraction_rules.xml
+        echo '<data-extraction-rules>' >> android/app/src/main/res/xml/data_extraction_rules.xml
+        echo '    <cloud-backup>' >> android/app/src/main/res/xml/data_extraction_rules.xml
+        echo '        <include domain="file" path="." />' >> android/app/src/main/res/xml/data_extraction_rules.xml
+        echo '        <include domain="sharedpref" path="." />' >> android/app/src/main/res/xml/data_extraction_rules.xml
+        echo '        <exclude domain="file" path="no_backup/" />' >> android/app/src/main/res/xml/data_extraction_rules.xml
+        echo '        <exclude domain="sharedpref" path="secure_prefs.xml" />' >> android/app/src/main/res/xml/data_extraction_rules.xml
+        echo '    </cloud-backup>' >> android/app/src/main/res/xml/data_extraction_rules.xml
+        echo '    <device-transfer>' >> android/app/src/main/res/xml/data_extraction_rules.xml
+        echo '        <include domain="file" path="." />' >> android/app/src/main/res/xml/data_extraction_rules.xml
+        echo '        <include domain="sharedpref" path="." />' >> android/app/src/main/res/xml/data_extraction_rules.xml
+        echo '        <exclude domain="file" path="no_backup/" />' >> android/app/src/main/res/xml/data_extraction_rules.xml
+        echo '        <exclude domain="sharedpref" path="secure_prefs.xml" />' >> android/app/src/main/res/xml/data_extraction_rules.xml
+        echo '    </device-transfer>' >> android/app/src/main/res/xml/data_extraction_rules.xml
+        echo '</data-extraction-rules>' >> android/app/src/main/res/xml/data_extraction_rules.xml
+
     - name: Create dummy signing config
       run: |
         echo "storePassword=dummy123" > android/key.properties
