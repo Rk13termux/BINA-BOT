@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:crypto/crypto.dart';
 import '../models/candle.dart';
 import '../utils/logger.dart';
 import '../utils/constants.dart';
@@ -20,13 +21,18 @@ class BinanceService extends ChangeNotifier {
   bool _isTestNet = false;
   String? _lastError;
 
+  // Account information and balances
+  Map<String, dynamic>? _accountInfo;
+  List<Map<String, dynamic>> _balances = [];
+
   // Getters
   bool get isAuthenticated => _isAuthenticated;
   bool get isConnected => _isConnected;
   bool get isTestNet => _isTestNet;
   String? get lastError => _lastError;
   String get baseUrl => _isTestNet ? _testNetUrl : _baseUrl;
-
+  Map<String, dynamic>? get accountInfo => _accountInfo;
+  List<Map<String, dynamic>> get balances => _balances;
   // Initialize service
   Future<void> initialize() async {
     try {
@@ -38,6 +44,12 @@ class BinanceService extends ChangeNotifier {
       // Test connection if authenticated
       if (_isAuthenticated) {
         await _testConnection();
+        // Load account info on initialization
+        try {
+          await getAccountInfo();
+        } catch (e) {
+          _logger.warning('Failed to load account info on init: $e');
+        }
       }
       
       _logger.info('Binance service initialized');
@@ -52,10 +64,10 @@ class BinanceService extends ChangeNotifier {
       _apiKey = await _storage.read(key: StorageKeys.binanceApiKey);
       _secretKey = await _storage.read(key: StorageKeys.binanceSecretKey);
       final testNetStr = await _storage.read(key: StorageKeys.binanceTestNet);
-      
+
       _isTestNet = testNetStr == 'true';
       _isAuthenticated = _apiKey != null && _secretKey != null;
-      
+
       if (_isAuthenticated) {
         _logger.info('Binance credentials loaded from storage');
       }
@@ -68,13 +80,13 @@ class BinanceService extends ChangeNotifier {
   Future<void> _testConnection() async {
     try {
       _logger.info('Testing Binance API connection...');
-      
+
       final response = await http.get(
         Uri.parse('$baseUrl/api/v3/ping'),
       ).timeout(
         const Duration(seconds: 5),
       );
-      
+
       _isConnected = response.statusCode == 200;
       _lastError = _isConnected ? null : 'API connection failed';
       notifyListeners();
@@ -87,18 +99,29 @@ class BinanceService extends ChangeNotifier {
   }
 
   // Set API credentials
-  Future<void> setCredentials(String apiKey, String secretKey, [bool testNet = false]) async {
+  Future<void> setCredentials(String apiKey, String secretKey,
+      [bool testNet = false]) async {
     try {
       await _storage.write(key: StorageKeys.binanceApiKey, value: apiKey);
       await _storage.write(key: StorageKeys.binanceSecretKey, value: secretKey);
       await _storage.write(key: StorageKeys.binanceTestNet, value: testNet.toString());
-      
+
       _apiKey = apiKey;
       _secretKey = secretKey;
       _isTestNet = testNet;
       _isAuthenticated = true;
-      
+
       await _testConnection();
+      
+      // Load account info after setting credentials
+      try {
+        await getAccountInfo();
+        _logger.info('Account info loaded after setting credentials');
+      } catch (e) {
+        _logger.warning('Failed to load account info: $e');
+      }
+      
+      notifyListeners();
       _logger.info('Binance credentials saved and tested');
     } catch (e) {
       _logger.error('Failed to save Binance credentials: $e');
@@ -129,13 +152,13 @@ class BinanceService extends ChangeNotifier {
   Future<List<Map<String, dynamic>>> getTickerData(List<String> symbols) async {
     try {
       final results = <Map<String, dynamic>>[];
-      
+
       for (final symbol in symbols) {
         try {
           final response = await http.get(
             Uri.parse('$baseUrl/api/v3/ticker/24hr?symbol=${symbol.toUpperCase()}USDT'),
           );
-          
+
           if (response.statusCode == 200) {
             final data = json.decode(response.body);
             results.add({
@@ -172,13 +195,13 @@ class BinanceService extends ChangeNotifier {
           });
         }
       }
-      
+
       _lastError = null;
       if (!_isConnected) {
         _isConnected = true;
         notifyListeners();
       }
-      
+
       return results;
     } catch (e) {
       _lastError = e.toString();
@@ -240,7 +263,7 @@ class BinanceService extends ChangeNotifier {
     }
   }
 
-  // Get account information (requires authentication)
+  // Account information (requires authentication)
   Future<Map<String, dynamic>> getAccountInfo() async {
     if (!_isAuthenticated) {
       throw Exception('Not authenticated. Please set API credentials.');
@@ -259,36 +282,128 @@ class BinanceService extends ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        _accountInfo = json.decode(response.body);
+        _balances = List<Map<String, dynamic>>.from(_accountInfo!['balances'] ?? []);
+
+        // Filter only balances with values > 0
+        _balances = _balances.where((balance) {
+          final free = double.tryParse(balance['free']?.toString() ?? '0') ?? 0;
+          final locked = double.tryParse(balance['locked']?.toString() ?? '0') ?? 0;
+          return (free + locked) > 0;
+        }).toList();
+
+        notifyListeners();
+        _logger.info('Account info loaded successfully');
+        return _accountInfo!;
       } else {
-        throw Exception('Failed to get account info: ${response.statusCode}');
+        final error = json.decode(response.body);
+        throw Exception('Binance API Error: ${error['msg'] ?? 'Unknown error'}');
       }
     } catch (e) {
       _logger.error('Failed to get account info: $e');
-      throw Exception('Failed to get account info');
+      throw Exception('Failed to get account info: $e');
     }
   }
 
-  // Get trading symbols
-  Future<List<String>> getTradingSymbols() async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/api/v3/exchangeInfo'),
-      );
+  // Generate signature for authenticated requests
+  String _generateSignature(String queryString) {
+    if (_secretKey == null) {
+      throw Exception('Secret key not set');
+    }
+    
+    final key = utf8.encode(_secretKey!);
+    final bytes = utf8.encode(queryString);
+    final hmacSha256 = Hmac(sha256, key);
+    final digest = hmacSha256.convert(bytes);
+    return digest.toString();
+  }
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final symbols = (data['symbols'] as List)
-            .where((symbol) => symbol['status'] == 'TRADING')
-            .map((symbol) => symbol['symbol'] as String)
-            .toList();
-        return symbols;
-      } else {
-        throw Exception('Failed to get trading symbols: ${response.statusCode}');
+  /// Get total balance in USDT
+  Future<double> getTotalBalanceUSDT() async {
+    try {
+      if (_balances.isEmpty) {
+        await getAccountInfo();
       }
+      
+      double totalBalance = 0.0;
+      
+      for (final balance in _balances) {
+        final asset = balance['asset'];
+        final free = double.tryParse(balance['free']?.toString() ?? '0') ?? 0;
+        final locked = double.tryParse(balance['locked']?.toString() ?? '0') ?? 0;
+        final totalAsset = free + locked;
+        
+        if (totalAsset > 0) {
+          if (asset == 'USDT' || asset == 'BUSD' || asset == 'USDC') {
+            totalBalance += totalAsset;
+          } else {
+            // Convert to USDT
+            try {
+              final price = await getCurrentPrice('${asset}USDT');
+              totalBalance += totalAsset * price;
+            } catch (e) {
+              // If conversion fails, skip this asset
+              _logger.warning('Failed to convert $asset to USDT: $e');
+            }
+          }
+        }
+      }
+      
+      return totalBalance;
     } catch (e) {
-      _logger.error('Failed to get trading symbols: $e');
-      throw Exception('Failed to get trading symbols');
+      _logger.error('Failed to calculate total balance: $e');
+      return 0.0;
+    }
+  }
+
+  /// Get formatted balances with USDT values
+  Future<List<Map<String, dynamic>>> getFormattedBalances() async {
+    try {
+      if (_balances.isEmpty) {
+        await getAccountInfo();
+      }
+      
+      List<Map<String, dynamic>> formattedBalances = [];
+      
+      for (final balance in _balances) {
+        final asset = balance['asset'];
+        final free = double.tryParse(balance['free']?.toString() ?? '0') ?? 0;
+        final locked = double.tryParse(balance['locked']?.toString() ?? '0') ?? 0;
+        final total = free + locked;
+        
+        if (total > 0) {
+          double usdtValue = 0.0;
+          
+          if (asset == 'USDT' || asset == 'BUSD' || asset == 'USDC') {
+            usdtValue = total;
+          } else {
+            try {
+              final price = await getCurrentPrice('${asset}USDT');
+              usdtValue = total * price;
+            } catch (e) {
+              // If conversion fails, set to 0
+              usdtValue = 0.0;
+            }
+          }
+          
+          formattedBalances.add({
+            'asset': asset,
+            'free': free,
+            'locked': locked,
+            'total': total,
+            'usdtValue': usdtValue,
+            'symbol': '${asset}USDT',
+          });
+        }
+      }
+      
+      // Sort by USDT value (highest first)
+      formattedBalances.sort((a, b) => b['usdtValue'].compareTo(a['usdtValue']));
+      
+      return formattedBalances;
+    } catch (e) {
+      _logger.error('Failed to get formatted balances: $e');
+      return [];
     }
   }
 
@@ -357,11 +472,51 @@ class BinanceService extends ChangeNotifier {
     }
   }
 
-  // Generate signature for authenticated requests
-  String _generateSignature(String queryString) {
-    // This is a placeholder implementation
-    // In a real implementation, you would use HMAC-SHA256
-    return 'placeholder_signature';
+  /// Obtener pares de trading disponibles
+  Future<List<Map<String, dynamic>>> getTradingPairs() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/v3/exchangeInfo'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final symbols = List<Map<String, dynamic>>.from(data['symbols'] ?? []);
+        
+        // Filtrar solo símbolos activos
+        return symbols.where((symbol) => symbol['status'] == 'TRADING').toList();
+      } else {
+        throw Exception('Failed to get trading pairs: ${response.statusCode}');
+      }
+    } catch (e) {
+      _logger.error('Failed to get trading pairs: $e');
+      throw Exception('Failed to get trading pairs: $e');
+    }
+  }
+
+  /// Obtener datos de ticker de 24 horas
+  Future<List<Map<String, dynamic>>> get24hrTicker() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/v3/ticker/24hr'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return List<Map<String, dynamic>>.from(data);
+      } else {
+        throw Exception('Failed to get 24hr ticker: ${response.statusCode}');
+      }
+    } catch (e) {
+      _logger.error('Failed to get 24hr ticker: $e');
+      throw Exception('Failed to get 24hr ticker: $e');
+    }
   }
 
   // Clear credentials

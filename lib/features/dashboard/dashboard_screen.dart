@@ -425,11 +425,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Container(
       height: 60,
       padding: const EdgeInsets.symmetric(horizontal: 24),
-      decoration: const BoxDecoration(
-        color: Color(0xFF1E2329),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceDark,
         border: Border(
           bottom: BorderSide(
-            color: Color(0xFF2B3139),
+            color: AppColors.goldPrimary,
             width: 1,
           ),
         ),
@@ -439,13 +439,59 @@ class _DashboardScreenState extends State<DashboardScreen> {
           // Título de la página actual
           Text(
             _menuItems[_selectedIndex]['title'],
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: AppColors.textPrimary,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
           const Spacer(),
+          
+          // Balance info when connected
+          Consumer<BinanceService>(
+            builder: (context, binanceService, child) {
+              if (binanceService.isAuthenticated && binanceService.balances.isNotEmpty) {
+                return FutureBuilder<double>(
+                  future: binanceService.getTotalBalanceUSDT(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppColors.goldPrimary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.goldPrimary, width: 1),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.account_balance_wallet,
+                              color: AppColors.goldPrimary,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              '\$${snapshot.data!.toStringAsFixed(2)}',
+                              style: TextStyle(
+                                color: AppColors.goldPrimary,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+          
+          const SizedBox(width: 16),
           
           // Indicador de conexión API
           Consumer<BinanceService>(
@@ -453,9 +499,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               return Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: binanceService.isConnected 
-                      ? const Color(0xFF0ECB81)
-                      : const Color(0xFFF6465D),
+                  color: binanceService.isAuthenticated && binanceService.isConnected
+                      ? AppColors.bullish
+                      : AppColors.bearish,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -471,7 +517,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      binanceService.isConnected ? 'API CONECTADA' : 'API DESCONECTADA',
+                      binanceService.isAuthenticated && binanceService.isConnected 
+                          ? 'API CONECTADA' 
+                          : 'API DESCONECTADA',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 11,
@@ -494,12 +542,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFFF0B90B)),
+                  border: Border.all(color: AppColors.goldPrimary),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.api,
-                  color: Color(0xFFF0B90B),
+                  color: AppColors.goldPrimary,
                   size: 20,
                 ),
               ),
@@ -1039,25 +1087,28 @@ class _ApiConfigDialogState extends State<ApiConfigDialog> {
     });
 
     try {
-      final authService = Provider.of<AuthService>(context, listen: false);
       final binanceService = Provider.of<BinanceService>(context, listen: false);
 
-      // Guardar credenciales
-      await authService.saveApiCredentials(
+      // Configurar credenciales directamente en BinanceService
+      await binanceService.setCredentials(
         _apiKeyController.text.trim(),
         _secretKeyController.text.trim(),
         _isTestNet,
       );
 
-      // Inicializar Binance Service
-      await binanceService.initialize();
-
       if (mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('¡API configurada exitosamente!'),
-            backgroundColor: Color(0xFF0ECB81),
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 8),
+                const Text('¡API configurada exitosamente!'),
+              ],
+            ),
+            backgroundColor: AppColors.bullish,
+            duration: const Duration(seconds: 3),
           ),
         );
       }
@@ -1065,8 +1116,15 @@ class _ApiConfigDialogState extends State<ApiConfigDialog> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error al configurar API: $e'),
-            backgroundColor: const Color(0xFFF6465D),
+            content: Row(
+              children: [
+                Icon(Icons.error, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(child: Text('Error al configurar API: $e')),
+              ],
+            ),
+            backgroundColor: AppColors.bearish,
+            duration: const Duration(seconds: 5),
           ),
         );
       }

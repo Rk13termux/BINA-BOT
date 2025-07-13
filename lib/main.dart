@@ -9,6 +9,7 @@ import 'ui/theme/app_theme.dart';
 // Feature imports
 import 'features/splash/splash_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
+import 'features/dashboard_strategy_view/invictus_main_screen.dart';
 import 'features/news/news_controller.dart';
 import 'features/trading/trading_controller.dart';
 import 'features/alerts/alerts_controller.dart';
@@ -87,16 +88,17 @@ class BinaBotProApp extends StatelessWidget {
         Provider(create: (_) => ApiManager()),
       ],
       child: MaterialApp(
-        title: 'BINA-BOT PRO',
+        title: 'INVICTUS TRADER PRO',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
         
-        // Iniciar con el dashboard principal completo
-        home: const DashboardScreen(),
+        // Iniciar con la nueva pantalla principal
+        home: const InvictusMainScreen(),
 
         // Configuración de rutas actualizadas
         routes: {
           '/splash': (context) => const SplashScreen(),
+          '/main': (context) => const InvictusMainScreen(),
           '/dashboard': (context) => const DashboardScreen(),
           // TODO: Agregar más rutas cuando las pantallas estén implementadas
           // '/trading': (context) => const TradingScreen(),
