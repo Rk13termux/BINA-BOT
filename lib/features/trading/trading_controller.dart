@@ -7,7 +7,7 @@ import '../../services/notification_service.dart';
 import '../../utils/logger.dart';
 
 class TradingController extends ChangeNotifier {
-  final BinanceService _binanceService = BinanceService();
+  BinanceService? _binanceService;
   final NotificationService _notificationService = NotificationService();
   final AppLogger _logger = AppLogger();
   
@@ -39,13 +39,22 @@ class TradingController extends ChangeNotifier {
   Map<String, dynamic> get premiumData => _premiumData;
   bool get isConnected => _isConnected;
 
+  /// Set the Binance service instance (to be called from Provider)
+  void setBinanceService(BinanceService binanceService) {
+    _binanceService = binanceService;
+  }
+
   /// Initialize trading controller
   Future<void> initialize() async {
     try {
       _setLoading(true);
       
+      if (_binanceService == null) {
+        throw Exception('BinanceService not set. Call setBinanceService() first.');
+      }
+      
       // Initialize services
-      await _binanceService.initialize();
+      await _binanceService!.initialize();
       await _notificationService.initialize();
       
       await _loadInitialData();
@@ -102,7 +111,8 @@ class TradingController extends ChangeNotifier {
   /// Update current price
   Future<void> _updateCurrentPrice() async {
     try {
-      final price = await _binanceService.getCurrentPrice(_selectedSymbol);
+      if (_binanceService == null) return;
+      final price = await _binanceService!.getCurrentPrice(_selectedSymbol);
       _currentPrice = price;
       notifyListeners();
     } catch (e) {
@@ -113,10 +123,11 @@ class TradingController extends ChangeNotifier {
   /// Update candlestick data
   Future<void> _updateCandleData() async {
     try {
-      final candles = await _binanceService.getCandlestickData(
+      if (_binanceService == null) return;
+      final candles = await _binanceService!.getCandlestickData(
         _selectedSymbol,
         _selectedInterval,
-        limit: 100,
+        100, // limit as positional parameter
       );
       _candleData = candles;
       notifyListeners();
@@ -128,7 +139,8 @@ class TradingController extends ChangeNotifier {
   /// Update market statistics
   Future<void> _updateMarketStats() async {
     try {
-      final stats = await _binanceService.get24hStats(_selectedSymbol);
+      if (_binanceService == null) return;
+      final stats = await _binanceService!.get24hStats(_selectedSymbol);
       _marketStats = stats;
       notifyListeners();
     } catch (e) {
@@ -144,53 +156,55 @@ class TradingController extends ChangeNotifier {
     try {
       _setLoading(true);
 
-      // For now, use test order
-      final result = await _binanceService.placeTestOrder(
-        symbol: _selectedSymbol,
-        side: side,
-        type: 'MARKET',
-        quantity: quantity,
-      );
-
-      if (result['success'] == true) {
-        // Create trade record
-        final trade = Trade(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          symbol: _selectedSymbol,
-          side: side.toLowerCase() == 'buy' ? OrderSide.buy : OrderSide.sell,
-          type: OrderType.market,
-          quantity: quantity,
-          price: _currentPrice,
-          status: TradeStatus.filled,
-          createdAt: DateTime.now(),
-          filledAt: DateTime.now(),
-          filledPrice: _currentPrice,
-          filledQuantity: quantity,
-        );
-
-        _tradeHistory.insert(0, trade);
-        notifyListeners();
-
-        await _notificationService.showTradingSignal(
-          Signal(
-            id: trade.id,
-            symbol: _selectedSymbol,
-            type:
-                side.toLowerCase() == 'buy' ? SignalType.buy : SignalType.sell,
-            price: _currentPrice,
-            confidence: ConfidenceLevel.high,
-            reason: 'Manual $side order executed',
-            timestamp: DateTime.now(),
-            metadata: {'quantity': quantity, 'type': 'market'},
-            source: 'manual',
-          ),
-        );
-
-        _logger.info('Market order placed: $side $quantity $_selectedSymbol');
-        return true;
+      if (_binanceService == null) {
+        _setError('BinanceService not available');
+        return false;
       }
 
-      return false;
+      // For now, use test order - placeTestOrder returns void
+      await _binanceService!.placeTestOrder(
+        _selectedSymbol,
+        side,
+        'MARKET',
+        quantity,
+      );
+
+      // If no exception was thrown, consider it successful
+      // Create trade record
+      final trade = Trade(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        symbol: _selectedSymbol,
+        side: side.toLowerCase() == 'buy' ? OrderSide.buy : OrderSide.sell,
+        type: OrderType.market,
+        quantity: quantity,
+        price: _currentPrice,
+        status: TradeStatus.filled,
+        createdAt: DateTime.now(),
+        filledAt: DateTime.now(),
+        filledPrice: _currentPrice,
+        filledQuantity: quantity,
+      );
+
+      _tradeHistory.insert(0, trade);
+      notifyListeners();
+
+      await _notificationService.showTradingSignal(
+        Signal(
+          id: trade.id,
+          symbol: _selectedSymbol,
+          type:
+              side.toLowerCase() == 'buy' ? SignalType.buy : SignalType.sell,
+          price: _currentPrice,
+          confidence: ConfidenceLevel.high,
+          reason: 'Manual $side order executed',
+          timestamp: DateTime.now(),
+          metadata: {'quantity': quantity, 'type': 'market'},
+          source: 'manual',
+        ),
+      );
+
+      _logger.info('Market order placed: $side $quantity $_selectedSymbol');
+      return true;
     } catch (e) {
       _setError('Failed to place market order: $e');
       return false;
@@ -208,37 +222,38 @@ class TradingController extends ChangeNotifier {
     try {
       _setLoading(true);
 
-      // For now, use test order
-      final result = await _binanceService.placeTestOrder(
-        symbol: _selectedSymbol,
-        side: side,
-        type: 'LIMIT',
-        quantity: quantity,
-        price: price,
-      );
-
-      if (result['success'] == true) {
-        // Create trade record
-        final trade = Trade(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          symbol: _selectedSymbol,
-          side: side.toLowerCase() == 'buy' ? OrderSide.buy : OrderSide.sell,
-          type: OrderType.limit,
-          quantity: quantity,
-          price: price,
-          status: TradeStatus.pending,
-          createdAt: DateTime.now(),
-        );
-
-        _tradeHistory.insert(0, trade);
-        notifyListeners();
-
-        _logger.info(
-            'Limit order placed: $side $quantity $_selectedSymbol at \$${price.toStringAsFixed(2)}');
-        return true;
+      if (_binanceService == null) {
+        _setError('BinanceService not available');
+        return false;
       }
 
-      return false;
+      // For now, use test order - placeTestOrder returns void
+      await _binanceService!.placeTestOrder(
+        _selectedSymbol,
+        side,
+        'LIMIT',
+        quantity,
+      );
+
+      // If no exception was thrown, consider it successful
+      // Create trade record
+      final trade = Trade(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        symbol: _selectedSymbol,
+        side: side.toLowerCase() == 'buy' ? OrderSide.buy : OrderSide.sell,
+        type: OrderType.limit,
+        quantity: quantity,
+        price: price,
+        status: TradeStatus.pending,
+        createdAt: DateTime.now(),
+      );
+
+      _tradeHistory.insert(0, trade);
+      notifyListeners();
+
+      _logger.info(
+          'Limit order placed: $side $quantity $_selectedSymbol at \$${price.toStringAsFixed(2)}');
+      return true;
     } catch (e) {
       _setError('Failed to place limit order: $e');
       return false;

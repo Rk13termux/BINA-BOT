@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:candlesticks/candlesticks.dart';
 import '../../../ui/theme/colors.dart';
 import '../../../services/auth_service.dart';
+import '../../../services/binance_service.dart';
 import 'trading_controller.dart';
 
 class TradingScreen extends StatefulWidget {
@@ -24,8 +25,18 @@ class _TradingScreenState extends State<TradingScreen>
     _tabController = TabController(length: 3, vsync: this);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TradingController>().setSelectedSymbol(_selectedSymbol);
-      context.read<TradingController>().setSelectedInterval(_selectedInterval);
+      final tradingController = context.read<TradingController>();
+      final binanceService = context.read<BinanceService>();
+      
+      // Configure BinanceService in TradingController
+      tradingController.setBinanceService(binanceService);
+      
+      // Set initial parameters
+      tradingController.setSelectedSymbol(_selectedSymbol);
+      tradingController.setSelectedInterval(_selectedInterval);
+      
+      // Initialize controller
+      tradingController.initialize();
     });
   }
 
