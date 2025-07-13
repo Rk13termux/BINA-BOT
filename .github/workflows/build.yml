@@ -30,7 +30,7 @@ jobs:
         run: flutter pub get
 
       - name: Check if project compiles
-        run: flutter build apk --debug --dry-run
+        run: flutter analyze --no-fatal-infos
 
   # Build Android APK
   build-android:
