@@ -6,6 +6,7 @@ import '../trading/trading_screen.dart';
 import '../alerts/alerts_screen.dart';
 import '../settings/settings_screen.dart';
 import '../plugins/plugins_screen.dart';
+import '../ai/ai_news_screen.dart';
 
 import 'widgets/market_overview_widget.dart';
 import 'widgets/portfolio_widget.dart';
@@ -47,6 +48,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       'widget': const TradingScreen(),
     },
     {
+      'title': 'AI News',
+      'icon': Icons.psychology_outlined,
+      'selectedIcon': Icons.psychology,
+      'widget': const AINewsScreen(),
+    },
+    {
       'title': 'Portfolio',
       'icon': Icons.account_balance_wallet_outlined,
       'selectedIcon': Icons.account_balance_wallet,
@@ -75,20 +82,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0B0E11), // Binance dark background
+      backgroundColor: AppColors.primaryDark, // Negro puro profesional
       body: Row(
         children: [
-          // Menú lateral estilo Binance
-          Container(
-            width: _isDrawerOpen ? 240 : 70,
-            decoration: const BoxDecoration(
-              color: Color(0xFF1E2329), // Binance sidebar color
+          // Menú lateral profesional desplegable
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            width: _isDrawerOpen ? 280 : 80,
+            decoration: BoxDecoration(
+              color: AppColors.primaryDark,
               border: Border(
                 right: BorderSide(
-                  color: Color(0xFF2B3139),
+                  color: AppColors.goldPrimary,
                   width: 1,
                 ),
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.goldPrimary.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(2, 0),
+                ),
+              ],
             ),
             child: Column(
               children: [
@@ -135,28 +150,50 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Container(
       height: 80,
       padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: Color(0xFF2B3139),
+            color: AppColors.goldPrimary,
             width: 1,
           ),
+        ),
+        gradient: LinearGradient(
+          colors: [
+            AppColors.primaryDark,
+            AppColors.surfaceDark,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
       ),
       child: Row(
         children: [
-          // Logo/Icon
+          // Logo/Icon profesional
           Container(
-            width: 36,
-            height: 36,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFFF0B90B), // Binance yellow
-              borderRadius: BorderRadius.circular(8),
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.goldPrimary,
+                  AppColors.goldSecondary,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.goldPrimary.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: const Icon(
-              Icons.trending_up,
+              Icons.auto_awesome,
               color: Colors.black,
-              size: 20,
+              size: 24,
             ),
           ),
           if (_isDrawerOpen) ...[
@@ -166,26 +203,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                  Text(
                     'BINA-BOT PRO',
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
+                      color: AppColors.textPrimary,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
                     ),
                   ),
-                  const Text(
-                    'Professional Trading',
+                  Text(
+                    'Professional AI Trading',
                     style: TextStyle(
-                      color: Color(0xFF848E9C),
+                      color: AppColors.goldPrimary,
                       fontSize: 10,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
             ),
           ],
-          // Toggle button
+          // Toggle button profesional
           GestureDetector(
             onTap: () {
               setState(() {
@@ -193,15 +232,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
               });
             },
             child: Container(
-              width: 32,
-              height: 32,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(4),
+                color: AppColors.surfaceDark,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: AppColors.goldPrimary,
+                  width: 1,
+                ),
               ),
               child: Icon(
-                _isDrawerOpen ? Icons.menu_open : Icons.menu,
-                color: const Color(0xFF848E9C),
+                _isDrawerOpen ? Icons.keyboard_arrow_left : Icons.keyboard_arrow_right,
+                color: AppColors.goldPrimary,
                 size: 20,
               ),
             ),
@@ -211,13 +254,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // Construir item del menú
+  // Construir item del menú profesional
   Widget _buildMenuItem(int index) {
     final item = _menuItems[index];
     final isSelected = _selectedIndex == index;
     
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -226,42 +269,76 @@ class _DashboardScreenState extends State<DashboardScreen> {
               _selectedIndex = index;
             });
           },
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            height: 48,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+          borderRadius: BorderRadius.circular(12),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            height: 56,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: isSelected 
-                  ? const Color(0xFFF0B90B).withOpacity(0.1)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(8),
+              gradient: isSelected 
+                  ? LinearGradient(
+                      colors: [
+                        AppColors.goldPrimary.withOpacity(0.2),
+                        AppColors.goldSecondary.withOpacity(0.1),
+                      ],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    )
+                  : null,
+              borderRadius: BorderRadius.circular(12),
               border: isSelected
-                  ? Border.all(color: const Color(0xFFF0B90B).withOpacity(0.3))
+                  ? Border.all(color: AppColors.goldPrimary, width: 1)
+                  : null,
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: AppColors.goldPrimary.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ]
                   : null,
             ),
             child: Row(
               children: [
-                Icon(
-                  isSelected ? item['selectedIcon'] : item['icon'],
-                  color: isSelected 
-                      ? const Color(0xFFF0B90B)
-                      : const Color(0xFF848E9C),
-                  size: 20,
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: isSelected 
+                        ? AppColors.goldPrimary
+                        : AppColors.surfaceDark,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    isSelected ? item['selectedIcon'] : item['icon'],
+                    color: isSelected 
+                        ? AppColors.primaryDark
+                        : AppColors.textSecondary,
+                    size: 18,
+                  ),
                 ),
                 if (_isDrawerOpen) ...[
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Text(
                       item['title'],
                       style: TextStyle(
                         color: isSelected 
-                            ? const Color(0xFFF0B90B)
-                            : const Color(0xFF848E9C),
+                            ? AppColors.goldPrimary
+                            : AppColors.textSecondary,
                         fontSize: 14,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                        letterSpacing: 0.5,
                       ),
                     ),
                   ),
+                  if (isSelected)
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      color: AppColors.goldPrimary,
+                      size: 12,
+                    ),
                 ],
               ],
             ),

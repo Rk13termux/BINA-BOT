@@ -1,40 +1,40 @@
 import 'package:flutter/material.dart';
 
-/// Paleta de colores BINA-BOT PRO - Diseño exclusivo inspirado en Picasso
+/// Paleta de colores BINA-BOT PRO - Diseño profesional negro exclusivo
 class AppColors {
-  // Colores principales - Black theme profesional con acentos dorados vibrantes
-  static const Color backgroundBlack = Color(0xFF000000); // Negro puro como el logo
-  static const Color primaryDark = Color(0xFF0A0A0A); // Negro profundo
-  static const Color secondaryDark = Color(0xFF1A1A1A); // Negro carbón
-  static const Color surfaceDark = Color(0xFF141414); // Superficie oscura premium
+  // Colores principales - Black theme profesional completo
+  static const Color backgroundBlack = Color(0xFF000000); // Negro puro principal
+  static const Color primaryDark = Color(0xFF000000); // Negro principal
+  static const Color secondaryDark = Color(0xFF111111); // Negro secondary
+  static const Color surfaceDark = Color(0xFF0A0A0A); // Superficie oscura
 
-  // Colores de acento - Dorado exclusivo BINA-BOT
-  static const Color goldPrimary = Color(0xFFFFD700); // Dorado brillante del logo
+  // Colores de acento - Dorado profesional
+  static const Color goldPrimary = Color(0xFFFFD700); // Dorado principal
   static const Color goldSecondary = Color(0xFFFFC107); // Dorado secundario
   static const Color goldAccent = Color(0xFFFFE082); // Dorado claro
   static const Color goldDeep = Color(0xFFB8860B); // Dorado profundo
 
   // Colores de trading profesionales
-  static const Color bullish = Color(0xFF00E676); // Verde neón alcista
-  static const Color bearish = Color(0xFFFF5252); // Rojo vibrante bajista
-  static const Color warning = Color(0xFFFF9800); // Naranja advertencia
-  static const Color info = Color(0xFF2196F3); // Azul información
-  static const Color success = Color(0xFF4CAF50); // Verde éxito
-  static const Color neutral = Color(0xFF9E9E9E); // Gris neutral
+  static const Color bullish = Color(0xFF00FF88); // Verde neón profesional
+  static const Color bearish = Color(0xFFFF4444); // Rojo profesional
+  static const Color warning = Color(0xFFFF9800); // Naranja
+  static const Color info = Color(0xFF2196F3); // Azul
+  static const Color success = Color(0xFF4CAF50); // Verde
+  static const Color neutral = Color(0xFF666666); // Gris neutral
 
-  // Colores de texto exclusivos
+  // Colores de texto profesionales
   static const Color textPrimary = Color(0xFFFFFFFF); // Blanco puro
-  static const Color textSecondary = Color(0xFFE0E0E0); // Blanco secondary
-  static const Color textHint = Color(0xFF757575); // Texto hint
-  static const Color textDisabled = Color(0xFF424242); // Texto deshabilitado
+  static const Color textSecondary = Color(0xFFCCCCCC); // Gris claro
+  static const Color textHint = Color(0xFF666666); // Texto hint
+  static const Color textDisabled = Color(0xFF333333); // Texto deshabilitado
 
   // Colores de superficie y bordes
-  static const Color border = Color(0xFF333333); // Bordes sutil
-  static const Color borderColor = Color(0xFF333333); // Alias para border
-  static const Color divider = Color(0xFF1E1E1E); // Divisores
-  static const Color dividerColor = Color(0xFF1E1E1E); // Alias para divider
-  static const Color cardBackground = Color(0xFF121212); // Fondo de tarjetas
-  static const Color error = Color(0xFFFF5252); // Color de error
+  static const Color border = Color(0xFF222222); // Bordes sutiles
+  static const Color borderColor = Color(0xFF222222); // Alias para border
+  static const Color divider = Color(0xFF111111); // Divisores
+  static const Color dividerColor = Color(0xFF111111); // Alias para divider
+  static const Color cardBackground = Color(0xFF0A0A0A); // Fondo de tarjetas
+  static const Color error = Color(0xFFFF4444); // Color de error
   
   // Sombras exclusivas
   static const Color premiumShadow = Color(0x40FFD700); // Sombra dorada

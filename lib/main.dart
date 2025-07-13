@@ -12,6 +12,7 @@ import 'features/dashboard/dashboard_screen.dart';
 import 'features/news/news_controller.dart';
 import 'features/trading/trading_controller.dart';
 import 'features/alerts/alerts_controller.dart';
+import 'features/ai/ai_news_controller.dart';
 
 // Service imports
 import 'services/auth_service.dart';
@@ -75,6 +76,7 @@ class BinaBotProApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => NewsController()),
         ChangeNotifierProvider(create: (_) => TradingController()),
         ChangeNotifierProvider(create: (_) => AlertsController()),
+        ChangeNotifierProvider(create: (_) => AINewsController()),
 
         // Services
         ChangeNotifierProvider(create: (_) => AuthService()),

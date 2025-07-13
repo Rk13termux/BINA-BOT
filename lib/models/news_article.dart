@@ -5,8 +5,11 @@ class NewsArticle {
   final String source;
   final DateTime publishedAt;
   final String summary;
+  final String content; // Contenido completo del artículo
   final String? imageUrl;
   final List<String> tags;
+  final String category; // Categoría del artículo
+  final String sentiment; // Sentimiento: Positive, Negative, Neutral
 
   NewsArticle({
     required this.title,
@@ -14,8 +17,11 @@ class NewsArticle {
     required this.source,
     required this.publishedAt,
     required this.summary,
+    required this.content,
     this.imageUrl,
     this.tags = const [],
+    required this.category,
+    required this.sentiment,
   });
 
   /// Convierte a JSON
@@ -26,8 +32,11 @@ class NewsArticle {
       'source': source,
       'publishedAt': publishedAt.toIso8601String(),
       'summary': summary,
+      'content': content,
       'imageUrl': imageUrl,
       'tags': tags,
+      'category': category,
+      'sentiment': sentiment,
     };
   }
 
@@ -40,8 +49,11 @@ class NewsArticle {
       publishedAt: DateTime.parse(
           json['publishedAt'] ?? DateTime.now().toIso8601String()),
       summary: json['summary'] ?? '',
+      content: json['content'] ?? '',
       imageUrl: json['imageUrl'],
       tags: List<String>.from(json['tags'] ?? []),
+      category: json['category'] ?? 'General',
+      sentiment: json['sentiment'] ?? 'Neutral',
     );
   }
 
@@ -52,8 +64,11 @@ class NewsArticle {
     String? source,
     DateTime? publishedAt,
     String? summary,
+    String? content,
     String? imageUrl,
     List<String>? tags,
+    String? category,
+    String? sentiment,
   }) {
     return NewsArticle(
       title: title ?? this.title,
@@ -61,8 +76,11 @@ class NewsArticle {
       source: source ?? this.source,
       publishedAt: publishedAt ?? this.publishedAt,
       summary: summary ?? this.summary,
+      content: content ?? this.content,
       imageUrl: imageUrl ?? this.imageUrl,
       tags: tags ?? this.tags,
+      category: category ?? this.category,
+      sentiment: sentiment ?? this.sentiment,
     );
   }
 
