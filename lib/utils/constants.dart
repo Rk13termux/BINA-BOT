@@ -215,6 +215,7 @@ class AppColors {
 class StorageKeys {
   static const String binanceApiKey = 'binance_api_key';
   static const String binanceSecretKey = 'binance_secret_key';
+  static const String binanceTestNet = 'binance_testnet';
   static const String userSettings = 'user_settings';
   static const String watchlist = 'watchlist';
   static const String alerts = 'alerts';

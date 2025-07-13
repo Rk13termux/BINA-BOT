@@ -19,6 +19,7 @@ import 'services/auth_service.dart';
 import 'services/ai_service.dart';
 import 'services/initialization_service.dart';
 import 'services/binance_websocket_service.dart';
+import 'services/binance_service.dart';
 import 'services/free_crypto_service.dart';
 import 'core/api_manager.dart';
 
@@ -78,6 +79,7 @@ class BinaBotProApp extends StatelessWidget {
 
         // Services
         ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => BinanceService()),
         Provider(create: (_) => AIService()),
         ChangeNotifierProvider(create: (_) => BinanceWebSocketService()),
         Provider(create: (_) => FreeCryptoService()),
