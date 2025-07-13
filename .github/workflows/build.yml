@@ -39,6 +39,64 @@ jobs:
     - name: Flutter Dependencies
       run: flutter pub get
       
+    - name: Fix XML Files (Android 14 Compatibility)
+      run: |
+        # Create backup_rules.xml
+        cat > android/app/src/main/res/xml/backup_rules.xml << 'EOF'
+        <?xml version="1.0" encoding="utf-8"?>
+        <full-backup-content>
+            <include domain="sharedpref" path="." />
+            <include domain="file" path="." />
+            <exclude domain="file" path="no_backup/" />
+            <exclude domain="sharedpref" path="secure_prefs.xml" />
+            <exclude domain="database" path="secure.db" />
+            <exclude domain="database" path="api_keys.db" />
+        </full-backup-content>
+        EOF
+        
+        # Create data_extraction_rules.xml
+        cat > android/app/src/main/res/xml/data_extraction_rules.xml << 'EOF'
+        <?xml version="1.0" encoding="utf-8"?>
+        <data-extraction-rules>
+            <cloud-backup>
+                <include domain="file" path="." />
+                <exclude domain="file" path="no_backup/" />
+                <exclude domain="sharedpref" path="secure_prefs.xml" />
+            </cloud-backup>
+            <device-transfer>
+                <include domain="file" path="." />
+                <exclude domain="file" path="no_backup/" />
+                <exclude domain="sharedpref" path="secure_prefs.xml" />
+            </device-transfer>
+        </data-extraction-rules>
+        EOF
+        
+        # Create network_security_config.xml
+        cat > android/app/src/main/res/xml/network_security_config.xml << 'EOF'
+        <?xml version="1.0" encoding="utf-8"?>
+        <network-security-config>
+            <domain-config cleartextTrafficPermitted="true">
+                <domain includeSubdomains="true">api.binance.com</domain>
+                <domain includeSubdomains="true">stream.binance.com</domain>
+                <domain includeSubdomains="true">api.binance.us</domain>
+                <domain includeSubdomains="true">stream.binance.us</domain>
+                <domain includeSubdomains="true">fapi.binance.com</domain>
+                <domain includeSubdomains="true">dapi.binance.com</domain>
+                <domain includeSubdomains="true">stream.binancefuture.com</domain>
+            </domain-config>
+            <base-config cleartextTrafficPermitted="false">
+                <trust-anchors>
+                    <certificates src="system"/>
+                </trust-anchors>
+            </base-config>
+        </network-security-config>
+        EOF
+        
+        # Verify XML files
+        echo "Verifying XML files..."
+        ls -la android/app/src/main/res/xml/
+        file android/app/src/main/res/xml/*.xml
+      
     - name: Build APK (Release)
       if: github.event.inputs.build_type != 'debug'
       run: flutter build apk --release --target-platform android-arm64
