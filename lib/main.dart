@@ -9,7 +9,6 @@ import 'ui/theme/app_theme.dart';
 // Feature imports
 import 'features/splash/splash_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
-import 'features/dashboard/bina_bot_pro_main_dashboard.dart';
 import 'features/news/news_controller.dart';
 import 'features/trading/trading_controller.dart';
 import 'features/alerts/alerts_controller.dart';
@@ -90,14 +89,13 @@ class BinaBotProApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
         
-        // Iniciar con el nuevo dashboard principal
-        home: const BinaBotProMainDashboard(),
+        // Iniciar con el dashboard principal completo
+        home: const DashboardScreen(),
 
         // Configuración de rutas actualizadas
         routes: {
           '/splash': (context) => const SplashScreen(),
-          '/dashboard': (context) => const BinaBotProMainDashboard(),
-          '/legacy-dashboard': (context) => const DashboardScreen(),
+          '/dashboard': (context) => const DashboardScreen(),
           // TODO: Agregar más rutas cuando las pantallas estén implementadas
           // '/trading': (context) => const TradingScreen(),
           // '/alerts': (context) => const AlertsScreen(),
@@ -122,7 +120,7 @@ class BinaBotProApp extends StatelessWidget {
         // Manejar rutas desconocidas
         onUnknownRoute: (settings) {
           return MaterialPageRoute(
-            builder: (context) => const BinaBotProMainDashboard(),
+            builder: (context) => const DashboardScreen(),
           );
         },
       ),
