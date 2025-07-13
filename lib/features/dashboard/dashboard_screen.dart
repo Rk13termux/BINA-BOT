@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../ui/theme/colors.dart';
 import '../../ui/widgets/subscription_status_widget.dart';
+import '../../ui/widgets/free_price_widget.dart';
 import '../trading/trading_screen.dart';
 import '../alerts/alerts_screen.dart';
 import '../news/news_screen.dart';
@@ -12,6 +13,7 @@ import 'widgets/market_overview_widget.dart';
 import 'widgets/portfolio_widget.dart';
 import 'widgets/quick_actions_widget.dart';
 import 'widgets/recent_alerts_widget.dart';
+import 'free_crypto_screen.dart';
 import '../../services/auth_service.dart';
 
 /// Pantalla principal del dashboard con navegación por pestañas
@@ -296,46 +298,120 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
               child: SubscriptionStatusWidget(),
             ),
 
-            // Top cryptos price tiles
+            // Top cryptos price tiles - Dynamic for free users, premium gets enhanced data
             SliverToBoxAdapter(
-              child: Container(
-                height: 120,
-                margin: const EdgeInsets.only(bottom: 16),
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  children: [
-                    PriceTile(
-                      symbol: 'BTC',
-                      price: 94825.67,
-                      change: 2.45,
+              child: Consumer<AuthService>(
+                builder: (context, auth, child) {
+                  final user = auth.currentUser;
+                  
+                  // For free users, show dynamic prices from free API
+                  if (user?.subscriptionTier == 'free' || user?.subscriptionTier == null) {
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Precios en Tiempo Real',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              TextButton.icon(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const FreeCryptoScreen(),
+                                    ),
+                                  );
+                                },
+                                icon: Icon(
+                                  Icons.arrow_forward,
+                                  color: AppColors.goldPrimary,
+                                  size: 16,
+                                ),
+                                label: Text(
+                                  'Ver más',
+                                  style: TextStyle(
+                                    color: AppColors.goldPrimary,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: FreePriceWidget(
+                            symbols: const ['BTC', 'ETH', 'BNB', 'SOL', 'ADA'],
+                            showHeader: false,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                  
+                  // For premium users, show enhanced price tiles with more data
+                  return Container(
+                    height: 120,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      children: [
+                        PriceTile(
+                          symbol: 'BTC',
+                          price: 94825.67,
+                          change: 2.45,
+                        ),
+                        const SizedBox(width: 12),
+                        PriceTile(
+                          symbol: 'ETH',
+                          price: 3245.89,
+                          change: 1.23,
+                        ),
+                        const SizedBox(width: 12),
+                        PriceTile(
+                          symbol: 'BNB',
+                          price: 642.15,
+                          change: -0.67,
+                        ),
+                        const SizedBox(width: 12),
+                        PriceTile(
+                          symbol: 'SOL',
+                          price: 234.56,
+                          change: 5.89,
+                        ),
+                        const SizedBox(width: 12),
+                        PriceTile(
+                          symbol: 'ADA',
+                          price: 1.23,
+                          change: 3.45,
+                        ),
+                        const SizedBox(width: 12),
+                        PriceTile(
+                          symbol: 'XRP',
+                          price: 2.34,
+                          change: 1.78,
+                        ),
+                        const SizedBox(width: 12),
+                        PriceTile(
+                          symbol: 'DOT',
+                          price: 8.90,
+                          change: -1.23,
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 12),
-                    PriceTile(
-                      symbol: 'ETH',
-                      price: 3245.89,
-                      change: 1.23,
-                    ),
-                    const SizedBox(width: 12),
-                    PriceTile(
-                      symbol: 'BNB',
-                      price: 642.15,
-                      change: -0.67,
-                    ),
-                    const SizedBox(width: 12),
-                    PriceTile(
-                      symbol: 'SOL',
-                      price: 234.56,
-                      change: 5.89,
-                    ),
-                    const SizedBox(width: 12),
-                    PriceTile(
-                      symbol: 'ADA',
-                      price: 1.23,
-                      change: 3.45,
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
 
