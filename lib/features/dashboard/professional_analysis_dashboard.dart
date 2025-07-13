@@ -5,6 +5,7 @@ import '../../services/binance_api_service.dart';
 import '../../ui/widgets/professional_candlestick_chart.dart';
 import '../../utils/constants.dart';
 import '../../utils/logger.dart';
+import 'widgets/professional_portfolio_widget.dart';
 
 class ProfessionalAnalysisDashboard extends StatefulWidget {
   const ProfessionalAnalysisDashboard({Key? key}) : super(key: key);
@@ -848,14 +849,8 @@ class _ProfessionalAnalysisDashboardState extends State<ProfessionalAnalysisDash
   }
   
   Widget _buildPortfolioTab() {
-    return Center(
-      child: Text(
-        'Portfolio - Próximamente',
-        style: TextStyle(
-          color: Colors.grey,
-          fontSize: 18,
-        ),
-      ),
+    return ProfessionalPortfolioWidget(
+      binanceService: _binanceService,
     );
   }
   
