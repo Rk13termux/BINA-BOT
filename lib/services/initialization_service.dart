@@ -4,7 +4,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../core/api_manager.dart';
 import '../core/websocket_manager.dart';
-import '../services/premium_api_service.dart';
 import '../utils/logger.dart';
 
 /// Servicio encargado de la inicialización completa de la aplicación
@@ -30,11 +29,9 @@ class InitializationService extends ChangeNotifier {
   // APIs y servicios
   ApiManager? _apiManager;
   WebSocketManager? _webSocketManager;
-  PremiumApiService? _premiumApiService;
   
   ApiManager get apiManager => _apiManager!;
   WebSocketManager get webSocketManager => _webSocketManager!;
-  PremiumApiService get premiumApiService => _premiumApiService!;
 
   /// Inicializa toda la aplicación
   Future<bool> initialize() async {
@@ -59,11 +56,7 @@ class InitializationService extends ChangeNotifier {
       _updateStatus('Configurando conexiones en tiempo real...');
       await _initializeWebSocketManager();
 
-      // 4. Inicializar Premium API Service
-      _updateStatus('Activando servicios premium...');
-      await _initializePremiumApiService();
-
-      // 5. Configurar credenciales por defecto para testing
+      // 4. Configurar credenciales por defecto para testing
       _updateStatus('Configurando credenciales de prueba...');
       await _setupTestCredentials();
 
@@ -123,18 +116,6 @@ class InitializationService extends ChangeNotifier {
       _logger.info('WebSocket Manager initialized');
     } catch (e) {
       _logger.error('Failed to initialize WebSocket Manager: $e');
-      rethrow;
-    }
-  }
-
-  /// Inicializa el Premium API Service
-  Future<void> _initializePremiumApiService() async {
-    try {
-      _premiumApiService = PremiumApiService();
-      await _premiumApiService!.initialize();
-      _logger.info('Premium API Service initialized');
-    } catch (e) {
-      _logger.error('Failed to initialize Premium API Service: $e');
       rethrow;
     }
   }

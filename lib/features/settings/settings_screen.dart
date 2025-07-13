@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../ui/theme/colors.dart' as UIColors;
 import '../../services/auth_service.dart';
-import '../../services/subscription_service.dart';
 import '../../services/notification_service.dart';
 import '../../utils/constants.dart';
 
@@ -74,8 +73,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 24),
             _buildGeneralSection(),
             const SizedBox(height: 24),
-            _buildSubscriptionSection(),
-            const SizedBox(height: 24),
             _buildAboutSection(),
           ],
         ),
@@ -104,24 +101,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Icons.badge,
               ),
               _buildInfoTile(
-                'Subscription',
-                user.subscriptionTier.toUpperCase(),
+                'Status',
+                'PRO USER',
                 Icons.star,
                 trailing: Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: user.subscriptionTier == 'premium'
-                        ? UIColors.AppColors.goldPrimary
-                        : UIColors.AppColors.info,
+                    color: UIColors.AppColors.goldPrimary,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
-                    user.subscriptionTier.toUpperCase(),
+                  child: const Text(
+                    'PRO',
                     style: TextStyle(
-                      color: user.subscriptionTier == 'premium'
-                          ? UIColors.AppColors.primaryDark
-                          : Colors.white,
+                      color: Colors.black,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                     ),
@@ -377,52 +370,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           isDestructive: true,
         ),
       ],
-    );
-  }
-
-  Widget _buildSubscriptionSection() {
-    return Consumer<SubscriptionService>(
-      builder: (context, subscription, child) {
-        return _buildSection(
-          title: 'Subscription',
-          icon: Icons.star,
-          children: [
-            _buildActionTile(
-              'Upgrade to Premium',
-              'Unlock advanced features',
-              Icons.upgrade,
-              () => _showUpgradeDialog(),
-              trailing: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: UIColors.AppColors.goldPrimary,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'PREMIUM',
-                  style: TextStyle(
-                    color: UIColors.AppColors.primaryDark,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            _buildActionTile(
-              'Restore Purchases',
-              'Restore your previous purchases',
-              Icons.restore_page,
-              () => subscription.restorePurchases(),
-            ),
-            _buildActionTile(
-              'Manage Subscription',
-              'View and manage your subscription',
-              Icons.manage_accounts,
-              () => _manageSubscription(),
-            ),
-          ],
-        );
-      },
     );
   }
 
@@ -722,74 +669,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showUpgradeDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: UIColors.AppColors.surfaceDark,
-        title: Text(
-          'Upgrade to Premium',
-          style: TextStyle(color: UIColors.AppColors.goldPrimary),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Unlock advanced features:',
-              style: TextStyle(color: UIColors.AppColors.textPrimary),
-            ),
-            const SizedBox(height: 16),
-            _buildFeatureItem('Advanced technical indicators'),
-            _buildFeatureItem('Real-time WebSocket data'),
-            _buildFeatureItem('Unlimited alerts'),
-            _buildFeatureItem('Custom plugins'),
-            _buildFeatureItem('Priority customer support'),
-            _buildFeatureItem('No ads'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child:
-                Text('Later', style: TextStyle(color: UIColors.AppColors.textSecondary)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.of(context).pushNamed('/subscription');
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: UIColors.AppColors.goldPrimary,
-              foregroundColor: UIColors.AppColors.primaryDark,
-            ),
-            child: const Text('View Plans'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFeatureItem(String feature) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(Icons.check, color: UIColors.AppColors.goldPrimary, size: 16),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              feature,
-              style: TextStyle(color: UIColors.AppColors.textSecondary, fontSize: 14),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _manageSubscription() {
-    Navigator.of(context).pushNamed('/subscription');
-  }
+  // All features are now free - no upgrade dialog needed
 
   void _openPrivacyPolicy() {
     // TODO: Open privacy policy

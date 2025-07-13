@@ -47,7 +47,6 @@ class AuthService extends ChangeNotifier {
         id: '1',
         email: email,
         displayName: email.split('@')[0],
-        subscriptionTier: 'free',
         createdAt: DateTime.now(),
         lastLoginAt: DateTime.now(),
       );
@@ -73,7 +72,6 @@ class AuthService extends ChangeNotifier {
         id: 'guest',
         email: 'guest@invictustraderpro.com',
         displayName: 'Guest User',
-        subscriptionTier: 'free',
         createdAt: DateTime.now(),
         lastLoginAt: DateTime.now(),
       );
@@ -149,15 +147,16 @@ class AuthService extends ChangeNotifier {
     return credentials['apiKey'] != null && credentials['apiSecret'] != null;
   }
 
-  // Update subscription
+  // Update subscription - All users now have full access
   Future<bool> updateSubscription(String newTier) async {
     try {
       if (_currentUser == null) return false;
 
-      _currentUser = _currentUser!.copyWith(subscriptionTier: newTier);
+      // No need to update subscription tier since all features are free
+      // Just save current user data
       await _saveUserData();
 
-      _logger.info('Subscription updated to: $newTier');
+      _logger.info('All features are available for free - no subscription needed');
       return true;
     } catch (e) {
       _logger.error('Failed to update subscription: $e');

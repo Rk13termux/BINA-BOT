@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../ui/theme/colors.dart';
-import '../../ui/widgets/subscription_status_widget.dart';
 import '../../ui/widgets/free_price_widget.dart';
 import '../trading/trading_screen.dart';
 import '../alerts/alerts_screen.dart';
 import '../settings/settings_screen.dart';
 import '../plugins/plugins_screen.dart';
-import 'widgets/price_tile.dart';
+
 import 'widgets/market_overview_widget.dart';
 import 'widgets/portfolio_widget.dart';
 import 'widgets/quick_actions_widget.dart';
@@ -258,25 +257,18 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
-                                  gradient: user.subscriptionTier == 'premium'
-                                      ? LinearGradient(
-                                          colors: [
-                                            AppColors.goldPrimary,
-                                            AppColors.warning
-                                          ],
-                                        )
-                                      : null,
-                                  color: user.subscriptionTier == 'premium'
-                                      ? null
-                                      : AppColors.info,
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      AppColors.goldPrimary,
+                                      AppColors.warning
+                                    ],
+                                  ),
                                   borderRadius: BorderRadius.circular(16),
                                 ),
-                                child: Text(
-                                  user.subscriptionTier.toUpperCase(),
+                                child: const Text(
+                                  'PRO',
                                   style: TextStyle(
-                                    color: user.subscriptionTier == 'premium'
-                                        ? AppColors.primaryDark
-                                        : Colors.white,
+                                    color: Colors.black,
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -292,128 +284,62 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
               ),
             ),
 
-            // Subscription Status Widget
-            const SliverToBoxAdapter(
-              child: SubscriptionStatusWidget(),
-            ),
+            // Subscription Status Widget - Eliminado ya que todas las funciones son gratuitas
 
-            // Top cryptos price tiles - Dynamic for free users, premium gets enhanced data
+            // Top cryptos price tiles - All users have access to real-time prices
             SliverToBoxAdapter(
-              child: Consumer<AuthService>(
-                builder: (context, auth, child) {
-                  final user = auth.currentUser;
-                  
-                  // For free users, show dynamic prices from free API
-                  if (user?.subscriptionTier == 'free' || user?.subscriptionTier == null) {
-                    return Column(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Precios en Tiempo Real',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              TextButton.icon(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const FreeCryptoScreen(),
-                                    ),
-                                  );
-                                },
-                                icon: Icon(
-                                  Icons.arrow_forward,
-                                  color: AppColors.goldPrimary,
-                                  size: 16,
-                                ),
-                                label: Text(
-                                  'Ver más',
-                                  style: TextStyle(
-                                    color: AppColors.goldPrimary,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ],
+                        const Text(
+                          'Precios en Tiempo Real',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: FreePriceWidget(
-                            symbols: const ['BTC', 'ETH', 'BNB', 'SOL', 'ADA'],
-                            showHeader: false,
+                        TextButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const FreeCryptoScreen(),
+                              ),
+                            );
+                          },
+                          icon: Icon(
+                            Icons.arrow_forward,
+                            color: AppColors.goldPrimary,
+                            size: 16,
                           ),
-                        ),
-                      ],
-                    );
-                  }
-                  
-                  // For premium users, show enhanced price tiles with more data
-                  return Container(
-                    height: 120,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      children: [
-                        PriceTile(
-                          symbol: 'BTC',
-                          price: 94825.67,
-                          change: 2.45,
-                        ),
-                        const SizedBox(width: 12),
-                        PriceTile(
-                          symbol: 'ETH',
-                          price: 3245.89,
-                          change: 1.23,
-                        ),
-                        const SizedBox(width: 12),
-                        PriceTile(
-                          symbol: 'BNB',
-                          price: 642.15,
-                          change: -0.67,
-                        ),
-                        const SizedBox(width: 12),
-                        PriceTile(
-                          symbol: 'SOL',
-                          price: 234.56,
-                          change: 5.89,
-                        ),
-                        const SizedBox(width: 12),
-                        PriceTile(
-                          symbol: 'ADA',
-                          price: 1.23,
-                          change: 3.45,
-                        ),
-                        const SizedBox(width: 12),
-                        PriceTile(
-                          symbol: 'XRP',
-                          price: 2.34,
-                          change: 1.78,
-                        ),
-                        const SizedBox(width: 12),
-                        PriceTile(
-                          symbol: 'DOT',
-                          price: 8.90,
-                          change: -1.23,
+                          label: Text(
+                            'Ver más',
+                            style: TextStyle(
+                              color: AppColors.goldPrimary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                  );
-                },
+                  ),
+                  const SizedBox(height: 8),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: FreePriceWidget(
+                      symbols: ['BTC', 'ETH', 'BNB', 'SOL', 'ADA'],
+                      showHeader: false,
+                    ),
+                  ),
+                ],
               ),
             ),
-
             // Quick Actions
             SliverToBoxAdapter(
               child: Padding(
@@ -456,65 +382,7 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
               ),
             ),
 
-            // Ad space for free users
-            SliverToBoxAdapter(
-              child: Consumer<AuthService>(
-                builder: (context, auth, child) {
-                  final user = auth.currentUser;
-                  if (user?.subscriptionTier == 'free') {
-                    return Container(
-                      margin: const EdgeInsets.all(16),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceDark,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.borderColor),
-                      ),
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.star,
-                            color: AppColors.goldPrimary,
-                            size: 32,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Upgrade to Premium',
-                            style: TextStyle(
-                              color: AppColors.textPrimary,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Get advanced features, real-time data, and remove ads',
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 12,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 12),
-                          ElevatedButton(
-                            onPressed: () {
-                              // TODO: Show upgrade dialog
-                              _showComingSoon('Premium Upgrade');
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.goldPrimary,
-                              foregroundColor: AppColors.primaryDark,
-                            ),
-                            child: const Text('Upgrade Now'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
-            ),
+            // All features are now free - no ads needed
 
             const SliverToBoxAdapter(child: SizedBox(height: 100)),
           ],
@@ -859,63 +727,8 @@ class _MoreTab extends StatelessWidget {
                 ),
               ],
             ),
+            // All features are now free - no premium upgrade needed
             const SizedBox(height: 24),
-            Consumer<AuthService>(
-              builder: (context, auth, child) {
-                final user = auth.currentUser;
-                if (user?.subscriptionTier != 'premium') {
-                  return Card(
-                    color: AppColors.surfaceDark,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.star,
-                            color: AppColors.goldPrimary,
-                            size: 48,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Unlock Premium Features',
-                            style: TextStyle(
-                              color: AppColors.textPrimary,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Get access to advanced tools, real-time data, unlimited alerts, and more!',
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 14,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 16),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () =>
-                                  _showComingSoon(context, 'Premium Upgrade'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.goldPrimary,
-                                foregroundColor: AppColors.primaryDark,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                              ),
-                              child: const Text('Upgrade to Premium'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-                return const SizedBox.shrink();
-              },
-            ),
           ],
         ),
       ),

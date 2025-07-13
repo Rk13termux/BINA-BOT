@@ -4,8 +4,6 @@ import '../../models/candle.dart';
 import '../../models/signal.dart';
 import '../../services/binance_service.dart';
 import '../../services/notification_service.dart';
-import '../../services/premium_api_service.dart';
-import '../../services/initialization_service.dart';
 import '../../utils/logger.dart';
 
 class TradingController extends ChangeNotifier {
@@ -13,9 +11,7 @@ class TradingController extends ChangeNotifier {
   final NotificationService _notificationService = NotificationService();
   final AppLogger _logger = AppLogger();
   
-  // Premium services
-  PremiumApiService? _premiumApiService;
-  InitializationService? _initService;
+  // Core services
 
   // State variables
   bool _isLoading = false;
@@ -52,14 +48,7 @@ class TradingController extends ChangeNotifier {
       await _binanceService.initialize();
       await _notificationService.initialize();
       
-      // Get premium API service from initialization service
-      _initService = InitializationService();
-      if (_initService!.isInitialized) {
-        _premiumApiService = _initService!.premiumApiService;
-      }
-      
       await _loadInitialData();
-      await _loadPremiumData();
       
       _isConnected = true;
       _logger.info('Trading controller initialized successfully');
@@ -78,43 +67,6 @@ class TradingController extends ChangeNotifier {
       _updateCandleData(),
       _updateMarketStats(),
     ]);
-  }
-
-  /// Load premium data from Premium API Service
-  Future<void> _loadPremiumData() async {
-    if (_premiumApiService == null) return;
-    
-    try {
-      // Load premium market data
-      final marketData = await _premiumApiService!.getRealTimeMarketData(_selectedSymbol);
-      if (marketData != null) {
-        _premiumData['market_data'] = marketData;
-      }
-
-      // Load AI predictions
-      final predictions = await _premiumApiService!.getAiPredictions(_selectedSymbol);
-      if (predictions != null) {
-        _premiumData['ai_predictions'] = predictions;
-      }
-
-      // Load advanced technical indicators
-      final indicators = await _premiumApiService!.getAdvancedTechnicalIndicators(_selectedSymbol);
-      if (indicators != null) {
-        _premiumData['technical_indicators'] = indicators;
-      }
-
-      // Load sentiment analysis
-      final sentiment = await _premiumApiService!.getNewsSentimentAnalysis();
-      if (sentiment != null) {
-        _premiumData['sentiment_analysis'] = sentiment;
-      }
-
-      _logger.info('Premium data loaded successfully');
-      notifyListeners();
-    } catch (e) {
-      _logger.error('Failed to load premium data: $e');
-      // Don't throw error, premium data is optional
-    }
   }
 
   /// Set selected trading symbol

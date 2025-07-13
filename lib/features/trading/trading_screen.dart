@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:candlesticks/candlesticks.dart';
 import '../../../ui/theme/colors.dart';
-import '../../../services/subscription_service.dart';
 import '../../../services/auth_service.dart';
 import 'trading_controller.dart';
 
@@ -202,12 +201,9 @@ class _TradingScreenState extends State<TradingScreen>
           // Account balance
           Consumer<AuthService>(
             builder: (context, auth, child) {
-              final subscription = context.watch<SubscriptionService>();
-              final showSubscriptionBanner = !subscription.isSubscribed;
-
+              // Todas las funciones están disponibles gratuitamente
               return Column(
                 children: [
-                  if (showSubscriptionBanner) _buildSubscriptionBanner(),
                   _buildBalanceCard(),
                 ],
               );
@@ -379,70 +375,6 @@ class _TradingScreenState extends State<TradingScreen>
           }).toList(),
         ),
       ),
-    );
-  }
-
-  Widget _buildSubscriptionBanner() {
-    return Consumer<SubscriptionService>(
-      builder: (context, subscription, child) {
-        if (!subscription.isSubscribed) {
-          return Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFD700).withValues(alpha: 0.1),
-              border: Border.all(color: const Color(0xFFFFD700)),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.star,
-                  color: Color(0xFFFFD700),
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'Upgrade to Premium',
-                        style: TextStyle(
-                          color: Color(0xFFFFD700),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(
-                        'Unlock advanced trading features & AI analysis',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.8),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    // Navigate to subscription screen
-                  },
-                  child: const Text(
-                    'Subscribe',
-                    style: TextStyle(
-                      color: Color(0xFFFFD700),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-        return const SizedBox.shrink();
-      },
     );
   }
 

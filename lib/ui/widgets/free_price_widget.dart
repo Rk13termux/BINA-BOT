@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../services/free_crypto_service.dart';
-import '../../features/subscription/subscription_screen.dart';
 
 class FreePriceWidget extends StatefulWidget {
   final List<String> symbols;
@@ -252,20 +251,21 @@ class _FreePriceWidgetState extends State<FreePriceWidget> {
           ),
           TextButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SubscriptionScreen(),
+              // Todas las funciones están disponibles gratuitamente
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('¡Todas las funciones están disponibles!'),
+                  backgroundColor: Colors.green,
                 ),
               );
             },
             style: TextButton.styleFrom(
-              backgroundColor: Colors.amber.shade600,
+              backgroundColor: Colors.green.shade600,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             ),
             child: const Text(
-              'Actualizar',
+              'GRATIS',
               style: TextStyle(fontSize: 12),
             ),
           ),

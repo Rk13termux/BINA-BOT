@@ -288,7 +288,6 @@ class FreeCryptoService {
   Future<String> _callPythonFunction(String function, String args) async {
     try {
       final pythonCmd = Platform.isWindows ? 'python' : 'python3';
-      final scriptPath = '${Directory.systemTemp.path}/crypto_service.py';
       
       final result = await Process.run(pythonCmd, [
         '-c',

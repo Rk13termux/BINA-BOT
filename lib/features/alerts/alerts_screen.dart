@@ -79,44 +79,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
               // Subscription warning for free users
               Consumer<AuthService>(
                 builder: (context, auth, child) {
-                  final user = auth.currentUser;
-                  if (user?.subscriptionTier == 'free') {
-                    return Container(
-                      margin: const EdgeInsets.all(16),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.warning.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppColors.warning),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.info, color: AppColors.warning),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Free Plan: 5 alerts max',
-                                  style: TextStyle(
-                                    color: AppColors.warning,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  'Upgrade to Premium for 25 alerts or Pro for unlimited',
-                                  style: TextStyle(
-                                      color: AppColors.textSecondary,
-                                      fontSize: 12),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
+                  // Todas las funciones están disponibles gratuitamente
                   return const SizedBox.shrink();
                 },
               ),

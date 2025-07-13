@@ -10,14 +10,13 @@ import 'ui/theme/app_theme.dart';
 import 'features/splash/splash_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
 import 'features/dashboard/bina_bot_pro_main_dashboard.dart';
-import 'features/subscription/subscription_screen.dart';
 import 'features/news/news_controller.dart';
 import 'features/trading/trading_controller.dart';
 import 'features/alerts/alerts_controller.dart';
 
 // Service imports
 import 'services/auth_service.dart';
-import 'services/subscription_service.dart';
+import 'services/ai_service.dart';
 import 'services/initialization_service.dart';
 import 'services/binance_websocket_service.dart';
 import 'services/free_crypto_service.dart';
@@ -79,7 +78,7 @@ class BinaBotProApp extends StatelessWidget {
 
         // Services
         ChangeNotifierProvider(create: (_) => AuthService()),
-        ChangeNotifierProvider(create: (_) => SubscriptionService()),
+        Provider(create: (_) => AIService()),
         ChangeNotifierProvider(create: (_) => BinanceWebSocketService()),
         Provider(create: (_) => FreeCryptoService()),
         Provider(create: (_) => ApiManager()),
@@ -97,7 +96,6 @@ class BinaBotProApp extends StatelessWidget {
           '/splash': (context) => const SplashScreen(),
           '/dashboard': (context) => const BinaBotProMainDashboard(),
           '/legacy-dashboard': (context) => const DashboardScreen(),
-          '/subscription': (context) => const SubscriptionScreen(),
           // TODO: Agregar más rutas cuando las pantallas estén implementadas
           // '/trading': (context) => const TradingScreen(),
           // '/alerts': (context) => const AlertsScreen(),
