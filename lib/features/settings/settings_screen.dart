@@ -756,14 +756,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              // TODO: Implement subscription upgrade
-              context.read<SubscriptionService>().purchaseSubscription(SubscriptionService.monthlySubscriptionId);
+              Navigator.of(context).pushNamed('/subscription');
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.goldPrimary,
               foregroundColor: AppColors.primaryDark,
             ),
-            child: const Text('Upgrade'),
+            child: const Text('View Plans'),
           ),
         ],
       ),
@@ -789,13 +788,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _manageSubscription() {
-    // TODO: Open subscription management
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Opening subscription management...'),
-        backgroundColor: AppColors.info,
-      ),
-    );
+    Navigator.of(context).pushNamed('/subscription');
   }
 
   void _openPrivacyPolicy() {

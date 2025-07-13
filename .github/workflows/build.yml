@@ -1,4 +1,4 @@
-name: Build Invictus Trader Pro (APK & EXE)
+name: Build Invictus Trader Pro - Simple Build
 
 on:
   push:
@@ -6,22 +6,41 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
-    inputs:
-      build_type:
-        description: 'Build type'
-        required: true
-        default: 'release'
-        type: choice
-        options:
-        - release
-        - debug
+
+env:
+  FLUTTER_VERSION: "3.27.1"
 
 jobs:
+  # Verificación básica
+  check:
+    name: Basic Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Check if project compiles
+        run: flutter build apk --debug --dry-run
+
+  # Build Android APK
   build-android:
     name: Build Android APK
     runs-on: ubuntu-latest
+    needs: check
+    if: success()
+    
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v4
     
     - name: Setup Java 17
@@ -33,127 +52,69 @@ jobs:
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.27.1'
+        flutter-version: ${{ env.FLUTTER_VERSION }}
         channel: 'stable'
+        cache: true
         
-    - name: Flutter Dependencies
+    - name: Get dependencies
       run: flutter pub get
-      
-    - name: Fix XML Files (Android 14 Compatibility)
+
+    - name: Create dummy signing config
       run: |
-        # Create backup_rules.xml
-        cat > android/app/src/main/res/xml/backup_rules.xml << 'EOF'
-        <?xml version="1.0" encoding="utf-8"?>
-        <full-backup-content>
-            <include domain="sharedpref" path="." />
-            <include domain="file" path="." />
-            <include domain="database" path="." />
-            <exclude domain="file" path="no_backup/" />
-            <exclude domain="sharedpref" path="secure_prefs.xml" />
-            <exclude domain="database" path="secure.db" />
-            <exclude domain="database" path="api_keys.db" />
-        </full-backup-content>
-        EOF
+        echo "storePassword=dummy123" > android/key.properties
+        echo "keyPassword=dummy123" >> android/key.properties
+        echo "keyAlias=dummykey" >> android/key.properties
+        echo "storeFile=../app/dummy-keystore.jks" >> android/key.properties
         
-        # Create data_extraction_rules.xml
-        cat > android/app/src/main/res/xml/data_extraction_rules.xml << 'EOF'
-        <?xml version="1.0" encoding="utf-8"?>
-        <data-extraction-rules>
-            <cloud-backup>
-                <include domain="file" path="." />
-                <include domain="sharedpref" path="." />
-                <exclude domain="file" path="no_backup/" />
-                <exclude domain="sharedpref" path="secure_prefs.xml" />
-            </cloud-backup>
-            <device-transfer>
-                <include domain="file" path="." />
-                <include domain="sharedpref" path="." />
-                <exclude domain="file" path="no_backup/" />
-                <exclude domain="sharedpref" path="secure_prefs.xml" />
-            </device-transfer>
-        </data-extraction-rules>
-        EOF
-        
-        # Create network_security_config.xml
-        cat > android/app/src/main/res/xml/network_security_config.xml << 'EOF'
-        <?xml version="1.0" encoding="utf-8"?>
-        <network-security-config>
-            <domain-config cleartextTrafficPermitted="true">
-                <domain includeSubdomains="true">api.binance.com</domain>
-                <domain includeSubdomains="true">stream.binance.com</domain>
-                <domain includeSubdomains="true">api.binance.us</domain>
-                <domain includeSubdomains="true">stream.binance.us</domain>
-                <domain includeSubdomains="true">fapi.binance.com</domain>
-                <domain includeSubdomains="true">dapi.binance.com</domain>
-                <domain includeSubdomains="true">stream.binancefuture.com</domain>
-            </domain-config>
-            <base-config cleartextTrafficPermitted="false">
-                <trust-anchors>
-                    <certificates src="system"/>
-                </trust-anchors>
-            </base-config>
-        </network-security-config>
-        EOF
-        
-        # Verify XML files
-        echo "Verifying XML files..."
-        ls -la android/app/src/main/res/xml/
-        file android/app/src/main/res/xml/*.xml
-      
-    - name: Build APK (Release)
-      if: github.event.inputs.build_type != 'debug'
+    - name: Create dummy keystore
+      run: |
+        keytool -genkey -v -keystore android/app/dummy-keystore.jks \
+          -keyalg RSA -keysize 2048 -validity 10000 -alias dummykey \
+          -storepass dummy123 -keypass dummy123 \
+          -dname "CN=Invictus Trader, OU=Trading, O=Invictus, L=City, S=State, C=US"
+
+    - name: Build APK Release
       run: flutter build apk --release --target-platform android-arm64
-        
-    - name: Build APK (Debug)
-      if: github.event.inputs.build_type == 'debug'
-      run: flutter build apk --debug --target-platform android-arm64
-        
-    - name: Upload Android APK
+
+    - name: Upload Release APK
       uses: actions/upload-artifact@v4
       with:
-        name: invictus-trader-android-apk
-        path: build/app/outputs/flutter-apk/*.apk
-        retention-days: 30
+        name: invictus-trader-release-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
 
+  # Build Windows Desktop
   build-windows:
-    name: Build Windows EXE
+    name: Build Windows Desktop
     runs-on: windows-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    needs: check
+    if: success()
     
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.27.1'
+        flutter-version: ${{ env.FLUTTER_VERSION }}
         channel: 'stable'
-        
+        cache: true
+
     - name: Enable Windows Desktop
       run: flutter config --enable-windows-desktop
-      
-    - name: Flutter Dependencies
+
+    - name: Get dependencies
       run: flutter pub get
-      
-    - name: Build Windows (Release)
-      if: github.event.inputs.build_type != 'debug'
+
+    - name: Build Windows
       run: flutter build windows --release
-        
-    - name: Build Windows (Debug)
-      if: github.event.inputs.build_type == 'debug'
-      run: flutter build windows --debug
-      
+
     - name: Create Windows ZIP
       run: |
-        cd build/windows/x64/runner
-        if ('${{ github.event.inputs.build_type }}' -eq 'debug') {
-          Compress-Archive -Path Debug/* -DestinationPath invictus-trader-windows-debug.zip
-        } else {
-          Compress-Archive -Path Release/* -DestinationPath invictus-trader-windows-release.zip
-        }
-        
-    - name: Upload Windows EXE
+        Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath invictus-trader-windows.zip
+
+    - name: Upload Windows build
       uses: actions/upload-artifact@v4
       with:
-        name: invictus-trader-windows-exe
-        path: build/windows/x64/runner/*.zip
-        retention-days: 30
+        name: invictus-trader-windows
+        path: invictus-trader-windows.zip

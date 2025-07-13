@@ -20,7 +20,7 @@ A professional Flutter trading application for cryptocurrency trading with Binan
 - **AI Analysis**: TensorFlow Lite integration for market analysis
 - **Multi-platform**: Android, iOS, Web, and Desktop support
 - **Secure Storage**: Encrypted API keys and sensitive data
-- **Monetization**: Free tier with ads, Premium tiers with advanced features
+- **Monetization**: Premium subscription system (\$5/month, \$99/year)
 - **Dark Theme**: Professional dark theme with gold accents
 
 ## 🏗️ Architecture
@@ -116,8 +116,6 @@ flutter build ios --release
    ```env
    BINANCE_API_KEY=your_binance_api_key
    BINANCE_SECRET_KEY=your_binance_secret_key
-   ADMOB_APP_ID_ANDROID=your_android_admob_app_id
-   ADMOB_APP_ID_IOS=your_ios_admob_app_id
    ```
 
 2. Update `lib/utils/constants.dart` with your configuration
@@ -191,8 +189,7 @@ flutter drive --target=test_driver/app.dart
 - `flutter_secure_storage`: Secure storage
 - `web_socket_channel`: WebSocket connections
 - `candlesticks`: Chart widgets
-- `google_mobile_ads`: Monetization
-- `in_app_purchase`: Subscription management
+- `in_app_purchase`: Premium subscription management
 
 ## 🤝 Contributing
 
@@ -391,7 +388,7 @@ Professional Flutter cryptocurrency trading application with Binance integration
 - **AI Analysis**: TensorFlow Lite powered market analysis
 - **Dark/Gold Theme**: Professional Binance-inspired UI
 - **Multi-platform**: Android, iOS, Web, and Desktop support
-- **Monetization**: AdMob integration with premium subscriptions
+- **Monetization**: Premium subscription system (\$5/month, \$99/year)
 
 ### Security & Storage
 - **Secure Storage**: Flutter Secure Storage for API keys
@@ -408,7 +405,7 @@ Professional Flutter cryptocurrency trading application with Binance integration
 - **Charts**: candlesticks, fl_chart
 - **HTML Parsing**: html package for news scraping
 - **ML**: tflite_flutter for AI analysis
-- **Monetization**: google_mobile_ads, in_app_purchase
+- **Monetization**: in_app_purchase for premium subscriptions
 
 ## � Screenshots
 
@@ -479,9 +476,9 @@ lib/
    - Create API keys in your Binance account
    - Add keys to secure storage (handled by the app)
 
-2. **AdMob Setup** (Optional)
-   - Configure AdMob app ID in `android/app/build.gradle`
-   - Add AdMob unit IDs in the app
+2. **Subscription Setup**
+   - Configure in-app purchase products in Google Play Console and App Store Connect
+   - Product IDs: `invictus_monthly_5usd`, `invictus_yearly_99usd`
 
 ## 🔧 Building
 

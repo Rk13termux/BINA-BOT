@@ -9,6 +9,7 @@ import 'ui/theme/app_theme.dart';
 // Feature imports
 import 'features/splash/splash_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
+import 'features/subscription/subscription_screen.dart';
 import 'features/news/news_controller.dart';
 import 'features/trading/trading_controller.dart';
 import 'features/alerts/alerts_controller.dart';
@@ -92,6 +93,7 @@ class InvictusTraderApp extends StatelessWidget {
         routes: {
           '/splash': (context) => const SplashScreen(),
           '/dashboard': (context) => const DashboardScreen(),
+          '/subscription': (context) => const SubscriptionScreen(),
           // TODO: Agregar más rutas cuando las pantallas estén implementadas
           // '/trading': (context) => const TradingScreen(),
           // '/alerts': (context) => const AlertsScreen(),

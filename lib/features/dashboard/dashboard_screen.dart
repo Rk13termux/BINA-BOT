@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../ui/theme/colors.dart';
+import '../../ui/widgets/subscription_status_widget.dart';
 import '../trading/trading_screen.dart';
 import '../alerts/alerts_screen.dart';
 import '../news/news_screen.dart';
@@ -288,6 +289,11 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
                   ],
                 ),
               ),
+            ),
+
+            // Subscription Status Widget
+            const SliverToBoxAdapter(
+              child: SubscriptionStatusWidget(),
             ),
 
             // Top cryptos price tiles

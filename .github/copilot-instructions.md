@@ -19,7 +19,7 @@ This is a professional Flutter trading application for cryptocurrency trading wi
 - **Charts**: candlesticks, fl_chart
 - **HTML Parsing**: html package for news scraping
 - **ML**: tflite_flutter for AI analysis
-- **Monetization**: google_mobile_ads, in_app_purchase
+- **Monetization**: in_app_purchase for premium subscriptions
 
 ## Code Style Guidelines
 1. **Naming Conventions**:

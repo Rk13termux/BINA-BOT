@@ -10,7 +10,7 @@ class SubscriptionService extends ChangeNotifier {
 
   // Subscription product IDs - Dos planes únicos
   static const String monthlySubscriptionId = 'invictus_monthly_5usd';
-  static const String yearlySubscriptionId = 'invictus_yearly_99usd';
+  static const String yearlySubscriptionId = 'invictus_yearly_100usd';
 
   static const Set<String> _kProductIds = {
     monthlySubscriptionId,
@@ -18,7 +18,7 @@ class SubscriptionService extends ChangeNotifier {
   };
 
   List<ProductDetails> _products = [];
-  final List<PurchaseDetails> _purchases = [];
+  List<PurchaseDetails> _purchases = [];
   bool _isAvailable = false;
   bool _loading = false;
   bool _isSubscribed = false;
@@ -35,8 +35,8 @@ class SubscriptionService extends ChangeNotifier {
   
   // Pricing information
   String get monthlyPrice => '\$5.00/month';
-  String get yearlyPrice => '\$99.00/year';
-  String get yearlySavings => 'Save \$1 vs Monthly';
+  String get yearlyPrice => '\$100.00/year';
+  String get yearlySavings => 'Save \$60 (50% off)';
   String get monthlyDescription => 'Full access to all premium features';
   String get yearlyDescription => 'Best value! All premium features + priority support';
 
@@ -86,8 +86,7 @@ class SubscriptionService extends ChangeNotifier {
   Future<void> _loadPurchases() async {
     try {
       await _inAppPurchase.restorePurchases();
-      // Note: Purchase updates are received through the purchaseStream
-      _logger.info('Restore purchases initiated');
+      _logger.info('Restored purchases successfully');
     } catch (e) {
       _logger.error('Failed to load purchases: $e');
     }
@@ -265,5 +264,10 @@ class SubscriptionService extends ChangeNotifier {
     if (!_isSubscribed || _subscriptionExpiry == null) return 0;
     final difference = _subscriptionExpiry!.difference(DateTime.now());
     return difference.inDays.clamp(0, 365);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

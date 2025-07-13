@@ -12,18 +12,9 @@ class AppConstants {
   static const String binanceWsUrl = 'wss://stream.binance.com:9443/ws/';
   static const String binanceTestnetWsUrl = 'wss://testnet.binance.vision/ws/';
 
-  // AdMob Ad Unit IDs (Test IDs - replace with real ones in production)
-  static const String adMobBannerAndroid =
-      'ca-app-pub-3940256099942544/6300978111';
-  static const String adMobBannerIOS = 'ca-app-pub-3940256099942544/2934735716';
-  static const String adMobInterstitialAndroid =
-      'ca-app-pub-3940256099942544/1033173712';
-  static const String adMobInterstitialIOS =
-      'ca-app-pub-3940256099942544/4411468910';
-  static const String adMobRewardedAndroid =
-      'ca-app-pub-3940256099942544/5224354917';
-  static const String adMobRewardedIOS =
-      'ca-app-pub-3940256099942544/1712485313';
+  // Suscripciones - IDs de productos
+  static const String monthlySubscriptionId = 'invictus_monthly_5usd';
+  static const String yearlySubscriptionId = 'invictus_yearly_99usd';
 
   // Intervalos de tiempo para gráficos
   static const Map<String, String> timeIntervals = {
@@ -102,55 +93,41 @@ class AppConstants {
   static const String encryptionKey = 'invictus_trader_encryption_key';
   static const int sessionTimeoutMinutes = 30;
 
-  // Configuración de monetización
-  static const String adMobAppId =
-      'ca-app-pub-3940256099942544~3347511713'; // Test ID
-  static const String adMobBannerId =
-      'ca-app-pub-3940256099942544/6300978111'; // Test ID
-  static const String adMobInterstitialId =
-      'ca-app-pub-3940256099942544/1033173712'; // Test ID
-
-  // Productos de suscripción
+  // Configuración de suscripciones (Solo sistema premium)
   static const Map<String, String> subscriptionProducts = {
-    'premium_monthly': 'invictus_premium_monthly',
-    'premium_yearly': 'invictus_premium_yearly',
-    'pro_monthly': 'invictus_pro_monthly',
-    'pro_yearly': 'invictus_pro_yearly',
+    'monthly_premium': 'invictus_monthly_5usd',
+    'yearly_premium': 'invictus_yearly_99usd',
   };
 
   // Precios de suscripción (en USD)
   static const Map<String, double> subscriptionPrices = {
-    'premium_monthly': 9.99,
-    'premium_yearly': 99.99,
-    'pro_monthly': 29.99,
-    'pro_yearly': 299.99,
+    'monthly_premium': 5.0,
+    'yearly_premium': 99.0,
   };
 
-  // Características por plan
+  // Características por plan (simplificado para 2 planes)
   static const Map<String, List<String>> planFeatures = {
     'free': [
       'Basic market data',
-      'Limited news access',
+      'Limited news access (5 articles/day)',
       'Basic alerts (5 max)',
-      'Ads supported',
+      'Standard portfolio tracking',
     ],
     'premium': [
       'Real-time market data',
       'Unlimited news access',
-      'Advanced alerts (25 max)',
-      'No ads',
+      'Advanced alerts (unlimited)',
+      'Ad-free experience',
       'Email notifications',
-      'Basic trading signals',
-    ],
-    'pro': [
-      'Professional trading tools',
-      'Advanced analytics',
-      'Unlimited alerts',
-      'Custom strategies',
-      'Plugin system',
-      'API access',
-      'Priority support',
-      'AI-powered insights',
+      'Trading signals',
+      'Portfolio tracking',
+      'Technical indicators',
+      'Priority support (yearly only)',
+      'AI-powered insights (yearly only)',
+      'Custom watchlists',
+      'Export data functionality',
+      'Advanced portfolio analytics',
+      'Beta features access',
     ],
   };
 
