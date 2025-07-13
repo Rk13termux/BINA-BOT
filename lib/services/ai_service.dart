@@ -68,6 +68,12 @@ class AIService {
   /// Verificar si el servicio está disponible
   bool get isAvailable => _isInitialized && _apiKey != null && _apiKey!.isNotEmpty;
 
+  /// Getter para verificar si el servicio está inicializado
+  bool get isInitialized => _isInitialized;
+
+  /// Getter para verificar si tiene API key válida
+  bool get hasApiKey => _apiKey != null && _apiKey!.isNotEmpty;
+
   /// Analizar mercado con IA
   Future<AIMarketAnalysis?> analyzeMarket({
     required String symbol,

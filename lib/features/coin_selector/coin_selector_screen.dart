@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../ui/theme/colors.dart';
+import '../../ui/widgets/invictus_app_bar.dart';
 import '../../services/binance_service.dart';
 import '../../utils/logger.dart';
 

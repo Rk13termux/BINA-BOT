@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:math' as math;
 import '../../ui/theme/colors.dart';
+import '../../ui/widgets/invictus_app_bar.dart';
 import '../../utils/logger.dart';
 import '../coin_selector/coin_selector_screen.dart';
 import '../strategy_selector/strategy_selector_screen.dart';
@@ -29,11 +30,10 @@ class _InvictusMainScreenState extends State<InvictusMainScreen>
   late Animation<double> _fabAnimation;
 
   // Estados de la aplicación
+  String _currentScreen = 'dashboard';
   String? _selectedCoin;
   BaseStrategy? _selectedStrategy;
-  bool _useAI = true;
   Map<String, dynamic> _strategyConfiguration = {};
-  bool _isStrategyRunning = false;
 
   @override
   void initState() {
@@ -83,6 +83,12 @@ class _InvictusMainScreenState extends State<InvictusMainScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundBlack,
+      appBar: InvictusAppBar(
+        title: _getCurrentScreenTitle(),
+        onMenuPressed: _toggleMenu,
+        showBalance: true,
+        showConnectionStatus: true,
+      ),
       body: Stack(
         children: [
           // Contenido principal
@@ -405,12 +411,14 @@ class _InvictusMainScreenState extends State<InvictusMainScreen>
 
   Widget _buildOrbitalMenu() {
     final menuItems = [
-      {'icon': Icons.account_balance_wallet, 'label': 'Portfolio', 'onTap': () => _navigateToPortfolio()},
-      {'icon': Icons.settings, 'label': 'Configuración', 'onTap': () => _navigateToSettings()},
-      {'icon': Icons.analytics, 'label': 'Análisis', 'onTap': () => _navigateToAnalysis()},
-      {'icon': Icons.history, 'label': 'Historial', 'onTap': () => _navigateToHistory()},
-      {'icon': Icons.notification_important, 'label': 'Alertas', 'onTap': () => _navigateToAlerts()},
-      {'icon': Icons.help, 'label': 'Ayuda', 'onTap': () => _navigateToHelp()},
+      {'icon': Icons.currency_bitcoin, 'label': 'Seleccionar Coin', 'action': 'select_coin'},
+      {'icon': Icons.psychology, 'label': 'Estrategias', 'action': 'select_strategy'},
+      {'icon': Icons.dashboard, 'label': 'Dashboard', 'action': 'dashboard'},
+      {'icon': Icons.account_balance_wallet, 'label': 'Portfolio', 'action': 'portfolio'},
+      {'icon': Icons.newspaper, 'label': 'Noticias', 'action': 'news'},
+      {'icon': Icons.analytics, 'label': 'Analytics', 'action': 'analytics'},
+      {'icon': Icons.notifications, 'label': 'Alertas', 'action': 'alerts'},
+      {'icon': Icons.settings, 'label': 'Configuración', 'action': 'settings'},
     ];
 
     return Container(
@@ -434,7 +442,7 @@ class _InvictusMainScreenState extends State<InvictusMainScreen>
               child: _buildMenuButton(
                 icon: item['icon'] as IconData,
                 label: item['label'] as String,
-                onTap: item['onTap'] as VoidCallback,
+                action: item['action'] as String,
               ),
             );
           }).toList(),
@@ -471,13 +479,10 @@ class _InvictusMainScreenState extends State<InvictusMainScreen>
   Widget _buildMenuButton({
     required IconData icon,
     required String label,
-    required VoidCallback onTap,
+    required String action,
   }) {
     return GestureDetector(
-      onTap: () {
-        _toggleMenu();
-        onTap();
-      },
+      onTap: () => _handleMenuItemPressed(action),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -548,6 +553,146 @@ class _InvictusMainScreenState extends State<InvictusMainScreen>
     );
   }
 
+  /// Obtener título dinámico de la pantalla actual
+  String _getCurrentScreenTitle() {
+    if (_selectedStrategy != null) {
+      return _selectedStrategy!.name;
+    }
+    
+    switch (_currentScreen) {
+      case 'dashboard':
+        return 'Trading Dashboard';
+      case 'coin_selector':
+        return 'Select Coin';
+      case 'strategy_selector':
+        return 'Select Strategy';
+      default:
+        return 'INVICTUS TRADER';
+    }
+  }
+
+  /// Manejar navegación del menú orbital
+  void _handleMenuItemPressed(String action) {
+    _toggleMenu(); // Cerrar menú primero
+    
+    switch (action) {
+      case 'select_coin':
+        _navigateToScreen('coin_selector');
+        break;
+      case 'select_strategy':
+        _navigateToScreen('strategy_selector');
+        break;
+      case 'dashboard':
+        _navigateToScreen('dashboard');
+        break;
+      case 'portfolio':
+        _navigateToPortfolio();
+        break;
+      case 'news':
+        _navigateToNews();
+        break;
+      case 'settings':
+        _navigateToSettings();
+        break;
+      case 'analytics':
+        _navigateToAnalytics();
+        break;
+      case 'alerts':
+        _navigateToAlerts();
+        break;
+    }
+  }
+
+  /// Navegar a una pantalla específica
+  void _navigateToScreen(String screen) {
+    setState(() {
+      _currentScreen = screen;
+    });
+    AppLogger().info('Navigated to screen: $screen');
+  }
+
+  /// Navegar a Portfolio
+  void _navigateToPortfolio() async {
+    try {
+      final binanceService = Provider.of<BinanceService>(context, listen: false);
+      if (!binanceService.isAuthenticated) {
+        _showAuthenticationDialog();
+        return;
+      }
+      
+      Navigator.pushNamed(context, '/portfolio');
+    } catch (e) {
+      AppLogger().error('Failed to navigate to portfolio: $e');
+    }
+  }
+
+  /// Navegar a Noticias
+  void _navigateToNews() {
+    Navigator.pushNamed(context, '/news');
+  }
+
+  /// Navegar a Configuración
+  void _navigateToSettings() {
+    Navigator.pushNamed(context, '/settings');
+  }
+
+  /// Navegar a Analytics
+  void _navigateToAnalytics() async {
+    try {
+      final aiService = Provider.of<AIService>(context, listen: false);
+      if (!aiService.isInitialized) {
+        await aiService.initialize();
+      }
+      
+      Navigator.pushNamed(context, '/analytics');
+    } catch (e) {
+      AppLogger().error('Failed to navigate to analytics: $e');
+    }
+  }
+
+  /// Navegar a Alertas
+  void _navigateToAlerts() {
+    Navigator.pushNamed(context, '/alerts');
+  }
+
+  /// Mostrar diálogo de autenticación
+  void _showAuthenticationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surfaceDark,
+        title: Text(
+          'Autenticación Requerida',
+          style: TextStyle(color: AppColors.textPrimary),
+        ),
+        content: Text(
+          'Debe configurar las credenciales de Binance para acceder a esta función.',
+          style: TextStyle(color: AppColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancelar',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _navigateToSettings();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.goldPrimary,
+              foregroundColor: Colors.black,
+            ),
+            child: const Text('Configurar'),
+          ),
+        ],
+      ),
+    );
+  }
+
   // Métodos de navegación y acciones
 
   void _toggleMenu() {
@@ -594,7 +739,8 @@ class _InvictusMainScreenState extends State<InvictusMainScreen>
   void _onStrategySelected(BaseStrategy strategy, bool useAI) {
     setState(() {
       _selectedStrategy = strategy;
-      _useAI = useAI;
+      // Configurar estrategia seleccionada
+      _selectedStrategy = strategy;
     });
 
     // Mostrar configuración de estrategia
@@ -719,38 +865,6 @@ class _InvictusMainScreenState extends State<InvictusMainScreen>
         ],
       ),
     );
-  }
-
-  // Métodos de navegación del menú orbital
-
-  void _navigateToPortfolio() {
-    _logger.info('Navigate to Portfolio');
-    // TODO: Implementar navegación al portfolio
-  }
-
-  void _navigateToSettings() {
-    _logger.info('Navigate to Settings');
-    // TODO: Implementar navegación a configuración
-  }
-
-  void _navigateToAnalysis() {
-    _logger.info('Navigate to Analysis');
-    // TODO: Implementar navegación a análisis
-  }
-
-  void _navigateToHistory() {
-    _logger.info('Navigate to History');
-    // TODO: Implementar navegación al historial
-  }
-
-  void _navigateToAlerts() {
-    _logger.info('Navigate to Alerts');
-    // TODO: Implementar navegación a alertas
-  }
-
-  void _navigateToHelp() {
-    _logger.info('Navigate to Help');
-    // TODO: Implementar navegación a ayuda
   }
 
   @override
