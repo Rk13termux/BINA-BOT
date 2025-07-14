@@ -1,5 +1,5 @@
-name: bina_bot_pro
-description: "BINA-BOT PRO - Professional Binance Trading Platform with AI-Powered Analysis and Real-Time Portfolio Management"
+name: invictus_trader_pro
+description: "Professional Trading App - Cryptocurrency trading platform with real-time analysis and automation"
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -18,10 +18,6 @@ dependencies:
   # HTTP & WebSocket
   http: ^1.2.0
   web_socket_channel: ^2.4.4
-  dio: ^5.4.0
-  
-  # Environment Configuration
-  flutter_dotenv: ^5.1.0
   
   # HTML Parsing for News Scraping
   html: ^0.15.4
@@ -39,9 +35,6 @@ dependencies:
   # Cryptography
   crypto: ^3.0.3
   encrypt: ^5.0.3
-  
-  # JSON Serialization
-  json_annotation: ^4.8.1
   
   # Notifications
   flutter_local_notifications: ^17.2.2
@@ -90,19 +83,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  # Assets configuration
   assets:
-    - .env
     - assets/images/
     - assets/icons/
-    - assets/fonts/
-    - assets/ml_models/
     - assets/plugins/
-  
-  # Fonts configuration
-  fonts:
-    - family: Montserrat
-      fonts:
-        - asset: assets/fonts/Montserrat-Regular.ttf
-        - asset: assets/fonts/Montserrat-Bold.ttf
-          weight: 700
+    - assets/ml_models/

@@ -2,107 +2,92 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'colors.dart';
 
-/// Tema principal de BINA-BOT PRO - Diseño exclusivo profesional
+/// Tema principal de la aplicación Invictus Trader Pro
 class AppTheme {
-  /// Tema negro profesional principal
+  /// Tema oscuro principal
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
 
-      // Esquema de colores BINA-BOT PRO
+      // Esquema de colores
       colorScheme: const ColorScheme.dark(
         primary: AppColors.goldPrimary,
         secondary: AppColors.goldSecondary,
         surface: AppColors.surfaceDark,
-        background: AppColors.backgroundBlack,
-        onPrimary: AppColors.backgroundBlack,
-        onSecondary: AppColors.backgroundBlack,
+        onPrimary: AppColors.primaryDark,
+        onSecondary: AppColors.primaryDark,
         onSurface: AppColors.textPrimary,
-        onBackground: AppColors.textPrimary,
         onError: AppColors.textPrimary,
-        error: AppColors.bearish,
       ),
 
-      // Scaffold background negro puro
-      scaffoldBackgroundColor: AppColors.backgroundBlack,
-
-      // Tema de la app bar profesional
+      // Tema de la app bar
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.backgroundBlack,
+        backgroundColor: AppColors.primaryDark,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         centerTitle: true,
         titleTextStyle: TextStyle(
-          color: AppColors.goldPrimary,
+          color: AppColors.textPrimary,
           fontSize: 20,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 1.0,
+          fontWeight: FontWeight.w600,
         ),
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.light,
-          systemNavigationBarColor: AppColors.backgroundBlack,
-          systemNavigationBarIconBrightness: Brightness.light,
         ),
       ),
 
-      // Tema de tarjetas premium
-      cardTheme: CardThemeData(
-        color: AppColors.surfaceDark,
-        elevation: 8,
-        shadowColor: AppColors.goldPrimary.withOpacity(0.1),
+      // Tema de tarjetas  
+      cardTheme: const CardThemeData(
+        color: AppColors.cardBackground,
+        elevation: 4,
         shape: RoundedRectangleBorder(
-          borderRadius: const BorderRadius.all(Radius.circular(16)),
+          borderRadius: BorderRadius.all(Radius.circular(12)),
           side: BorderSide(
-            color: AppColors.goldPrimary.withOpacity(0.3),
+            color: AppColors.borderColor,
             width: 1,
           ),
         ),
       ),
 
-      // Tema de botones elevados premium
+      // Tema de botones elevados
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.goldPrimary,
-          foregroundColor: AppColors.backgroundBlack,
-          elevation: 4,
-          shadowColor: AppColors.goldPrimary.withOpacity(0.3),
+          foregroundColor: AppColors.primaryDark,
+          elevation: 2,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(8),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
-          ),
-        ),
-      ),
-
-      // Tema de botones de texto dorados
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: AppColors.goldPrimary,
-          overlayColor: AppColors.goldPrimary.withOpacity(0.1),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           textStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            letterSpacing: 0.3,
           ),
         ),
       ),
 
-      // Tema de botones outline premium
+      // Tema de botones de texto
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.goldPrimary,
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+
+      // Tema de botones outline
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.goldPrimary,
-          side: BorderSide(color: AppColors.goldPrimary.withOpacity(0.8)),
-          overlayColor: AppColors.goldPrimary.withOpacity(0.1),
+          side: const BorderSide(color: AppColors.goldPrimary),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(8),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         ),
       ),
 

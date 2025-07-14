@@ -1,3 +1,0 @@
-@echo off
-echo Performing hot reload...
-echo r > NUL

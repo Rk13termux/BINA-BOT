@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../ui/theme/colors.dart';
 import '../../models/news_article.dart';
+import '../../services/subscription_service.dart';
 import 'news_controller.dart';
 import 'news_detail_screen.dart';
 import 'bookmarks_screen.dart';
@@ -385,7 +386,68 @@ class _NewsScreenState extends State<NewsScreen> with TickerProviderStateMixin {
   Widget _buildNewsTab() {
     return Column(
       children: [
-        // Todas las funciones están ahora disponibles gratuitamente
+        // Subscription banner for non-premium users
+        Consumer<SubscriptionService>(
+          builder: (context, subscription, child) {
+            if (!subscription.isSubscribed) {
+              return Container(
+                margin: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(                        color: const Color(0xFFFFD700).withValues(alpha: 0.1),
+                  border: Border.all(color: const Color(0xFFFFD700)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.star,
+                      color: Color(0xFFFFD700),
+                      size: 24,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'Upgrade to Premium',
+                            style: TextStyle(
+                              color: Color(0xFFFFD700),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            'Get unlimited access to premium news & analysis',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.8),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        // Navigate to subscription screen
+                      },
+                      child: const Text(
+                        'Subscribe',
+                        style: TextStyle(
+                          color: Color(0xFFFFD700),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
+
         Expanded(
           child: Consumer<NewsController>(
             builder: (context, newsController, child) {
