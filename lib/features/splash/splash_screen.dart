@@ -144,7 +144,7 @@ class _SplashScreenState extends State<SplashScreen>
                     animation: _logoAnimation,
                     builder: (context, child) {
                       return Opacity(
-                        opacity: _logoAnimation.value,
+                        opacity: (_logoAnimation.value).clamp(0.0, 1.0),
                         child: Column(
                           children: [
                             Text(

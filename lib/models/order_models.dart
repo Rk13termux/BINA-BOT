@@ -109,23 +109,24 @@ class OrderRequest {
   bool isValid() {
     // Validaciones básicas
     if (symbol.isEmpty) return false;
-    
+
     // Para órdenes LIMIT y STOP_LOSS_LIMIT, el precio es requerido
-    if ((type == OrderType.limit || 
-         type == OrderType.stopLossLimit || 
-         type == OrderType.takeProfitLimit) && price == null) {
+    if ((type == OrderType.limit ||
+            type == OrderType.stopLossLimit ||
+            type == OrderType.takeProfitLimit) &&
+        price == null) {
       return false;
     }
-    
+
     // Para órdenes STOP_LOSS y STOP_LOSS_LIMIT, stopPrice es requerido
-    if ((type == OrderType.stopLoss || 
-         type == OrderType.stopLossLimit) && stopPrice == null) {
+    if ((type == OrderType.stopLoss || type == OrderType.stopLossLimit) &&
+        stopPrice == null) {
       return false;
     }
-    
+
     // Cantidad debe ser especificada (quantity o quoteOrderQty)
     if (quantity == null && quoteOrderQty == null) return false;
-    
+
     return true;
   }
 
@@ -220,7 +221,7 @@ class OrderRequest {
   @override
   String toString() {
     return 'OrderRequest(symbol: $symbol, side: ${side.value}, type: ${type.value}, '
-           'quantity: $quantity, price: $price)';
+        'quantity: $quantity, price: $price)';
   }
 }
 
@@ -278,14 +279,21 @@ class OrderResponse {
       transactTime: json['transactTime'] ?? json['time'] ?? 0,
       price: double.tryParse(json['price']?.toString() ?? '0') ?? 0.0,
       origQty: double.tryParse(json['origQty']?.toString() ?? '0') ?? 0.0,
-      executedQty: double.tryParse(json['executedQty']?.toString() ?? '0') ?? 0.0,
-      cummulativeQuoteQty: double.tryParse(json['cummulativeQuoteQty']?.toString() ?? '0') ?? 0.0,
+      executedQty:
+          double.tryParse(json['executedQty']?.toString() ?? '0') ?? 0.0,
+      cummulativeQuoteQty:
+          double.tryParse(json['cummulativeQuoteQty']?.toString() ?? '0') ??
+              0.0,
       status: OrderStatus.fromString(json['status'] ?? 'NEW'),
       timeInForce: TimeInForce.fromString(json['timeInForce'] ?? 'GTC'),
       type: OrderType.fromString(json['type'] ?? 'MARKET'),
       side: OrderSide.fromString(json['side'] ?? 'BUY'),
-      stopPrice: json['stopPrice'] != null ? double.tryParse(json['stopPrice'].toString()) : null,
-      icebergQty: json['icebergQty'] != null ? double.tryParse(json['icebergQty'].toString()) : null,
+      stopPrice: json['stopPrice'] != null
+          ? double.tryParse(json['stopPrice'].toString())
+          : null,
+      icebergQty: json['icebergQty'] != null
+          ? double.tryParse(json['icebergQty'].toString())
+          : null,
       time: json['time'] ?? json['transactTime'] ?? 0,
       updateTime: json['updateTime'] ?? json['time'] ?? 0,
       isWorking: json['isWorking'] ?? false,
@@ -329,7 +337,8 @@ class OrderResponse {
   bool get isPartiallyFilled => status == OrderStatus.partiallyFilled;
 
   /// Verificar si la orden está activa
-  bool get isActive => status == OrderStatus.newOrder || status == OrderStatus.partiallyFilled;
+  bool get isActive =>
+      status == OrderStatus.newOrder || status == OrderStatus.partiallyFilled;
 
   /// Verificar si la orden puede ser cancelada
   bool get canBeCanceled => isActive && status != OrderStatus.pendingCancel;
@@ -338,7 +347,8 @@ class OrderResponse {
   double get remainingQty => origQty - executedQty;
 
   /// Obtener porcentaje de ejecución
-  double get fillPercentage => origQty > 0 ? (executedQty / origQty) * 100 : 0.0;
+  double get fillPercentage =>
+      origQty > 0 ? (executedQty / origQty) * 100 : 0.0;
 
   /// Obtener precio promedio de ejecución
   double get avgPrice {
@@ -349,7 +359,7 @@ class OrderResponse {
   @override
   String toString() {
     return 'OrderResponse(orderId: $orderId, symbol: $symbol, side: ${side.value}, '
-           'type: ${type.value}, status: ${status.value}, executedQty: $executedQty/$origQty)';
+        'type: ${type.value}, status: ${status.value}, executedQty: $executedQty/$origQty)';
   }
 }
 

@@ -12,7 +12,7 @@ class TradingController extends ChangeNotifier {
   final BinanceService _binanceService = BinanceService();
   final NotificationService _notificationService = NotificationService();
   final AppLogger _logger = AppLogger();
-  
+
   // Premium services
   PremiumApiService? _premiumApiService;
   InitializationService? _initService;
@@ -47,20 +47,20 @@ class TradingController extends ChangeNotifier {
   Future<void> initialize() async {
     try {
       _setLoading(true);
-      
+
       // Initialize services
       await _binanceService.initialize();
       await _notificationService.initialize();
-      
+
       // Get premium API service from initialization service
       _initService = InitializationService();
       if (_initService!.isInitialized) {
         _premiumApiService = _initService!.premiumApiService;
       }
-      
+
       await _loadInitialData();
       await _loadPremiumData();
-      
+
       _isConnected = true;
       _logger.info('Trading controller initialized successfully');
     } catch (e) {
@@ -83,22 +83,25 @@ class TradingController extends ChangeNotifier {
   /// Load premium data from Premium API Service
   Future<void> _loadPremiumData() async {
     if (_premiumApiService == null) return;
-    
+
     try {
       // Load premium market data
-      final marketData = await _premiumApiService!.getRealTimeMarketData(_selectedSymbol);
+      final marketData =
+          await _premiumApiService!.getRealTimeMarketData(_selectedSymbol);
       if (marketData != null) {
         _premiumData['market_data'] = marketData;
       }
 
       // Load AI predictions
-      final predictions = await _premiumApiService!.getAiPredictions(_selectedSymbol);
+      final predictions =
+          await _premiumApiService!.getAiPredictions(_selectedSymbol);
       if (predictions != null) {
         _premiumData['ai_predictions'] = predictions;
       }
 
       // Load advanced technical indicators
-      final indicators = await _premiumApiService!.getAdvancedTechnicalIndicators(_selectedSymbol);
+      final indicators = await _premiumApiService!
+          .getAdvancedTechnicalIndicators(_selectedSymbol);
       if (indicators != null) {
         _premiumData['technical_indicators'] = indicators;
       }
