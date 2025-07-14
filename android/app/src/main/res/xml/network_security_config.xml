@@ -9,7 +9,6 @@
         <domain includeSubdomains="true">fapi.binance.com</domain>
         <domain includeSubdomains="true">dapi.binance.com</domain>
         <!-- WebSocket streams -->
-        <domain includeSubdomains="true">stream.binance.com</domain>
         <domain includeSubdomains="true">stream.binancefuture.com</domain>
     </domain-config>
     
