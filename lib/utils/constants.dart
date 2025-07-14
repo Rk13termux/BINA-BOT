@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 /// Constantes globales de la aplicación Invictus Trader Pro
 class AppConstants {
   // Información de la aplicación
@@ -14,9 +12,18 @@ class AppConstants {
   static const String binanceWsUrl = 'wss://stream.binance.com:9443/ws/';
   static const String binanceTestnetWsUrl = 'wss://testnet.binance.vision/ws/';
 
-  // Suscripciones - IDs de productos
-  static const String monthlySubscriptionId = 'invictus_monthly_5usd';
-  static const String yearlySubscriptionId = 'invictus_yearly_99usd';
+  // AdMob Ad Unit IDs (Test IDs - replace with real ones in production)
+  static const String adMobBannerAndroid =
+      'ca-app-pub-3940256099942544/6300978111';
+  static const String adMobBannerIOS = 'ca-app-pub-3940256099942544/2934735716';
+  static const String adMobInterstitialAndroid =
+      'ca-app-pub-3940256099942544/1033173712';
+  static const String adMobInterstitialIOS =
+      'ca-app-pub-3940256099942544/4411468910';
+  static const String adMobRewardedAndroid =
+      'ca-app-pub-3940256099942544/5224354917';
+  static const String adMobRewardedIOS =
+      'ca-app-pub-3940256099942544/1712485313';
 
   // Intervalos de tiempo para gráficos
   static const Map<String, String> timeIntervals = {
@@ -95,41 +102,55 @@ class AppConstants {
   static const String encryptionKey = 'invictus_trader_encryption_key';
   static const int sessionTimeoutMinutes = 30;
 
-  // Configuración de suscripciones (Solo sistema premium)
+  // Configuración de monetización
+  static const String adMobAppId =
+      'ca-app-pub-3940256099942544~3347511713'; // Test ID
+  static const String adMobBannerId =
+      'ca-app-pub-3940256099942544/6300978111'; // Test ID
+  static const String adMobInterstitialId =
+      'ca-app-pub-3940256099942544/1033173712'; // Test ID
+
+  // Productos de suscripción
   static const Map<String, String> subscriptionProducts = {
-    'monthly_premium': 'invictus_monthly_5usd',
-    'yearly_premium': 'invictus_yearly_99usd',
+    'premium_monthly': 'invictus_premium_monthly',
+    'premium_yearly': 'invictus_premium_yearly',
+    'pro_monthly': 'invictus_pro_monthly',
+    'pro_yearly': 'invictus_pro_yearly',
   };
 
   // Precios de suscripción (en USD)
   static const Map<String, double> subscriptionPrices = {
-    'monthly_premium': 5.0,
-    'yearly_premium': 99.0,
+    'premium_monthly': 9.99,
+    'premium_yearly': 99.99,
+    'pro_monthly': 29.99,
+    'pro_yearly': 299.99,
   };
 
-  // Características por plan (simplificado para 2 planes)
+  // Características por plan
   static const Map<String, List<String>> planFeatures = {
     'free': [
       'Basic market data',
-      'Limited news access (5 articles/day)',
+      'Limited news access',
       'Basic alerts (5 max)',
-      'Standard portfolio tracking',
+      'Ads supported',
     ],
     'premium': [
       'Real-time market data',
       'Unlimited news access',
-      'Advanced alerts (unlimited)',
-      'Ad-free experience',
+      'Advanced alerts (25 max)',
+      'No ads',
       'Email notifications',
-      'Trading signals',
-      'Portfolio tracking',
-      'Technical indicators',
-      'Priority support (yearly only)',
-      'AI-powered insights (yearly only)',
-      'Custom watchlists',
-      'Export data functionality',
-      'Advanced portfolio analytics',
-      'Beta features access',
+      'Basic trading signals',
+    ],
+    'pro': [
+      'Professional trading tools',
+      'Advanced analytics',
+      'Unlimited alerts',
+      'Custom strategies',
+      'Plugin system',
+      'API access',
+      'Priority support',
+      'AI-powered insights',
     ],
   };
 
@@ -174,48 +195,10 @@ class AppConstants {
   static const int maxBackupFiles = 7;
 }
 
-// Colores de la aplicación
-class AppColors {
-  // Colores principales
-  static const Color backgroundDark = Color(0xFF1A1A1A);
-  static const Color goldPrimary = Color(0xFFFFD700);
-
-  // Colores de trading
-  static const Color bullishGreen = Color(0xFF00FF88);
-  static const Color bearishRed = Color(0xFFFF4444);
-
-  // Colores de superficie
-  static const Color surfaceDark = Color(0xFF2A2A2A);
-  static const Color cardDark = Color(0xFF212121);
-
-  // Colores de texto
-  static const Color textPrimary = Color(0xFFFFFFFF);
-  static const Color textSecondary = Color(0xFFB0B0B0);
-  static const Color textMuted = Color(0xFF808080);
-
-  // Colores de estado
-  static const Color success = Color(0xFF4CAF50);
-  static const Color warning = Color(0xFFFF9800);
-  static const Color error = Color(0xFFF44336);
-  static const Color info = Color(0xFF2196F3);
-
-  // Colores de gradiente
-  static const List<Color> goldGradient = [
-    Color(0xFFFFD700),
-    Color(0xFFFFA500),
-  ];
-
-  static const List<Color> backgroundGradient = [
-    Color(0xFF1A1A1A),
-    Color(0xFF2A2A2A),
-  ];
-}
-
 /// Claves para almacenamiento seguro
 class StorageKeys {
   static const String binanceApiKey = 'binance_api_key';
   static const String binanceSecretKey = 'binance_secret_key';
-  static const String binanceTestNet = 'binance_testnet';
   static const String userSettings = 'user_settings';
   static const String watchlist = 'watchlist';
   static const String alerts = 'alerts';

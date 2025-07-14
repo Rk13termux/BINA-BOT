@@ -123,7 +123,7 @@ class BinanceWebSocketService extends ChangeNotifier {
     try {
       final subscribeMessage = {
         'method': 'SUBSCRIBE',
-        'params': ['${symbolLower}@ticker'],
+        'params': ['$symbolLower@ticker'],
         'id': _generateId(),
       };
       
@@ -183,7 +183,7 @@ class BinanceWebSocketService extends ChangeNotifier {
     try {
       final unsubscribeMessage = {
         'method': 'UNSUBSCRIBE',
-        'params': ['${symbolLower}@ticker'],
+        'params': ['$symbolLower@ticker'],
         'id': _generateId(),
       };
       

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../ui/theme/colors.dart' as UIColors;
+import '../../ui/theme/colors.dart';
 import '../../services/auth_service.dart';
+import '../../services/subscription_service.dart';
 import '../../services/notification_service.dart';
 import '../../utils/constants.dart';
 
@@ -43,18 +44,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: UIColors.AppColors.primaryDark,
+      backgroundColor: AppColors.primaryDark,
       appBar: AppBar(
-        backgroundColor: UIColors.AppColors.primaryDark,
+        backgroundColor: AppColors.primaryDark,
         title: Text(
           'Settings',
           style: TextStyle(
-            color: UIColors.AppColors.textPrimary,
+            color: AppColors.textPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: UIColors.AppColors.goldPrimary),
+          icon: Icon(Icons.arrow_back, color: AppColors.goldPrimary),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -72,6 +73,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildAppearanceSection(),
             const SizedBox(height: 24),
             _buildGeneralSection(),
+            const SizedBox(height: 24),
+            _buildSubscriptionSection(),
             const SizedBox(height: 24),
             _buildAboutSection(),
           ],
@@ -101,20 +104,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Icons.badge,
               ),
               _buildInfoTile(
-                'Status',
-                'PRO USER',
+                'Subscription',
+                user.subscriptionTier.toUpperCase(),
                 Icons.star,
                 trailing: Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: UIColors.AppColors.goldPrimary,
+                    color: user.subscriptionTier == 'premium'
+                        ? AppColors.goldPrimary
+                        : AppColors.info,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
-                    'PRO',
+                  child: Text(
+                    user.subscriptionTier.toUpperCase(),
                     style: TextStyle(
-                      color: Colors.black,
+                      color: user.subscriptionTier == 'premium'
+                          ? AppColors.primaryDark
+                          : Colors.white,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                     ),
@@ -134,7 +141,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   icon: const Icon(Icons.logout),
                   label: const Text('Logout'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: UIColors.AppColors.error,
+                    backgroundColor: AppColors.bearish,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
@@ -150,8 +157,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   icon: const Icon(Icons.login),
                   label: const Text('Login'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: UIColors.AppColors.goldPrimary,
-                    foregroundColor: UIColors.AppColors.primaryDark,
+                    backgroundColor: AppColors.goldPrimary,
+                    foregroundColor: AppColors.primaryDark,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),
@@ -171,29 +178,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Text(
           'Connect your Binance account for live trading',
           style: TextStyle(
-            color: UIColors.AppColors.textSecondary,
+            color: AppColors.textSecondary,
             fontSize: 14,
           ),
         ),
         const SizedBox(height: 16),
         TextField(
           controller: _apiKeyController,
-          style: TextStyle(color: UIColors.AppColors.textPrimary),
+          style: TextStyle(color: AppColors.textPrimary),
           decoration: InputDecoration(
             labelText: 'API Key',
-            labelStyle: TextStyle(color: UIColors.AppColors.textSecondary),
+            labelStyle: TextStyle(color: AppColors.textSecondary),
             hintText: 'Enter your Binance API key',
             hintStyle:
-                TextStyle(color: UIColors.AppColors.textSecondary.withValues(alpha: 0.7)),
-            prefixIcon: Icon(Icons.key, color: UIColors.AppColors.goldPrimary),
+                TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.7)),
+            prefixIcon: Icon(Icons.key, color: AppColors.goldPrimary),
             border: OutlineInputBorder(
-              borderSide: BorderSide(color: UIColors.AppColors.textDisabled),
+              borderSide: BorderSide(color: AppColors.borderColor),
             ),
             enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: UIColors.AppColors.textDisabled),
+              borderSide: BorderSide(color: AppColors.borderColor),
             ),
             focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: UIColors.AppColors.goldPrimary),
+              borderSide: BorderSide(color: AppColors.goldPrimary),
             ),
           ),
           obscureText: true,
@@ -201,22 +208,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
         const SizedBox(height: 16),
         TextField(
           controller: _secretKeyController,
-          style: TextStyle(color: UIColors.AppColors.textPrimary),
+          style: TextStyle(color: AppColors.textPrimary),
           decoration: InputDecoration(
             labelText: 'Secret Key',
-            labelStyle: TextStyle(color: UIColors.AppColors.textSecondary),
+            labelStyle: TextStyle(color: AppColors.textSecondary),
             hintText: 'Enter your Binance secret key',
             hintStyle:
-                TextStyle(color: UIColors.AppColors.textSecondary.withValues(alpha: 0.7)),
-            prefixIcon: Icon(Icons.security, color: UIColors.AppColors.goldPrimary),
+                TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.7)),
+            prefixIcon: Icon(Icons.security, color: AppColors.goldPrimary),
             border: OutlineInputBorder(
-              borderSide: BorderSide(color: UIColors.AppColors.textDisabled),
+              borderSide: BorderSide(color: AppColors.borderColor),
             ),
             enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: UIColors.AppColors.textDisabled),
+              borderSide: BorderSide(color: AppColors.borderColor),
             ),
             focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: UIColors.AppColors.goldPrimary),
+              borderSide: BorderSide(color: AppColors.goldPrimary),
             ),
           ),
           obscureText: true,
@@ -229,8 +236,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             icon: const Icon(Icons.save),
             label: const Text('Save API Keys'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: UIColors.AppColors.goldPrimary,
-              foregroundColor: UIColors.AppColors.primaryDark,
+              backgroundColor: AppColors.goldPrimary,
+              foregroundColor: AppColors.primaryDark,
               padding: const EdgeInsets.symmetric(vertical: 12),
             ),
           ),
@@ -239,7 +246,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Text(
           'Your API keys are encrypted and stored securely on your device.',
           style: TextStyle(
-            color: UIColors.AppColors.textSecondary,
+            color: AppColors.textSecondary,
             fontSize: 12,
           ),
           textAlign: TextAlign.center,
@@ -373,6 +380,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Widget _buildSubscriptionSection() {
+    return Consumer<SubscriptionService>(
+      builder: (context, subscription, child) {
+        return _buildSection(
+          title: 'Subscription',
+          icon: Icons.star,
+          children: [
+            _buildActionTile(
+              'Upgrade to Premium',
+              'Unlock advanced features',
+              Icons.upgrade,
+              () => _showUpgradeDialog(),
+              trailing: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.goldPrimary,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'PREMIUM',
+                  style: TextStyle(
+                    color: AppColors.primaryDark,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            _buildActionTile(
+              'Restore Purchases',
+              'Restore your previous purchases',
+              Icons.restore_page,
+              () => subscription.restorePurchases(),
+            ),
+            _buildActionTile(
+              'Manage Subscription',
+              'View and manage your subscription',
+              Icons.manage_accounts,
+              () => _manageSubscription(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildAboutSection() {
     return _buildSection(
       title: 'About',
@@ -417,7 +470,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required List<Widget> children,
   }) {
     return Card(
-      color: UIColors.AppColors.surfaceDark,
+      color: AppColors.surfaceDark,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -425,12 +478,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Row(
               children: [
-                Icon(icon, color: UIColors.AppColors.goldPrimary, size: 20),
+                Icon(icon, color: AppColors.goldPrimary, size: 20),
                 const SizedBox(width: 8),
                 Text(
                   title,
                   style: TextStyle(
-                    color: UIColors.AppColors.textPrimary,
+                    color: AppColors.textPrimary,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -455,18 +508,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
       contentPadding: EdgeInsets.zero,
       title: Text(
         title,
-        style: TextStyle(color: UIColors.AppColors.textPrimary),
+        style: TextStyle(color: AppColors.textPrimary),
       ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(color: UIColors.AppColors.textSecondary, fontSize: 12),
+        style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
       ),
       trailing: Switch(
         value: value,
         onChanged: onChanged,
-        activeColor: UIColors.AppColors.goldPrimary,
-        inactiveThumbColor: UIColors.AppColors.textSecondary,
-        inactiveTrackColor: UIColors.AppColors.textDisabled,
+        activeColor: AppColors.goldPrimary,
+        inactiveThumbColor: AppColors.textSecondary,
+        inactiveTrackColor: AppColors.borderColor,
       ),
     );
   }
@@ -482,17 +535,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       contentPadding: EdgeInsets.zero,
       title: Text(
         title,
-        style: TextStyle(color: UIColors.AppColors.textPrimary),
+        style: TextStyle(color: AppColors.textPrimary),
       ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(color: UIColors.AppColors.textSecondary, fontSize: 12),
+        style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
       ),
       trailing: DropdownButton<String>(
         value: value,
         onChanged: onChanged,
-        dropdownColor: UIColors.AppColors.surfaceDark,
-        style: TextStyle(color: UIColors.AppColors.textPrimary),
+        dropdownColor: AppColors.surfaceDark,
+        style: TextStyle(color: AppColors.textPrimary),
         underline: Container(),
         items: options.map((String option) {
           return DropdownMenuItem<String>(
@@ -516,22 +569,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
       contentPadding: EdgeInsets.zero,
       leading: Icon(
         icon,
-        color: isDestructive ? UIColors.AppColors.error : UIColors.AppColors.goldPrimary,
+        color: isDestructive ? AppColors.bearish : AppColors.goldPrimary,
       ),
       title: Text(
         title,
         style: TextStyle(
-          color: isDestructive ? UIColors.AppColors.error : UIColors.AppColors.textPrimary,
+          color: isDestructive ? AppColors.bearish : AppColors.textPrimary,
         ),
       ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(color: UIColors.AppColors.textSecondary, fontSize: 12),
+        style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
       ),
       trailing: trailing ??
           Icon(
             Icons.chevron_right,
-            color: UIColors.AppColors.textSecondary,
+            color: AppColors.textSecondary,
           ),
       onTap: onTap,
     );
@@ -545,14 +598,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: Icon(icon, color: UIColors.AppColors.goldPrimary),
+      leading: Icon(icon, color: AppColors.goldPrimary),
       title: Text(
         title,
-        style: TextStyle(color: UIColors.AppColors.textPrimary),
+        style: TextStyle(color: AppColors.textPrimary),
       ),
       subtitle: Text(
         value,
-        style: TextStyle(color: UIColors.AppColors.textSecondary, fontSize: 12),
+        style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
       ),
       trailing: trailing,
     );
@@ -563,7 +616,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('API keys saved securely'),
-        backgroundColor: UIColors.AppColors.success,
+        backgroundColor: AppColors.success,
       ),
     );
   }
@@ -580,7 +633,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Data export feature coming soon'),
-        backgroundColor: UIColors.AppColors.info,
+        backgroundColor: AppColors.info,
       ),
     );
   }
@@ -590,7 +643,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Data import feature coming soon'),
-        backgroundColor: UIColors.AppColors.info,
+        backgroundColor: AppColors.info,
       ),
     );
   }
@@ -599,20 +652,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: UIColors.AppColors.surfaceDark,
+        backgroundColor: AppColors.surfaceDark,
         title: Text(
           'Clear Cache',
-          style: TextStyle(color: UIColors.AppColors.textPrimary),
+          style: TextStyle(color: AppColors.textPrimary),
         ),
         content: Text(
           'This will clear all cached data. Are you sure?',
-          style: TextStyle(color: UIColors.AppColors.textSecondary),
+          style: TextStyle(color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel',
-                style: TextStyle(color: UIColors.AppColors.textSecondary)),
+                style: TextStyle(color: AppColors.textSecondary)),
           ),
           TextButton(
             onPressed: () {
@@ -621,11 +674,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: const Text('Cache cleared'),
-                  backgroundColor: UIColors.AppColors.success,
+                  backgroundColor: AppColors.success,
                 ),
               );
             },
-            child: Text('Clear', style: TextStyle(color: UIColors.AppColors.error)),
+            child: Text('Clear', style: TextStyle(color: AppColors.bearish)),
           ),
         ],
       ),
@@ -636,20 +689,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: UIColors.AppColors.surfaceDark,
+        backgroundColor: AppColors.surfaceDark,
         title: Text(
           'Reset Settings',
-          style: TextStyle(color: UIColors.AppColors.textPrimary),
+          style: TextStyle(color: AppColors.textPrimary),
         ),
         content: Text(
           'This will reset all settings to default values. Are you sure?',
-          style: TextStyle(color: UIColors.AppColors.textSecondary),
+          style: TextStyle(color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel',
-                style: TextStyle(color: UIColors.AppColors.textSecondary)),
+                style: TextStyle(color: AppColors.textSecondary)),
           ),
           TextButton(
             onPressed: () {
@@ -658,25 +711,99 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: const Text('Settings reset to default'),
-                  backgroundColor: UIColors.AppColors.success,
+                  backgroundColor: AppColors.success,
                 ),
               );
             },
-            child: Text('Reset', style: TextStyle(color: UIColors.AppColors.error)),
+            child: Text('Reset', style: TextStyle(color: AppColors.bearish)),
           ),
         ],
       ),
     );
   }
 
-  // All features are now free - no upgrade dialog needed
+  void _showUpgradeDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surfaceDark,
+        title: Text(
+          'Upgrade to Premium',
+          style: TextStyle(color: AppColors.goldPrimary),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Unlock advanced features:',
+              style: TextStyle(color: AppColors.textPrimary),
+            ),
+            const SizedBox(height: 16),
+            _buildFeatureItem('Advanced technical indicators'),
+            _buildFeatureItem('Real-time WebSocket data'),
+            _buildFeatureItem('Unlimited alerts'),
+            _buildFeatureItem('Custom plugins'),
+            _buildFeatureItem('Priority customer support'),
+            _buildFeatureItem('No ads'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child:
+                Text('Later', style: TextStyle(color: AppColors.textSecondary)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // TODO: Implement subscription upgrade
+              context.read<SubscriptionService>().purchaseSubscription(context.read<SubscriptionService>().monthlySubscriptionId);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.goldPrimary,
+              foregroundColor: AppColors.primaryDark,
+            ),
+            child: const Text('Upgrade'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeatureItem(String feature) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(Icons.check, color: AppColors.goldPrimary, size: 16),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              feature,
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _manageSubscription() {
+    // TODO: Open subscription management
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Opening subscription management...'),
+        backgroundColor: AppColors.info,
+      ),
+    );
+  }
 
   void _openPrivacyPolicy() {
     // TODO: Open privacy policy
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Opening privacy policy...'),
-        backgroundColor: UIColors.AppColors.info,
+        backgroundColor: AppColors.info,
       ),
     );
   }
@@ -686,7 +813,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Opening terms of service...'),
-        backgroundColor: UIColors.AppColors.info,
+        backgroundColor: AppColors.info,
       ),
     );
   }
@@ -696,7 +823,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Opening support contact...'),
-        backgroundColor: UIColors.AppColors.info,
+        backgroundColor: AppColors.info,
       ),
     );
   }
@@ -706,7 +833,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Opening app store...'),
-        backgroundColor: UIColors.AppColors.info,
+        backgroundColor: AppColors.info,
       ),
     );
   }

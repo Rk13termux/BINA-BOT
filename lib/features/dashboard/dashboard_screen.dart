@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../ui/theme/colors.dart';
-import '../../ui/widgets/free_price_widget.dart';
 import '../trading/trading_screen.dart';
 import '../alerts/alerts_screen.dart';
+import '../news/news_screen.dart';
 import '../settings/settings_screen.dart';
 import '../plugins/plugins_screen.dart';
-import '../ai/ai_news_screen.dart';
-
+import 'widgets/price_tile.dart';
 import 'widgets/market_overview_widget.dart';
 import 'widgets/portfolio_widget.dart';
 import 'widgets/quick_actions_widget.dart';
 import 'widgets/recent_alerts_widget.dart';
-import 'free_crypto_screen.dart';
 import '../../services/auth_service.dart';
-import '../../services/binance_service.dart';
 
-/// Pantalla principal del dashboard con menú lateral estilo Binance
+/// Pantalla principal del dashboard con navegación por pestañas
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -24,484 +21,86 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
-  int _selectedIndex = 0;
-  bool _isDrawerOpen = false;
+class _DashboardScreenState extends State<DashboardScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
 
-  final List<Map<String, dynamic>> _menuItems = [
+  final List<Map<String, dynamic>> _screens = [
     {
       'title': 'Dashboard',
-      'icon': Icons.dashboard_outlined,
-      'selectedIcon': Icons.dashboard,
+      'icon': Icons.dashboard,
       'widget': const _DashboardHomeTab(),
     },
     {
-      'title': 'Mercados',
-      'icon': Icons.trending_up_outlined,
-      'selectedIcon': Icons.trending_up,
-      'widget': const FreeCryptoScreen(),
-    },
-    {
       'title': 'Trading',
-      'icon': Icons.show_chart_outlined,
-      'selectedIcon': Icons.show_chart,
+      'icon': Icons.show_chart,
       'widget': const TradingScreen(),
     },
     {
-      'title': 'AI News',
-      'icon': Icons.psychology_outlined,
-      'selectedIcon': Icons.psychology,
-      'widget': const AINewsScreen(),
-    },
-    {
-      'title': 'Portfolio',
-      'icon': Icons.account_balance_wallet_outlined,
-      'selectedIcon': Icons.account_balance_wallet,
-      'widget': const _PortfolioTab(),
-    },
-    {
-      'title': 'Alertas',
-      'icon': Icons.notifications_outlined,
-      'selectedIcon': Icons.notifications,
+      'title': 'Alerts',
+      'icon': Icons.notifications,
       'widget': const AlertsScreen(),
     },
     {
-      'title': 'Plugins',
-      'icon': Icons.extension_outlined,
-      'selectedIcon': Icons.extension,
-      'widget': const PluginsScreen(),
+      'title': 'News',
+      'icon': Icons.article,
+      'widget': const NewsScreen(),
     },
     {
-      'title': 'Configuración',
-      'icon': Icons.settings_outlined,
-      'selectedIcon': Icons.settings,
-      'widget': const SettingsScreen(),
+      'title': 'More',
+      'icon': Icons.more_horiz,
+      'widget': const _MoreTab(),
     },
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: _screens.length, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primaryDark, // Negro puro profesional
-      body: Row(
-        children: [
-          // Menú lateral profesional desplegable
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: _isDrawerOpen ? 280 : 80,
-            decoration: BoxDecoration(
-              color: AppColors.primaryDark,
-              border: Border(
-                right: BorderSide(
-                  color: AppColors.goldPrimary,
-                  width: 1,
-                ),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.goldPrimary.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(2, 0),
-                ),
-              ],
+      backgroundColor: AppColors.primaryDark,
+      appBar: AppBar(
+        backgroundColor: AppColors.primaryDark,
+        elevation: 0,
+        title: Row(
+          children: [
+            Icon(
+              Icons.trending_up,
+              color: AppColors.goldPrimary,
+              size: 28,
             ),
-            child: Column(
-              children: [
-                // Header del menú
-                _buildMenuHeader(),
-                
-                // Items del menú
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _menuItems.length,
-                    itemBuilder: (context, index) {
-                      return _buildMenuItem(index);
-                    },
-                  ),
-                ),
-                
-                // Footer del menú
-                _buildMenuFooter(),
-              ],
-            ),
-          ),
-          
-          // Contenido principal
-          Expanded(
-            child: Column(
-              children: [
-                // Top bar estilo Binance
-                _buildTopBar(),
-                
-                // Contenido de la página actual
-                Expanded(
-                  child: _menuItems[_selectedIndex]['widget'] as Widget,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Construir header del menú
-  Widget _buildMenuHeader() {
-    return Container(
-      height: 80,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: AppColors.goldPrimary,
-            width: 1,
-          ),
-        ),
-        gradient: LinearGradient(
-          colors: [
-            AppColors.primaryDark,
-            AppColors.surfaceDark,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Row(
-        children: [
-          // Logo/Icon profesional
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.goldPrimary,
-                  AppColors.goldSecondary,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.goldPrimary.withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.auto_awesome,
-              color: Colors.black,
-              size: 24,
-            ),
-          ),
-          if (_isDrawerOpen) ...[
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'BINA-BOT PRO',
-                    style: TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                  Text(
-                    'Professional AI Trading',
-                    style: TextStyle(
-                      color: AppColors.goldPrimary,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-          // Toggle button profesional
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _isDrawerOpen = !_isDrawerOpen;
-              });
-            },
-            child: Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: AppColors.surfaceDark,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: AppColors.goldPrimary,
-                  width: 1,
-                ),
-              ),
-              child: Icon(
-                _isDrawerOpen ? Icons.keyboard_arrow_left : Icons.keyboard_arrow_right,
+            const SizedBox(width: 8),
+            Text(
+              'Invictus Trader Pro',
+              style: TextStyle(
                 color: AppColors.goldPrimary,
-                size: 20,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Construir item del menú profesional
-  Widget _buildMenuItem(int index) {
-    final item = _menuItems[index];
-    final isSelected = _selectedIndex == index;
-    
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-          borderRadius: BorderRadius.circular(12),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            height: 56,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              gradient: isSelected 
-                  ? LinearGradient(
-                      colors: [
-                        AppColors.goldPrimary.withOpacity(0.2),
-                        AppColors.goldSecondary.withOpacity(0.1),
-                      ],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    )
-                  : null,
-              borderRadius: BorderRadius.circular(12),
-              border: isSelected
-                  ? Border.all(color: AppColors.goldPrimary, width: 1)
-                  : null,
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color: AppColors.goldPrimary.withOpacity(0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: isSelected 
-                        ? AppColors.goldPrimary
-                        : AppColors.surfaceDark,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    isSelected ? item['selectedIcon'] : item['icon'],
-                    color: isSelected 
-                        ? AppColors.primaryDark
-                        : AppColors.textSecondary,
-                    size: 18,
-                  ),
-                ),
-                if (_isDrawerOpen) ...[
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Text(
-                      item['title'],
-                      style: TextStyle(
-                        color: isSelected 
-                            ? AppColors.goldPrimary
-                            : AppColors.textSecondary,
-                        fontSize: 14,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                  if (isSelected)
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      color: AppColors.goldPrimary,
-                      size: 12,
-                    ),
-                ],
-              ],
-            ),
-          ),
+          ],
         ),
-      ),
-    );
-  }
-
-  // Construir footer del menú
-  Widget _buildMenuFooter() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            color: Color(0xFF2B3139),
-            width: 1,
-          ),
-        ),
-      ),
-      child: Consumer<AuthService>(
-        builder: (context, auth, child) {
-          final user = auth.currentUser;
-          return Row(
-            children: [
-              // Avatar
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF0B90B),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  Icons.person,
-                  color: Colors.black,
-                  size: 18,
-                ),
-              ),
-              if (_isDrawerOpen) ...[
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        user?.email.split('@')[0].toUpperCase() ?? 'Trader',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF0ECB81),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: const Text(
-                          'PRO',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  // Construir top bar
-  Widget _buildTopBar() {
-    return Container(
-      height: 60,
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceDark,
-        border: Border(
-          bottom: BorderSide(
-            color: AppColors.goldPrimary,
-            width: 1,
-          ),
-        ),
-      ),
-      child: Row(
-        children: [
-          // Título de la página actual
-          Text(
-            _menuItems[_selectedIndex]['title'],
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const Spacer(),
-          
-          // Balance info when connected
-          Consumer<BinanceService>(
-            builder: (context, binanceService, child) {
-              if (binanceService.isAuthenticated && binanceService.balances.isNotEmpty) {
-                return FutureBuilder<double>(
-                  future: binanceService.getTotalBalanceUSDT(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: AppColors.goldPrimary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.goldPrimary, width: 1),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.account_balance_wallet,
-                              color: AppColors.goldPrimary,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              '\$${snapshot.data!.toStringAsFixed(2)}',
-                              style: TextStyle(
-                                color: AppColors.goldPrimary,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                );
-              }
-              return const SizedBox.shrink();
-            },
-          ),
-          
-          const SizedBox(width: 16),
-          
-          // Indicador de conexión API
-          Consumer<BinanceService>(
-            builder: (context, binanceService, child) {
+        actions: [
+          // Connection status indicator
+          Consumer<AuthService>(
+            builder: (context, auth, child) {
               return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                margin: const EdgeInsets.only(right: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: binanceService.isAuthenticated && binanceService.isConnected
-                      ? AppColors.bullish
-                      : AppColors.bearish,
+                  color: auth.isAuthenticated
+                      ? AppColors.success
+                      : AppColors.warning,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -510,19 +109,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Container(
                       width: 6,
                       height: 6,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 4),
                     Text(
-                      binanceService.isAuthenticated && binanceService.isConnected 
-                          ? 'API CONECTADA' 
-                          : 'API DESCONECTADA',
-                      style: const TextStyle(
+                      auth.isAuthenticated ? 'LIVE' : 'DEMO',
+                      style: TextStyle(
                         color: Colors.white,
-                        fontSize: 11,
+                        fontSize: 10,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -531,38 +128,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
               );
             },
           ),
-          const SizedBox(width: 16),
-          
-          // Botón de configuración de API
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: _showApiConfigDialog,
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.goldPrimary),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  Icons.api,
-                  color: AppColors.goldPrimary,
-                  size: 20,
-                ),
-              ),
-            ),
+          // Settings button
+          IconButton(
+            icon: Icon(Icons.settings, color: AppColors.goldPrimary),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
           ),
         ],
       ),
-    );
-  }
-
-  // Mostrar diálogo de configuración de API
-  void _showApiConfigDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => const ApiConfigDialog(),
+      body: TabBarView(
+        controller: _tabController,
+        children: _screens.map((screen) => screen['widget'] as Widget).toList(),
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surfaceDark,
+          border: Border(
+            top: BorderSide(
+              color: AppColors.borderColor,
+              width: 1,
+            ),
+          ),
+        ),
+        child: TabBar(
+          controller: _tabController,
+          tabAlignment: TabAlignment.fill,
+          indicatorColor: AppColors.goldPrimary,
+          labelColor: AppColors.goldPrimary,
+          unselectedLabelColor: AppColors.textSecondary,
+          labelStyle:
+              const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+          unselectedLabelStyle: const TextStyle(fontSize: 10),
+          tabs: _screens.map((screen) {
+            return Tab(
+              icon: Icon(
+                screen['icon'] as IconData,
+                size: 20,
+              ),
+              text: screen['title'] as String,
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 }
@@ -645,18 +256,25 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      AppColors.goldPrimary,
-                                      AppColors.warning
-                                    ],
-                                  ),
+                                  gradient: user.subscriptionTier == 'premium'
+                                      ? LinearGradient(
+                                          colors: [
+                                            AppColors.goldPrimary,
+                                            AppColors.warning
+                                          ],
+                                        )
+                                      : null,
+                                  color: user.subscriptionTier == 'premium'
+                                      ? null
+                                      : AppColors.info,
                                   borderRadius: BorderRadius.circular(16),
                                 ),
-                                child: const Text(
-                                  'PRO',
+                                child: Text(
+                                  user.subscriptionTier.toUpperCase(),
                                   style: TextStyle(
-                                    color: Colors.black,
+                                    color: user.subscriptionTier == 'premium'
+                                        ? AppColors.primaryDark
+                                        : Colors.white,
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -672,62 +290,49 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
               ),
             ),
 
-            // Subscription Status Widget - Eliminado ya que todas las funciones son gratuitas
-
-            // Top cryptos price tiles - All users have access to real-time prices
+            // Top cryptos price tiles
             SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Precios en Tiempo Real',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        TextButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const FreeCryptoScreen(),
-                              ),
-                            );
-                          },
-                          icon: Icon(
-                            Icons.arrow_forward,
-                            color: AppColors.goldPrimary,
-                            size: 16,
-                          ),
-                          label: Text(
-                            'Ver más',
-                            style: TextStyle(
-                              color: AppColors.goldPrimary,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
+              child: Container(
+                height: 120,
+                margin: const EdgeInsets.only(bottom: 16),
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  children: [
+                    PriceTile(
+                      symbol: 'BTC',
+                      price: 94825.67,
+                      change: 2.45,
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: FreePriceWidget(
-                      symbols: ['BTC', 'ETH', 'BNB', 'SOL', 'ADA'],
-                      showHeader: false,
+                    const SizedBox(width: 12),
+                    PriceTile(
+                      symbol: 'ETH',
+                      price: 3245.89,
+                      change: 1.23,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 12),
+                    PriceTile(
+                      symbol: 'BNB',
+                      price: 642.15,
+                      change: -0.67,
+                    ),
+                    const SizedBox(width: 12),
+                    PriceTile(
+                      symbol: 'SOL',
+                      price: 234.56,
+                      change: 5.89,
+                    ),
+                    const SizedBox(width: 12),
+                    PriceTile(
+                      symbol: 'ADA',
+                      price: 1.23,
+                      change: 3.45,
+                    ),
+                  ],
+                ),
               ),
             ),
+
             // Quick Actions
             SliverToBoxAdapter(
               child: Padding(
@@ -770,7 +375,65 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
               ),
             ),
 
-            // All features are now free - no ads needed
+            // Ad space for free users
+            SliverToBoxAdapter(
+              child: Consumer<AuthService>(
+                builder: (context, auth, child) {
+                  final user = auth.currentUser;
+                  if (user?.subscriptionTier == 'free') {
+                    return Container(
+                      margin: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceDark,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.borderColor),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.star,
+                            color: AppColors.goldPrimary,
+                            size: 32,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Upgrade to Premium',
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Get advanced features, real-time data, and remove ads',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 12,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 12),
+                          ElevatedButton(
+                            onPressed: () {
+                              // TODO: Show upgrade dialog
+                              _showComingSoon('Premium Upgrade');
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.goldPrimary,
+                              foregroundColor: AppColors.primaryDark,
+                            ),
+                            child: const Text('Upgrade Now'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
 
             const SliverToBoxAdapter(child: SizedBox(height: 100)),
           ],
@@ -825,245 +488,162 @@ class _DashboardHomeTabState extends State<_DashboardHomeTab> {
   }
 }
 
-// Diálogo de configuración de API
-class ApiConfigDialog extends StatefulWidget {
-  const ApiConfigDialog({super.key});
-
-  @override
-  State<ApiConfigDialog> createState() => _ApiConfigDialogState();
-}
-
-class _ApiConfigDialogState extends State<ApiConfigDialog> {
-  final _apiKeyController = TextEditingController();
-  final _secretKeyController = TextEditingController();
-  bool _isLoading = false;
-  bool _isTestNet = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSavedCredentials();
-  }
-
-  Future<void> _loadSavedCredentials() async {
-    final authService = Provider.of<AuthService>(context, listen: false);
-    final credentials = await authService.getApiCredentials();
-    setState(() {
-      _apiKeyController.text = credentials['apiKey'] ?? '';
-      _secretKeyController.text = credentials['apiSecret'] ?? '';
-      _isTestNet = credentials['testNet'] == 'true';
-    });
-  }
+class _MoreTab extends StatelessWidget {
+  const _MoreTab();
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: const Color(0xFF1E2329),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Container(
-        width: 400,
-        padding: const EdgeInsets.all(24),
+    return Scaffold(
+      backgroundColor: AppColors.primaryDark,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
-            Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF0B90B),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.api,
-                    color: Colors.black,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Configurar API Binance',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        'Configura tu API de Binance para acceder a todas las funcionalidades profesionales.',
-                        style: TextStyle(
-                          color: Color(0xFF848E9C),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+            Text(
+              'More Options',
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 24),
+            _buildSection(
+              'Tools & Analysis',
+              [
+                _buildMenuItem(
+                  'Plugins',
+                  'Manage and install trading plugins',
+                  Icons.extension,
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const PluginsScreen()),
                   ),
                 ),
-                IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(
-                    Icons.close,
-                    color: Color(0xFF848E9C),
-                  ),
+                _buildMenuItem(
+                  'Technical Analysis',
+                  'Advanced charting and indicators',
+                  Icons.show_chart,
+                  () => _showComingSoon(context, 'Technical Analysis'),
+                ),
+                _buildMenuItem(
+                  'Backtesting',
+                  'Test your strategies with historical data',
+                  Icons.history,
+                  () => _showComingSoon(context, 'Backtesting'),
                 ),
               ],
             ),
             const SizedBox(height: 24),
-
-            // API Key
-            const Text(
-              'API Key',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _apiKeyController,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: 'Ingresa tu API Key de Binance',
-                hintStyle: const TextStyle(color: Color(0xFF848E9C)),
-                filled: true,
-                fillColor: const Color(0xFF2B3139),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Color(0xFFF0B90B)),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Secret Key
-            const Text(
-              'Secret Key',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _secretKeyController,
-              obscureText: true,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: 'Ingresa tu Secret Key de Binance',
-                hintStyle: const TextStyle(color: Color(0xFF848E9C)),
-                filled: true,
-                fillColor: const Color(0xFF2B3139),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Color(0xFFF0B90B)),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // TestNet Toggle
-            Row(
-              children: [
-                Switch(
-                  value: _isTestNet,
-                  onChanged: (value) {
-                    setState(() {
-                      _isTestNet = value;
-                    });
-                  },
-                  activeColor: const Color(0xFFF0B90B),
-                ),
-                const SizedBox(width: 8),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Usar TestNet',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text(
-                        'Habilita para usar el entorno de pruebas de Binance',
-                        style: TextStyle(
-                          color: Color(0xFF848E9C),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+            _buildSection(
+              'Account & Settings',
+              [
+                _buildMenuItem(
+                  'Settings',
+                  'App preferences and configuration',
+                  Icons.settings,
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SettingsScreen()),
                   ),
+                ),
+                _buildMenuItem(
+                  'Security',
+                  'Two-factor authentication and security',
+                  Icons.security,
+                  () => _showComingSoon(context, 'Security Settings'),
+                ),
+                _buildMenuItem(
+                  'API Management',
+                  'Manage your API keys and connections',
+                  Icons.api,
+                  () => _showComingSoon(context, 'API Management'),
                 ),
               ],
             ),
             const SizedBox(height: 24),
-
-            // Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFF848E9C)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text(
-                      'Cancelar',
-                      style: TextStyle(color: Color(0xFF848E9C)),
-                    ),
-                  ),
+            _buildSection(
+              'Learning & Support',
+              [
+                _buildMenuItem(
+                  'Trading Academy',
+                  'Learn trading strategies and techniques',
+                  Icons.school,
+                  () => _showComingSoon(context, 'Trading Academy'),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _saveApiConfig,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF0B90B),
-                      foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-                            ),
-                          )
-                        : const Text(
-                            'Configurar',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                _buildMenuItem(
+                  'Help & Support',
+                  'Get help and contact support',
+                  Icons.help,
+                  () => _showComingSoon(context, 'Help & Support'),
+                ),
+                _buildMenuItem(
+                  'Community',
+                  'Join our trading community',
+                  Icons.people,
+                  () => _showComingSoon(context, 'Community'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Consumer<AuthService>(
+              builder: (context, auth, child) {
+                final user = auth.currentUser;
+                if (user?.subscriptionTier != 'premium') {
+                  return Card(
+                    color: AppColors.surfaceDark,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.star,
+                            color: AppColors.goldPrimary,
+                            size: 48,
                           ),
-                  ),
-                ),
-              ],
+                          const SizedBox(height: 16),
+                          Text(
+                            'Unlock Premium Features',
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Get access to advanced tools, real-time data, unlimited alerts, and more!',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 14,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () =>
+                                  _showComingSoon(context, 'Premium Upgrade'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.goldPrimary,
+                                foregroundColor: AppColors.primaryDark,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              child: const Text('Upgrade to Premium'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
             ),
           ],
         ),
@@ -1071,146 +651,64 @@ class _ApiConfigDialogState extends State<ApiConfigDialog> {
     );
   }
 
-  Future<void> _saveApiConfig() async {
-    if (_apiKeyController.text.trim().isEmpty || _secretKeyController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor ingresa tanto el API Key como el Secret Key'),
-          backgroundColor: Color(0xFFF6465D),
+  Widget _buildSection(String title, List<Widget> items) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      );
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final binanceService = Provider.of<BinanceService>(context, listen: false);
-
-      // Configurar credenciales directamente en BinanceService
-      await binanceService.setCredentials(
-        _apiKeyController.text.trim(),
-        _secretKeyController.text.trim(),
-        _isTestNet,
-      );
-
-      if (mounted) {
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(Icons.check_circle, color: Colors.white),
-                const SizedBox(width: 8),
-                const Text('¡API configurada exitosamente!'),
-              ],
-            ),
-            backgroundColor: AppColors.bullish,
-            duration: const Duration(seconds: 3),
+        const SizedBox(height: 12),
+        Card(
+          color: AppColors.surfaceDark,
+          child: Column(
+            children: items,
           ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(Icons.error, color: Colors.white),
-                const SizedBox(width: 8),
-                Expanded(child: Text('Error al configurar API: $e')),
-              ],
-            ),
-            backgroundColor: AppColors.bearish,
-            duration: const Duration(seconds: 5),
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
+        ),
+      ],
+    );
   }
 
-  @override
-  void dispose() {
-    _apiKeyController.dispose();
-    _secretKeyController.dispose();
-    super.dispose();
+  Widget _buildMenuItem(
+    String title,
+    String subtitle,
+    IconData icon,
+    VoidCallback onTap,
+  ) {
+    return ListTile(
+      leading: Icon(icon, color: AppColors.goldPrimary),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: TextStyle(
+          color: AppColors.textSecondary,
+          fontSize: 12,
+        ),
+      ),
+      trailing: Icon(
+        Icons.chevron_right,
+        color: AppColors.textSecondary,
+      ),
+      onTap: onTap,
+    );
   }
-}
 
-// Tab de Portfolio
-class _PortfolioTab extends StatelessWidget {
-  const _PortfolioTab();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          // Header con descripción
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  const Color(0xFFF0B90B).withOpacity(0.2),
-                  const Color(0xFFF0B90B).withOpacity(0.05),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: const Color(0xFFF0B90B).withOpacity(0.3),
-                width: 1,
-              ),
-            ),
-            child: const Column(
-              children: [
-                Icon(
-                  Icons.account_balance_wallet,
-                  size: 48,
-                  color: Color(0xFFF0B90B),
-                ),
-                SizedBox(height: 16),
-                Text(
-                  'Portfolio Profesional',
-                  style: TextStyle(
-                    color: Color(0xFFF0B90B),
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Seguimiento avanzado de tu portfolio con análisis en tiempo real',
-                  style: TextStyle(
-                    color: Color(0xFF848E9C),
-                    fontSize: 16,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Widget de Portfolio
-          const Expanded(
-            child: PortfolioWidget(),
-          ),
-        ],
+  void _showComingSoon(BuildContext context, String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$feature coming soon!'),
+        backgroundColor: AppColors.info,
       ),
     );
   }

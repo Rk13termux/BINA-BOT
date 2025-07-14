@@ -1,4 +1,4 @@
-/// Modelo para información de la cuenta de Binance
+/// Información de cuenta de Binance
 class AccountInfo {
   final int makerCommission;
   final int takerCommission;
@@ -28,6 +28,7 @@ class AccountInfo {
     required this.permissions,
   });
 
+  /// Crear desde JSON de respuesta de Binance
   factory AccountInfo.fromJson(Map<String, dynamic> json) {
     return AccountInfo(
       makerCommission: json['makerCommission'] ?? 0,
@@ -41,14 +42,17 @@ class AccountInfo {
       updateTime: json['updateTime'] ?? 0,
       accountType: json['accountType'] ?? 'SPOT',
       balances: (json['balances'] as List<dynamic>?)
-          ?.map((balance) => Balance.fromJson(balance))
-          .toList() ?? [],
+              ?.map((balance) => Balance.fromJson(balance))
+              .toList() ??
+          [],
       permissions: (json['permissions'] as List<dynamic>?)
-          ?.map((permission) => permission.toString())
-          .toList() ?? [],
+              ?.map((permission) => permission.toString())
+              .toList() ??
+          [],
     );
   }
 
+  /// Convertir a JSON
   Map<String, dynamic> toJson() {
     return {
       'makerCommission': makerCommission,
@@ -67,7 +71,7 @@ class AccountInfo {
   }
 
   /// Obtener balance de un asset específico
-  Balance? getBalance(String asset) {
+  Balance? getBalanceForAsset(String asset) {
     try {
       return balances.firstWhere(
         (balance) => balance.asset.toUpperCase() == asset.toUpperCase(),
@@ -77,16 +81,43 @@ class AccountInfo {
     }
   }
 
-  /// Obtener balance total en USDT
+  /// Obtener balance total estimado en USDT
   double getTotalBalanceUSDT() {
-    // Esta función necesitaría precios actuales para calcular
-    // Por ahora retorna solo el balance de USDT
-    final usdtBalance = getBalance('USDT');
-    return usdtBalance?.free ?? 0.0;
+    // Nota: Para cálculo preciso, necesitaríamos precios actuales
+    // Este es un cálculo simplificado
+    double total = 0.0;
+    
+    for (final balance in balances) {
+      if (balance.asset == 'USDT') {
+        total += balance.free + balance.locked;
+      }
+      // TODO: Agregar conversión de otros assets a USDT usando precios actuales
+    }
+    
+    return total;
+  }
+
+  /// Obtener balances con valor mayor a cero
+  List<Balance> get nonZeroBalances {
+    return balances.where((balance) => 
+        (balance.free + balance.locked) > 0.0
+    ).toList();
+  }
+
+  /// Verificar si tiene balance suficiente para trading
+  bool hasBalanceForTrading(String asset, double amount) {
+    final balance = getBalanceForAsset(asset);
+    return balance != null && balance.free >= amount;
+  }
+
+  @override
+  String toString() {
+    return 'AccountInfo(accountType: $accountType, canTrade: $canTrade, '
+           'balancesCount: ${balances.length}, totalUSDT: ${getTotalBalanceUSDT().toStringAsFixed(2)})';
   }
 }
 
-/// Modelo para balance de asset
+/// Balance de un asset específico
 class Balance {
   final String asset;
   final double free;
@@ -98,14 +129,16 @@ class Balance {
     required this.locked,
   });
 
+  /// Crear desde JSON
   factory Balance.fromJson(Map<String, dynamic> json) {
     return Balance(
       asset: json['asset'] ?? '',
-      free: double.tryParse(json['free'].toString()) ?? 0.0,
-      locked: double.tryParse(json['locked'].toString()) ?? 0.0,
+      free: double.tryParse(json['free']?.toString() ?? '0') ?? 0.0,
+      locked: double.tryParse(json['locked']?.toString() ?? '0') ?? 0.0,
     );
   }
 
+  /// Convertir a JSON
   Map<String, dynamic> toJson() {
     return {
       'asset': asset,
@@ -114,9 +147,29 @@ class Balance {
     };
   }
 
-  /// Balance total (libre + bloqueado)
+  /// Total disponible (libre + bloqueado)
   double get total => free + locked;
 
-  /// Verificar si el balance es mayor a cero
-  bool get hasBalance => total > 0;
+  /// Verificar si tiene balance disponible
+  bool get hasBalance => total > 0.0;
+
+  /// Verificar si tiene balance libre para trading
+  bool get hasFreeBalance => free > 0.0;
+
+  @override
+  String toString() {
+    return 'Balance(asset: $asset, free: $free, locked: $locked, total: $total)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Balance &&
+        other.asset == asset &&
+        other.free == free &&
+        other.locked == locked;
+  }
+
+  @override
+  int get hashCode => asset.hashCode ^ free.hashCode ^ locked.hashCode;
 }

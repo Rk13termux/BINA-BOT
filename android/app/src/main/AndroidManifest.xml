@@ -1,17 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     
-    <!-- Permisos básicos para aplicación de trading -->
+    <!-- Permisos básicos -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     
-    <!-- Permisos para notificaciones -->
+    <!-- Permisos para Android 11+ (API 30+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
-    
-    <!-- Permisos para almacenamiento (Android 11+ compatibilidad) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
@@ -19,13 +14,6 @@
     <!-- Permisos heredados para compatibilidad -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
-    
-    <!-- Permisos para in-app purchases -->
-    <uses-permission android:name="com.android.vending.BILLING" />
-    
-    <!-- Permisos para mantener la aplicación activa durante trading -->
-    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     
     <!-- Features de hardware -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />

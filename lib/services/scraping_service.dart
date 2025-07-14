@@ -119,13 +119,10 @@ class ScrapingService {
           if (title.isNotEmpty && link.isNotEmpty) {
             articles.add(NewsArticle(
               title: title,
-              content: excerpt, // Usar excerpt como contenido temporal
               summary: excerpt,
               url: link,
               source: source,
               publishedAt: publishedAt,
-              category: 'General',
-              sentiment: 'Neutral',
               imageUrl: '', // Could be enhanced to extract images
             ));
           }
@@ -279,13 +276,10 @@ class ScrapingService {
               if (title.isNotEmpty && link.isNotEmpty) {
                 articles.add(NewsArticle(
                   title: title,
-                  content: '', // Contenido se obtendría con scraping adicional
                   summary: '',
                   url: link,
                   source: source,
                   publishedAt: DateTime.now(),
-                  category: 'General',
-                  sentiment: 'Neutral',
                   imageUrl: '',
                 ));
               }

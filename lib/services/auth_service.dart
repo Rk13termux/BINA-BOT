@@ -4,7 +4,6 @@ import 'package:crypto/crypto.dart';
 import 'dart:convert';
 import '../models/user.dart';
 import '../utils/logger.dart';
-import '../utils/constants.dart';
 
 class AuthService extends ChangeNotifier {
   static const FlutterSecureStorage _storage = FlutterSecureStorage();
@@ -48,6 +47,7 @@ class AuthService extends ChangeNotifier {
         id: '1',
         email: email,
         displayName: email.split('@')[0],
+        subscriptionTier: 'free',
         createdAt: DateTime.now(),
         lastLoginAt: DateTime.now(),
       );
@@ -73,6 +73,7 @@ class AuthService extends ChangeNotifier {
         id: 'guest',
         email: 'guest@invictustraderpro.com',
         displayName: 'Guest User',
+        subscriptionTier: 'free',
         createdAt: DateTime.now(),
         lastLoginAt: DateTime.now(),
       );
@@ -103,11 +104,10 @@ class AuthService extends ChangeNotifier {
   }
 
   // Binance API credentials management
-  Future<bool> saveApiCredentials(String apiKey, String apiSecret, [bool testNet = false]) async {
+  Future<bool> saveApiCredentials(String apiKey, String apiSecret) async {
     try {
       await _storage.write(key: _apiKeyKey, value: apiKey);
       await _storage.write(key: _apiSecretKey, value: apiSecret);
-      await _storage.write(key: StorageKeys.binanceTestNet, value: testNet.toString());
 
       _logger.info('API credentials saved');
       return true;
@@ -121,16 +121,14 @@ class AuthService extends ChangeNotifier {
     try {
       final apiKey = await _storage.read(key: _apiKeyKey);
       final apiSecret = await _storage.read(key: _apiSecretKey);
-      final testNet = await _storage.read(key: StorageKeys.binanceTestNet);
 
       return {
         'apiKey': apiKey,
         'apiSecret': apiSecret,
-        'testNet': testNet,
       };
     } catch (e) {
       _logger.error('Failed to get API credentials: $e');
-      return {'apiKey': null, 'apiSecret': null, 'testNet': null};
+      return {'apiKey': null, 'apiSecret': null};
     }
   }
 
@@ -138,7 +136,6 @@ class AuthService extends ChangeNotifier {
     try {
       await _storage.delete(key: _apiKeyKey);
       await _storage.delete(key: _apiSecretKey);
-      await _storage.delete(key: StorageKeys.binanceTestNet);
 
       _logger.info('API credentials cleared');
     } catch (e) {
@@ -152,16 +149,15 @@ class AuthService extends ChangeNotifier {
     return credentials['apiKey'] != null && credentials['apiSecret'] != null;
   }
 
-  // Update subscription - All users now have full access
+  // Update subscription
   Future<bool> updateSubscription(String newTier) async {
     try {
       if (_currentUser == null) return false;
 
-      // No need to update subscription tier since all features are free
-      // Just save current user data
+      _currentUser = _currentUser!.copyWith(subscriptionTier: newTier);
       await _saveUserData();
 
-      _logger.info('All features are available for free - no subscription needed');
+      _logger.info('Subscription updated to: $newTier');
       return true;
     } catch (e) {
       _logger.error('Failed to update subscription: $e');

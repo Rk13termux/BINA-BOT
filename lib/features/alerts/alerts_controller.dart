@@ -310,7 +310,7 @@ class AlertsController extends ChangeNotifier {
   Future<void> _checkAlertsForSymbol(
       String symbol, List<PriceAlert> symbolAlerts) async {
     try {
-      final currentPrice = await _binanceService.getCurrentPrice(symbol);
+      final currentPrice = await _binanceService.getPrice(symbol);
 
       for (final alert in symbolAlerts) {
         bool triggered = false;

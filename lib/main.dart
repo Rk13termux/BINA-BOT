@@ -9,19 +9,15 @@ import 'ui/theme/app_theme.dart';
 // Feature imports
 import 'features/splash/splash_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
-import 'features/dashboard_strategy_view/invictus_main_screen.dart';
 import 'features/news/news_controller.dart';
 import 'features/trading/trading_controller.dart';
 import 'features/alerts/alerts_controller.dart';
-import 'features/ai/ai_news_controller.dart';
 
 // Service imports
 import 'services/auth_service.dart';
-import 'services/ai_service.dart';
+import 'services/subscription_service.dart';
 import 'services/initialization_service.dart';
 import 'services/binance_websocket_service.dart';
-import 'services/binance_service.dart';
-import 'services/free_crypto_service.dart';
 import 'core/api_manager.dart';
 
 // Utils
@@ -46,25 +42,25 @@ void main() async {
       DeviceOrientation.landscapeRight,
     ]);
 
-    // Configurar barra de estado para tema negro
+    // Configurar barra de estado
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.light,
-        systemNavigationBarColor: Color(0xFF000000), // Negro puro
+        systemNavigationBarColor: Color(0xFF1A1A1A),
         systemNavigationBarIconBrightness: Brightness.light,
       ),
     );
 
-    runApp(const BinaBotProApp());
+    runApp(const InvictusTraderApp());
   }, (error, stack) {
     AppLogger().error('Zone Error: $error');
     AppLogger().error('Zone Stack: $stack');
   });
 }
 
-class BinaBotProApp extends StatelessWidget {
-  const BinaBotProApp({super.key});
+class InvictusTraderApp extends StatelessWidget {
+  const InvictusTraderApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -72,33 +68,29 @@ class BinaBotProApp extends StatelessWidget {
       providers: [
         // Initialization Service (debe ser el primero)
         ChangeNotifierProvider(create: (_) => InitializationService()),
-        
+
         // Controllers
         ChangeNotifierProvider(create: (_) => NewsController()),
         ChangeNotifierProvider(create: (_) => TradingController()),
         ChangeNotifierProvider(create: (_) => AlertsController()),
-        ChangeNotifierProvider(create: (_) => AINewsController()),
 
         // Services
         ChangeNotifierProvider(create: (_) => AuthService()),
-        ChangeNotifierProvider(create: (_) => BinanceService()),
-        Provider(create: (_) => AIService()),
+        ChangeNotifierProvider(create: (_) => SubscriptionService()),
         ChangeNotifierProvider(create: (_) => BinanceWebSocketService()),
-        Provider(create: (_) => FreeCryptoService()),
         Provider(create: (_) => ApiManager()),
       ],
       child: MaterialApp(
-        title: 'INVICTUS TRADER PRO',
+        title: 'Invictus Trader Pro',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
-        
-        // Iniciar con la nueva pantalla principal
-        home: const InvictusMainScreen(),
 
-        // Configuración de rutas actualizadas
+        // Iniciar con SplashScreen
+        home: const SplashScreen(),
+
+        // Configuración de rutas
         routes: {
           '/splash': (context) => const SplashScreen(),
-          '/main': (context) => const InvictusMainScreen(),
           '/dashboard': (context) => const DashboardScreen(),
           // TODO: Agregar más rutas cuando las pantallas estén implementadas
           // '/trading': (context) => const TradingScreen(),
@@ -108,23 +100,21 @@ class BinaBotProApp extends StatelessWidget {
           // '/news': (context) => const NewsScreen(),
         },
 
-        // Configuración del builder para el tema negro
+        // Configuración del builder para el tema
         builder: (context, child) {
           return MediaQuery(
             data: MediaQuery.of(context).copyWith(
-              textScaler: const TextScaler.linear(1.0), // Prevenir escalado de texto
+              textScaler:
+                  const TextScaler.linear(1.0), // Prevenir escalado de texto
             ),
-            child: Container(
-              color: const Color(0xFF000000), // Fondo negro garantizado
-              child: child!,
-            ),
+            child: child!,
           );
         },
-        
+
         // Manejar rutas desconocidas
         onUnknownRoute: (settings) {
           return MaterialPageRoute(
-            builder: (context) => const DashboardScreen(),
+            builder: (context) => const SplashScreen(),
           );
         },
       ),

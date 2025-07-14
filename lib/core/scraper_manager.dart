@@ -44,13 +44,10 @@ class ScraperManager {
           if (title.isNotEmpty && link.isNotEmpty) {
             articles.add(NewsArticle(
               title: title,
-              content: '', // Contenido se obtendría con scraping adicional
               url: _makeAbsoluteUrl(link, 'https://www.coindesk.com'),
               source: 'CoinDesk',
               publishedAt: _parseTime(time),
               summary: '',
-              category: 'General',
-              sentiment: 'Neutral',
             ));
           }
         }
@@ -89,13 +86,10 @@ class ScraperManager {
           if (title.isNotEmpty && link.isNotEmpty) {
             articles.add(NewsArticle(
               title: title,
-              content: '', // Contenido se obtendría con scraping adicional
               url: _makeAbsoluteUrl(link, 'https://cointelegraph.com'),
               source: 'CoinTelegraph',
               publishedAt: _parseTime(time),
               summary: '',
-              category: 'General',
-              sentiment: 'Neutral',
             ));
           }
         }
@@ -133,13 +127,10 @@ class ScraperManager {
           if (title.isNotEmpty && link.isNotEmpty) {
             articles.add(NewsArticle(
               title: title,
-              content: '', // Contenido se obtendría con scraping adicional
               url: _makeAbsoluteUrl(link, 'https://cryptonews.com'),
               source: 'CryptoNews',
               publishedAt: _parseTime(time),
               summary: '',
-              category: 'General',
-              sentiment: 'Neutral',
             ));
           }
         }
@@ -177,13 +168,10 @@ class ScraperManager {
           if (title.isNotEmpty && link.isNotEmpty) {
             articles.add(NewsArticle(
               title: title,
-              content: '', // Contenido se obtendría con scraping adicional
               url: _makeAbsoluteUrl(link, 'https://decrypt.co'),
               source: 'Decrypt',
               publishedAt: _parseTime(time),
               summary: '',
-              category: 'General',
-              sentiment: 'Neutral',
             ));
           }
         }
