@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/binance_websocket_service.dart';
 import '../../core/api_manager.dart';
-import '../../ui/widgets/api_connection_tester.dart';
 
 class ApiConfigurationScreen extends StatefulWidget {
   const ApiConfigurationScreen({super.key});
@@ -154,11 +153,6 @@ class _ApiConfigurationScreenState extends State<ApiConfigurationScreen> {
                 ],
               ),
             ),
-
-            const SizedBox(height: 24),
-
-            // API Connection Status
-            const ApiConnectionTester(),
 
             const SizedBox(height: 24),
 
