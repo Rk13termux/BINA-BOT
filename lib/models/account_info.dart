@@ -86,22 +86,22 @@ class AccountInfo {
     // Nota: Para cálculo preciso, necesitaríamos precios actuales
     // Este es un cálculo simplificado
     double total = 0.0;
-    
+
     for (final balance in balances) {
       if (balance.asset == 'USDT') {
         total += balance.free + balance.locked;
       }
       // TODO: Agregar conversión de otros assets a USDT usando precios actuales
     }
-    
+
     return total;
   }
 
   /// Obtener balances con valor mayor a cero
   List<Balance> get nonZeroBalances {
-    return balances.where((balance) => 
-        (balance.free + balance.locked) > 0.0
-    ).toList();
+    return balances
+        .where((balance) => (balance.free + balance.locked) > 0.0)
+        .toList();
   }
 
   /// Verificar si tiene balance suficiente para trading
@@ -113,7 +113,7 @@ class AccountInfo {
   @override
   String toString() {
     return 'AccountInfo(accountType: $accountType, canTrade: $canTrade, '
-           'balancesCount: ${balances.length}, totalUSDT: ${getTotalBalanceUSDT().toStringAsFixed(2)})';
+        'balancesCount: ${balances.length}, totalUSDT: ${getTotalBalanceUSDT().toStringAsFixed(2)})';
   }
 }
 

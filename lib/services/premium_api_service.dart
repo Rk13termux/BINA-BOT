@@ -6,26 +6,26 @@ import '../utils/logger.dart';
 /// Servicio Premium API para funciones avanzadas
 class PremiumApiService extends ChangeNotifier {
   static final AppLogger _logger = AppLogger();
-  
+
   // State
   bool _isInitialized = false;
   bool _isConnected = false;
   String? _lastError;
-  
+
   // Getters
   bool get isInitialized => _isInitialized;
   bool get isConnected => _isConnected;
   String? get lastError => _lastError;
-  
+
   /// Initialize the premium API service
   Future<void> initialize() async {
     try {
       _logger.info('Initializing Premium API Service...');
-      
+
       // For now, mark as initialized (demo mode)
       _isInitialized = true;
       _isConnected = true;
-      
+
       _logger.info('Premium API Service initialized successfully (Demo Mode)');
       notifyListeners();
     } catch (e) {
@@ -34,17 +34,17 @@ class PremiumApiService extends ChangeNotifier {
       rethrow;
     }
   }
-  
+
   /// Get real-time market data
   Future<Map<String, dynamic>?> getRealTimeMarketData(String symbol) async {
     try {
       if (!_isInitialized) {
         throw Exception('Premium API Service not initialized');
       }
-      
+
       // Simulate premium market data
       await Future.delayed(Duration(milliseconds: 500));
-      
+
       return {
         'symbol': symbol,
         'timestamp': DateTime.now().millisecondsSinceEpoch,
@@ -63,17 +63,17 @@ class PremiumApiService extends ChangeNotifier {
       return null;
     }
   }
-  
+
   /// Get AI predictions for a symbol
   Future<Map<String, dynamic>?> getAiPredictions(String symbol) async {
     try {
       if (!_isInitialized) {
         throw Exception('Premium API Service not initialized');
       }
-      
+
       // Simulate AI predictions
       await Future.delayed(Duration(milliseconds: 800));
-      
+
       return {
         'symbol': symbol,
         'prediction_1h': {
@@ -100,17 +100,18 @@ class PremiumApiService extends ChangeNotifier {
       return null;
     }
   }
-  
+
   /// Get advanced technical indicators
-  Future<Map<String, dynamic>?> getAdvancedTechnicalIndicators(String symbol) async {
+  Future<Map<String, dynamic>?> getAdvancedTechnicalIndicators(
+      String symbol) async {
     try {
       if (!_isInitialized) {
         throw Exception('Premium API Service not initialized');
       }
-      
+
       // Simulate advanced technical indicators
       await Future.delayed(Duration(milliseconds: 600));
-      
+
       return {
         'symbol': symbol,
         'timestamp': DateTime.now().millisecondsSinceEpoch,
@@ -152,17 +153,17 @@ class PremiumApiService extends ChangeNotifier {
       return null;
     }
   }
-  
+
   /// Get news sentiment analysis
   Future<Map<String, dynamic>?> getNewsSentimentAnalysis() async {
     try {
       if (!_isInitialized) {
         throw Exception('Premium API Service not initialized');
       }
-      
+
       // Simulate news sentiment analysis
       await Future.delayed(Duration(milliseconds: 400));
-      
+
       return {
         'timestamp': DateTime.now().millisecondsSinceEpoch,
         'overall_sentiment': _generateSentiment(),
@@ -193,20 +194,20 @@ class PremiumApiService extends ChangeNotifier {
       return null;
     }
   }
-  
+
   /// Get premium trading signals
   Future<List<Signal>?> getPremiumSignals(String symbol) async {
     try {
       if (!_isInitialized) {
         throw Exception('Premium API Service not initialized');
       }
-      
+
       // Simulate premium signals
       await Future.delayed(Duration(milliseconds: 300));
-      
+
       final signals = <Signal>[];
       final random = DateTime.now().millisecond;
-      
+
       // Generate 1-3 signals
       for (int i = 0; i < (random % 3) + 1; i++) {
         signals.add(Signal(
@@ -226,38 +227,38 @@ class PremiumApiService extends ChangeNotifier {
           source: 'premium_api',
         ));
       }
-      
+
       return signals;
     } catch (e) {
       _logger.error('Failed to get premium signals: $e');
       return null;
     }
   }
-  
+
   // HELPER METHODS FOR GENERATING DEMO DATA
-  
+
   double _generateRandomValue(double min, double max) {
     final random = DateTime.now().microsecond / 1000000;
     return min + (max - min) * random;
   }
-  
+
   int _generateRandomInt(int min, int max) {
     final random = DateTime.now().microsecond % (max - min + 1);
     return min + random;
   }
-  
+
   double _generateRandomVolume() {
     return _generateRandomValue(1000000, 10000000);
   }
-  
+
   double _generateRandomMarketCap() {
     return _generateRandomValue(800000000000, 1200000000000);
   }
-  
+
   double _generateRandomPercent() {
     return _generateRandomValue(-10, 10);
   }
-  
+
   List<double> _generateSupportLevels() {
     return [
       _generateRandomValue(40000, 42000),
@@ -265,7 +266,7 @@ class PremiumApiService extends ChangeNotifier {
       _generateRandomValue(36000, 38000),
     ];
   }
-  
+
   List<double> _generateResistanceLevels() {
     return [
       _generateRandomValue(48000, 50000),
@@ -273,87 +274,99 @@ class PremiumApiService extends ChangeNotifier {
       _generateRandomValue(52000, 54000),
     ];
   }
-  
+
   String _generateTrendDirection() {
     final directions = ['bullish', 'bearish', 'sideways'];
     return directions[DateTime.now().second % directions.length];
   }
-  
+
   double _generateVolatilityIndex() {
     return _generateRandomValue(0.1, 0.9);
   }
-  
+
   String _generatePredictionDirection() {
     final directions = ['up', 'down', 'sideways'];
     return directions[DateTime.now().second % directions.length];
   }
-  
+
   double _generateConfidence() {
     return _generateRandomValue(0.6, 0.95);
   }
-  
+
   double _generateTargetPrice() {
     return _generateRandomValue(40000, 50000);
   }
-  
+
   String _generateTrendSignal() {
     final signals = ['bullish', 'bearish', 'neutral'];
     return signals[DateTime.now().second % signals.length];
   }
-  
+
   String _generateRSISignal() {
     final signals = ['overbought', 'oversold', 'neutral'];
     return signals[DateTime.now().second % signals.length];
   }
-  
+
   String _generateBBPosition() {
     final positions = ['above_upper', 'below_lower', 'middle'];
     return positions[DateTime.now().second % positions.length];
   }
-  
+
   String _generateStochasticSignal() {
     final signals = ['buy', 'sell', 'hold'];
     return signals[DateTime.now().second % signals.length];
   }
-  
+
   String _generateOverallSignal() {
     final signals = ['strong_buy', 'buy', 'hold', 'sell', 'strong_sell'];
     return signals[DateTime.now().second % signals.length];
   }
-  
+
   String _generateSignalStrength() {
     final strengths = ['weak', 'moderate', 'strong', 'very_strong'];
     return strengths[DateTime.now().second % strengths.length];
   }
-  
+
   String _generateSentiment() {
     final sentiments = ['positive', 'negative', 'neutral'];
     return sentiments[DateTime.now().second % sentiments.length];
   }
-  
+
   List<String> _generateTrendingKeywords() {
     final keywords = [
-      'bitcoin', 'ethereum', 'regulation', 'adoption', 'defi',
-      'nft', 'blockchain', 'investment', 'halving', 'mining'
+      'bitcoin',
+      'ethereum',
+      'regulation',
+      'adoption',
+      'defi',
+      'nft',
+      'blockchain',
+      'investment',
+      'halving',
+      'mining'
     ];
     return keywords.take(5).toList();
   }
-  
+
   String _generateMarketImpact() {
     final impacts = ['high', 'medium', 'low'];
     return impacts[DateTime.now().second % impacts.length];
   }
-  
+
   SignalType _generateSignalType() {
     final types = [SignalType.buy, SignalType.sell, SignalType.hold];
     return types[DateTime.now().second % types.length];
   }
-  
+
   ConfidenceLevel _generateConfidenceLevel() {
-    final levels = [ConfidenceLevel.low, ConfidenceLevel.medium, ConfidenceLevel.high];
+    final levels = [
+      ConfidenceLevel.low,
+      ConfidenceLevel.medium,
+      ConfidenceLevel.high
+    ];
     return levels[DateTime.now().second % levels.length];
   }
-  
+
   String _generateSignalReason() {
     final reasons = [
       'AI model prediction',
@@ -367,12 +380,12 @@ class PremiumApiService extends ChangeNotifier {
     ];
     return reasons[DateTime.now().second % reasons.length];
   }
-  
+
   String _generateRiskLevel() {
     final levels = ['low', 'medium', 'high'];
     return levels[DateTime.now().second % levels.length];
   }
-  
+
   @override
   void dispose() {
     _isInitialized = false;

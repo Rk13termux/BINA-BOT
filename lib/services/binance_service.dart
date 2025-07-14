@@ -17,7 +17,7 @@ class BinanceService extends ChangeNotifier {
   // API Configuration
   static const String _baseUrl = 'https://api.binance.com';
   static const String _testNetUrl = 'https://testnet.binance.vision';
-  
+
   // Authentication
   String? _apiKey;
   String? _secretKey;
@@ -53,15 +53,15 @@ class BinanceService extends ChangeNotifier {
   Future<void> initialize() async {
     try {
       _logger.info('Initializing Binance service...');
-      
+
       // Cargar credenciales almacenadas
       await _loadStoredCredentials();
-      
+
       // Probar conexión si está autenticado
       if (_isAuthenticated) {
         await testConnection();
       }
-      
+
       _logger.info('Binance service initialized successfully');
     } catch (e) {
       _logger.error('Failed to initialize Binance service: $e');
@@ -83,19 +83,20 @@ class BinanceService extends ChangeNotifier {
 
       // Validar credenciales
       final isValid = await testConnection();
-      
+
       if (isValid) {
         // Guardar credenciales de forma segura
         await _storage.write(key: 'binance_api_key', value: _apiKey);
         await _storage.write(key: 'binance_secret_key', value: _secretKey);
-        await _storage.write(key: 'binance_is_testnet', value: _isTestNet.toString());
-        
+        await _storage.write(
+            key: 'binance_is_testnet', value: _isTestNet.toString());
+
         _isAuthenticated = true;
         _lastError = null;
-        
+
         // Cargar información de cuenta
         await getAccountInfo();
-        
+
         _logger.info('Binance credentials configured successfully');
         notifyListeners();
         return true;
@@ -119,10 +120,10 @@ class BinanceService extends ChangeNotifier {
       _apiKey = await _storage.read(key: 'binance_api_key');
       _secretKey = await _storage.read(key: 'binance_secret_key');
       final isTestNetStr = await _storage.read(key: 'binance_is_testnet');
-      
+
       _isTestNet = isTestNetStr == 'true';
       _isAuthenticated = _apiKey != null && _secretKey != null;
-      
+
       if (_isAuthenticated) {
         _logger.info('Loaded stored Binance credentials');
       }
@@ -139,7 +140,7 @@ class BinanceService extends ChangeNotifier {
       }
 
       final response = await _makeSignedRequest('GET', '/api/v3/account');
-      
+
       if (response.statusCode == 200) {
         _isConnected = true;
         _lastError = null;
@@ -171,9 +172,9 @@ class BinanceService extends ChangeNotifier {
         _logger.warning('Rate limit approaching: $_requestWeight/1200');
         await Future.delayed(Duration(seconds: 1));
       }
-      
+
       final url = '$baseUrl/api/v3/ticker/price?symbol=${symbol.toUpperCase()}';
-      
+
       final response = await http.get(
         Uri.parse(url),
         headers: _getHeaders(),
@@ -184,14 +185,15 @@ class BinanceService extends ChangeNotifier {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final price = double.parse(data['price']);
-        
+
         _consecutiveFailures = 0; // Reset on success
         _logger.debug('Price for $symbol: \$${price.toStringAsFixed(2)}');
         return price;
       } else {
         _consecutiveFailures++;
         final errorData = json.decode(response.body);
-        throw Exception('Failed to get price: ${errorData['msg'] ?? 'Unknown error'}');
+        throw Exception(
+            'Failed to get price: ${errorData['msg'] ?? 'Unknown error'}');
       }
     } catch (e) {
       _consecutiveFailures++;
@@ -221,7 +223,7 @@ class BinanceService extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        
+
         final candles = data.map((candleData) {
           return Candle(
             openTime: DateTime.fromMillisecondsSinceEpoch(candleData[0]),
@@ -238,7 +240,8 @@ class BinanceService extends ChangeNotifier {
         return candles;
       } else {
         final errorData = json.decode(response.body);
-        throw Exception('Failed to get candles: ${errorData['msg'] ?? 'Unknown error'}');
+        throw Exception(
+            'Failed to get candles: ${errorData['msg'] ?? 'Unknown error'}');
       }
     } catch (e) {
       _logger.error('Error getting candles for $symbol: $e');
@@ -258,13 +261,14 @@ class BinanceService extends ChangeNotifier {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         _accountInfo = AccountInfo.fromJson(data);
-        
+
         _logger.info('Account info retrieved successfully');
         notifyListeners();
         return _accountInfo!;
       } else {
         final errorData = json.decode(response.body);
-        throw Exception('Failed to get account info: ${errorData['msg'] ?? 'Unknown error'}');
+        throw Exception(
+            'Failed to get account info: ${errorData['msg'] ?? 'Unknown error'}');
       }
     } catch (e) {
       _logger.error('Error getting account info: $e');
@@ -280,21 +284,23 @@ class BinanceService extends ChangeNotifier {
       }
 
       final params = orderRequest.toJson();
-      final response = await _makeSignedRequest('POST', '/api/v3/order', params);
+      final response =
+          await _makeSignedRequest('POST', '/api/v3/order', params);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final orderResponse = OrderResponse.fromJson(data);
-        
+
         _logger.info('Order placed successfully: ${orderResponse.orderId}');
-        
+
         // Actualizar información de cuenta después de la orden
         await getAccountInfo();
-        
+
         return orderResponse;
       } else {
         final errorData = json.decode(response.body);
-        throw Exception('Failed to place order: ${errorData['msg'] ?? 'Unknown error'}');
+        throw Exception(
+            'Failed to place order: ${errorData['msg'] ?? 'Unknown error'}');
       }
     } catch (e) {
       _logger.error('Error placing order: $e');
@@ -317,21 +323,23 @@ class BinanceService extends ChangeNotifier {
         'orderId': orderId.toString(),
       };
 
-      final response = await _makeSignedRequest('DELETE', '/api/v3/order', params);
+      final response =
+          await _makeSignedRequest('DELETE', '/api/v3/order', params);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final orderResponse = OrderResponse.fromJson(data);
-        
+
         _logger.info('Order cancelled successfully: $orderId');
-        
+
         // Actualizar información de cuenta
         await getAccountInfo();
-        
+
         return orderResponse;
       } else {
         final errorData = json.decode(response.body);
-        throw Exception('Failed to cancel order: ${errorData['msg'] ?? 'Unknown error'}');
+        throw Exception(
+            'Failed to cancel order: ${errorData['msg'] ?? 'Unknown error'}');
       }
     } catch (e) {
       _logger.error('Error cancelling order: $e');
@@ -351,14 +359,16 @@ class BinanceService extends ChangeNotifier {
         params['symbol'] = symbol.toUpperCase();
       }
 
-      final response = await _makeSignedRequest('GET', '/api/v3/openOrders', params);
+      final response =
+          await _makeSignedRequest('GET', '/api/v3/openOrders', params);
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         return data.map((order) => OrderResponse.fromJson(order)).toList();
       } else {
         final errorData = json.decode(response.body);
-        throw Exception('Failed to get open orders: ${errorData['msg'] ?? 'Unknown error'}');
+        throw Exception(
+            'Failed to get open orders: ${errorData['msg'] ?? 'Unknown error'}');
       }
     } catch (e) {
       _logger.error('Error getting open orders: $e');
@@ -370,7 +380,7 @@ class BinanceService extends ChangeNotifier {
   Future<List<Map<String, dynamic>>> getTradingPairs() async {
     try {
       final url = '$baseUrl/api/v3/exchangeInfo';
-      
+
       final response = await http.get(
         Uri.parse(url),
         headers: _getHeaders(),
@@ -381,7 +391,7 @@ class BinanceService extends ChangeNotifier {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final symbols = data['symbols'] as List<dynamic>;
-        
+
         return symbols
             .where((symbol) => symbol['status'] == 'TRADING')
             .map((symbol) => {
@@ -404,7 +414,7 @@ class BinanceService extends ChangeNotifier {
   Future<Map<String, dynamic>> get24hrTicker(String symbol) async {
     try {
       final url = '$baseUrl/api/v3/ticker/24hr?symbol=${symbol.toUpperCase()}';
-      
+
       final response = await http.get(
         Uri.parse(url),
         headers: _getHeaders(),
@@ -433,7 +443,7 @@ class BinanceService extends ChangeNotifier {
       _isConnected = false;
       _accountInfo = null;
       _lastError = null;
-      
+
       _logger.info('Binance credentials cleared');
       notifyListeners();
     } catch (e) {
@@ -486,19 +496,20 @@ class BinanceService extends ChangeNotifier {
     if (_secretKey == null) {
       throw Exception('Secret key not configured');
     }
-    
+
     final key = utf8.encode(_secretKey!);
     final bytes = utf8.encode(data);
     final hmacSha256 = Hmac(sha256, key);
     final digest = hmacSha256.convert(bytes);
-    
+
     return digest.toString();
   }
 
   /// Construir query string
   String _buildQueryString(Map<String, dynamic> params) {
     return params.entries
-        .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value.toString())}')
+        .map((e) =>
+            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value.toString())}')
         .join('&');
   }
 
@@ -516,7 +527,6 @@ class BinanceService extends ChangeNotifier {
     if (weightHeader != null) {
       _requestWeight = int.tryParse(weightHeader) ?? 0;
     }
-    _lastRequestTime = DateTime.now();
   }
 
   /// Obtener balance total en USDT
@@ -525,7 +535,7 @@ class BinanceService extends ChangeNotifier {
       if (_accountInfo == null) {
         await getAccountInfo();
       }
-      
+
       return _accountInfo?.getTotalBalanceUSDT() ?? 0.0;
     } catch (e) {
       _logger.error('Error getting total balance: $e');
@@ -550,10 +560,10 @@ class BinanceService extends ChangeNotifier {
       }
 
       _logger.info('Placing test order: $side $quantity $symbol');
-      
+
       // Simular orden de prueba exitosa
       await Future.delayed(Duration(milliseconds: 500));
-      
+
       return {
         'success': true,
         'orderId': DateTime.now().millisecondsSinceEpoch,
@@ -593,7 +603,8 @@ class BinanceService extends ChangeNotifier {
       'lastRequestTime': _lastRequestTime?.toIso8601String(),
       'accountType': _accountInfo?.accountType,
       'canTrade': canTrade,
-      'totalBalanceUSDT': _accountInfo?.getTotalBalanceUSDT().toStringAsFixed(2),
+      'totalBalanceUSDT':
+          _accountInfo?.getTotalBalanceUSDT().toStringAsFixed(2),
     };
   }
 
@@ -604,4 +615,52 @@ class BinanceService extends ChangeNotifier {
     _logger.info('Circuit breaker manually reset');
     notifyListeners();
   }
+
+  /// Obtener precio actual (método de compatibilidad)
+  Future<double> getCurrentPrice(String symbol) async {
+    return await getPrice(symbol);
+  }
+
+  /// Obtener estadísticas de 24hr (método de compatibilidad) 
+  Future<Map<String, dynamic>> get24hStats(String symbol) async {
+    return await get24hrTicker(symbol);
+  }
+
+  /// Obtener datos de velas (método de compatibilidad)
+  Future<List<Candle>> getCandlestickData({
+    required String symbol,
+    required String interval,
+    int limit = 100,
+  }) async {
+    return await getCandles(
+      symbol: symbol,
+      interval: interval,
+      limit: limit,
+    );
+  }
+
+  /// Obtener balances formateados para UI
+  Future<List<Map<String, dynamic>>> getFormattedBalances() async {
+    try {
+      if (_accountInfo == null) {
+        await getAccountInfo();
+      }
+
+      return _accountInfo?.balances
+          .where((balance) => balance.free > 0 || balance.locked > 0)
+          .map((balance) => {
+                'asset': balance.asset,
+                'free': balance.free,
+                'locked': balance.locked,
+                'total': balance.free + balance.locked,
+              })
+          .toList() ?? [];
+    } catch (e) {
+      _logger.error('Error getting formatted balances: $e');
+      return [];
+    }
+  }
+
+  /// Getter para balances (compatibilidad)
+  List<Balance> get balances => _accountInfo?.balances ?? [];
 }

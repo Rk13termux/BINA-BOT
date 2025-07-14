@@ -190,8 +190,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             labelText: 'API Key',
             labelStyle: TextStyle(color: AppColors.textSecondary),
             hintText: 'Enter your Binance API key',
-            hintStyle:
-                TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.7)),
+            hintStyle: TextStyle(
+                color: AppColors.textSecondary.withValues(alpha: 0.7)),
             prefixIcon: Icon(Icons.key, color: AppColors.goldPrimary),
             border: OutlineInputBorder(
               borderSide: BorderSide(color: AppColors.borderColor),
@@ -213,8 +213,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             labelText: 'Secret Key',
             labelStyle: TextStyle(color: AppColors.textSecondary),
             hintText: 'Enter your Binance secret key',
-            hintStyle:
-                TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.7)),
+            hintStyle: TextStyle(
+                color: AppColors.textSecondary.withValues(alpha: 0.7)),
             prefixIcon: Icon(Icons.security, color: AppColors.goldPrimary),
             border: OutlineInputBorder(
               borderSide: BorderSide(color: AppColors.borderColor),
@@ -757,7 +757,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onPressed: () {
               Navigator.pop(context);
               // TODO: Implement subscription upgrade
-              context.read<SubscriptionService>().purchaseSubscription(context.read<SubscriptionService>().monthlySubscriptionId);
+              context.read<SubscriptionService>().purchaseSubscription(
+                  context.read<SubscriptionService>().monthlySubscriptionId);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.goldPrimary,
