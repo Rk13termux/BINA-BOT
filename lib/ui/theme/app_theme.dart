@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'colors.dart';
+import 'app_colors.dart';
 
 /// Tema principal de la aplicación Invictus Trader Pro
 class AppTheme {
@@ -14,7 +14,7 @@ class AppTheme {
       colorScheme: const ColorScheme.dark(
         primary: AppColors.goldPrimary,
         secondary: AppColors.goldSecondary,
-        surface: AppColors.surfaceDark,
+        surface: AppColors.surface,
         onPrimary: AppColors.primaryDark,
         onSecondary: AppColors.primaryDark,
         onSurface: AppColors.textPrimary,
@@ -40,12 +40,12 @@ class AppTheme {
 
       // Tema de tarjetas  
       cardTheme: const CardThemeData(
-        color: AppColors.cardBackground,
+        color: AppColors.backgroundSecondary,
         elevation: 4,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(12)),
           side: BorderSide(
-            color: AppColors.borderColor,
+            color: AppColors.border,
             width: 1,
           ),
         ),
@@ -94,14 +94,14 @@ class AppTheme {
       // Tema de campos de texto
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.cardBackground,
+        fillColor: AppColors.backgroundSecondary,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.borderColor),
+          borderSide: const BorderSide(color: AppColors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.borderColor),
+          borderSide: const BorderSide(color: AppColors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -123,7 +123,7 @@ class AppTheme {
 
       // Tema de la bottom navigation bar
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: AppColors.secondaryDark,
+        backgroundColor: AppColors.backgroundSecondary,
         selectedItemColor: AppColors.goldPrimary,
         unselectedItemColor: AppColors.textSecondary,
         type: BottomNavigationBarType.fixed,
@@ -132,10 +132,10 @@ class AppTheme {
 
       // Tema de chips
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.cardBackground,
+        backgroundColor: AppColors.backgroundSecondary,
         selectedColor: AppColors.goldPrimary,
         labelStyle: const TextStyle(color: AppColors.textPrimary),
-        side: const BorderSide(color: AppColors.borderColor),
+        side: const BorderSide(color: AppColors.border),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
@@ -143,13 +143,13 @@ class AppTheme {
 
       // Tema de divisores
       dividerTheme: const DividerThemeData(
-        color: AppColors.dividerColor,
+        color: AppColors.divider,
         thickness: 1,
       ),
 
       // Tema de diálogos
       dialogTheme: const DialogThemeData(
-        backgroundColor: AppColors.cardBackground,
+        backgroundColor: AppColors.backgroundSecondary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
@@ -166,7 +166,7 @@ class AppTheme {
 
       // Tema de snackbars
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.cardBackground,
+        backgroundColor: AppColors.backgroundSecondary,
         contentTextStyle: const TextStyle(color: AppColors.textPrimary),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
@@ -186,21 +186,21 @@ class AppTheme {
           if (states.contains(WidgetState.selected)) {
             return AppColors.goldSecondary.withValues(alpha: 0.5);
           }
-          return AppColors.borderColor;
+          return AppColors.border;
         }),
       ),
 
       // Tema de sliders
       sliderTheme: const SliderThemeData(
         activeTrackColor: AppColors.goldPrimary,
-        inactiveTrackColor: AppColors.borderColor,
+        inactiveTrackColor: AppColors.border,
         thumbColor: AppColors.goldPrimary,
         overlayColor: AppColors.goldSecondary,
       ),
 
       // Tema de la bottom sheet
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: AppColors.cardBackground,
+        backgroundColor: AppColors.backgroundSecondary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
@@ -216,8 +216,8 @@ class AppTheme {
       // Tema de progress indicators
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.goldPrimary,
-        linearTrackColor: AppColors.borderColor,
-        circularTrackColor: AppColors.borderColor,
+        linearTrackColor: AppColors.border,
+        circularTrackColor: AppColors.border,
       ),
     );
   }

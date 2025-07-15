@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/initialization_service.dart';
-import '../dashboard/dashboard_screen.dart';
+import '../dashboard/screens/ultra_professional_dashboard.dart';
 import '../../ui/theme/colors.dart';
 
 /// Pantalla de carga que maneja la inicialización de la aplicación
@@ -80,7 +80,7 @@ class _SplashScreenState extends State<SplashScreen>
       await Future.delayed(const Duration(milliseconds: 500));
       if (mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const DashboardScreen()),
+          MaterialPageRoute(builder: (_) => const UltraProfessionalDashboard()),
         );
       }
     }
@@ -127,10 +127,20 @@ class _SplashScreenState extends State<SplashScreen>
                               ),
                             ],
                           ),
-                          child: const Icon(
-                            Icons.trending_up,
-                            size: 60,
-                            color: AppColors.primaryDark,
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/icons/icon.png',
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Icon(
+                                  Icons.trending_up,
+                                  size: 60,
+                                  color: AppColors.primaryDark,
+                                );
+                              },
+                            ),
                           ),
                         ),
                       );

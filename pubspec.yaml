@@ -72,6 +72,7 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   hive_generator: ^2.0.1
   build_runner: ^2.4.8
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -90,3 +91,22 @@ flutter:
     - assets/plugins/
     - assets/ml_models/
     - .env
+
+# Configuración para generar iconos automáticamente
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/icon.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#1A1A1A"
+  adaptive_icon_foreground: "assets/icons/icon.png"
+  remove_alpha_ios: true
+  web:
+    generate: true
+    image_path: "assets/icons/icon.png"
+    background_color: "#1A1A1A"
+    theme_color: "#FFD700"
+  windows:
+    generate: true
+    image_path: "assets/icons/icon.png"
+    icon_size: 48
