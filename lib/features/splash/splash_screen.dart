@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/initialization_service.dart';
-import '../dashboard/screens/ultra_professional_dashboard.dart';
+import '../dashboard/screens/professional_trading_dashboard.dart';
 import '../../ui/theme/app_colors.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -71,11 +71,11 @@ class _SplashScreenState extends State<SplashScreen>
     final success = await initService.initialize();
     
     if (success && mounted) {
-      // Navegar al dashboard después de una pequeña pausa
+      // Navegar al dashboard profesional después de una pequeña pausa
       await Future.delayed(const Duration(milliseconds: 500));
       if (mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const UltraProfessionalDashboard()),
+          MaterialPageRoute(builder: (_) => const ProfessionalTradingDashboard()),
         );
       }
     }
