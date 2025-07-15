@@ -10,6 +10,8 @@ import 'ui/theme/app_theme.dart';
 // Service imports
 import 'services/auth_service.dart';
 import 'services/ai_service_professional.dart' as professional_ai;
+import 'services/advanced_ai_service.dart';
+import 'services/technical_indicator_service.dart';
 import 'services/data_stream_service.dart';
 import 'services/plugins/plugin_manager.dart';
 import 'services/initialization_service.dart';
@@ -20,6 +22,7 @@ import 'core/api_manager.dart';
 // Feature imports
 import 'features/splash/splash_screen.dart';
 import 'features/main/main_screen_simple.dart';
+import 'features/dashboard/screens/ultra_professional_dashboard.dart';
 import 'features/trading/trading_screen.dart';
 import 'features/alerts/alerts_screen.dart';
 import 'features/news/news_screen.dart';
@@ -89,6 +92,8 @@ class InvictusTraderApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => BinanceService()),
         ChangeNotifierProvider(create: (_) => professional_ai.AIService()),
+        ChangeNotifierProvider(create: (_) => AdvancedAIService()),
+        ChangeNotifierProvider(create: (_) => TechnicalIndicatorService()),
         ChangeNotifierProvider(create: (_) => BinanceWebSocketService()),
 
         // Plugin Manager
@@ -127,7 +132,7 @@ class InvictusTraderApp extends StatelessWidget {
         routes: {
           '/splash': (context) => const SplashScreen(),
           '/main': (context) => const MainScreenSimple(),
-          '/dashboard': (context) => const MainScreenSimple(),
+          '/dashboard': (context) => const UltraProfessionalDashboard(),
           '/trading': (context) => const TradingScreen(),
           '/alerts': (context) => const AlertsScreen(),
           '/news': (context) => const NewsScreen(),
