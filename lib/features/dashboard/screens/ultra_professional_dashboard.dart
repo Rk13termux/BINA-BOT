@@ -83,8 +83,6 @@ class _UltraProfessionalDashboardState extends State<UltraProfessionalDashboard>
   }
 
   Future<void> _initializeTechnicalIndicators() async {
-    final indicatorService = context.read<TechnicalIndicatorService>();
-    
     // Configurar indicadores predeterminados
     final indicators = IndicatorFactory.createDefaultIndicators();
     
@@ -137,8 +135,19 @@ class _UltraProfessionalDashboardState extends State<UltraProfessionalDashboard>
     }
 
     return Scaffold(
-      backgroundColor: AppColors.primaryDark,
-      body: CustomScrollView(
+      backgroundColor: const Color(0xFF000000), // Negro puro
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF000000), // Negro puro
+              Color(0xFF0A0A0A), // Negro muy oscuro
+            ],
+          ),
+        ),
+        child: CustomScrollView(
         slivers: [
           _buildAppBar(),
           SliverToBoxAdapter(
@@ -160,14 +169,26 @@ class _UltraProfessionalDashboardState extends State<UltraProfessionalDashboard>
             ),
           ),
         ],
+        ),
       ),
     );
   }
 
   Widget _buildOnboardingFlow() {
     return Scaffold(
-      backgroundColor: AppColors.primaryDark,
-      body: Center(
+      backgroundColor: const Color(0xFF000000), // Negro puro
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF000000), // Negro puro
+              Color(0xFF0A0A0A), // Negro muy oscuro
+            ],
+          ),
+        ),
+        child: Center(
         child: Container(
           padding: const EdgeInsets.all(32),
           constraints: const BoxConstraints(maxWidth: 600),
@@ -262,7 +283,8 @@ class _UltraProfessionalDashboardState extends State<UltraProfessionalDashboard>
             ],
           ),
         ),
-      ),
+        ),
+      ), // Cierra Container del gradiente
     );
   }
 
