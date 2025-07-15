@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 class AppColors {
   // === COLORES PRINCIPALES ===
   
-  /// Color oscuro principal - Fondo principal de la aplicación
-  static const Color primaryDark = Color(0xFF1A1A1A);
+  /// Color negro principal - Fondo principal de la aplicación
+  static const Color primaryDark = Color(0xFF000000);
   
   /// Color dorado principal - Acentos y elementos importantes
   static const Color goldPrimary = Color(0xFFFFD700);
@@ -33,16 +33,16 @@ class AppColors {
   // === COLORES DE FONDO ===
   
   /// Fondo secundario - Cards y contenedores
-  static const Color backgroundSecondary = Color(0xFF2A2A2A);
+  static const Color backgroundSecondary = Color(0xFF0A0A0A);
   
   /// Fondo terciario - Elementos elevados
-  static const Color backgroundTertiary = Color(0xFF3A3A3A);
+  static const Color backgroundTertiary = Color(0xFF1A1A1A);
   
   /// Fondo para surfaces
-  static const Color surface = Color(0xFF1E1E1E);
+  static const Color surface = Color(0xFF000000);
   
   /// Fondo para elementos flotantes
-  static const Color surfaceVariant = Color(0xFF2D2D2D);
+  static const Color surfaceVariant = Color(0xFF0F0F0F);
 
   // === COLORES DE TEXTO ===
   
@@ -92,13 +92,13 @@ class AppColors {
   // === COLORES DE BORDES Y DIVISORES ===
   
   /// Borde principal
-  static const Color border = Color(0xFF444444);
+  static const Color border = Color(0xFF222222);
   
   /// Borde secundario
-  static const Color borderSecondary = Color(0xFF555555);
+  static const Color borderSecondary = Color(0xFF333333);
   
   /// Divisor
-  static const Color divider = Color(0xFF333333);
+  static const Color divider = Color(0xFF111111);
 
   // === GRADIENTES PREDEFINIDOS ===
   
@@ -113,7 +113,7 @@ class AppColors {
   static const LinearGradient backgroundGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [primaryDark, backgroundSecondary],
+    colors: [Color(0xFF000000), Color(0xFF0A0A0A)],
   );
   
   /// Gradiente alcista
