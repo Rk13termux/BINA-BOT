@@ -23,6 +23,8 @@ import 'core/api_manager.dart';
 import 'features/splash/splash_screen.dart';
 import 'features/main/main_screen_simple.dart';
 import 'features/dashboard/screens/ultra_professional_dashboard.dart';
+import 'features/dashboard/screens/professional_trading_dashboard.dart';
+import 'features/api_config/professional_api_config_screen.dart';
 import 'features/trading/trading_screen.dart';
 import 'features/alerts/alerts_screen.dart';
 import 'features/news/news_screen.dart';
@@ -125,14 +127,16 @@ class InvictusTraderApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
 
-        // Iniciar con SplashScreen
+        // Iniciar con SplashScreen que redirige al dashboard profesional
         home: const SplashScreen(),
 
         // Configuración de rutas
         routes: {
           '/splash': (context) => const SplashScreen(),
           '/main': (context) => const MainScreenSimple(),
-          '/dashboard': (context) => const UltraProfessionalDashboard(),
+          '/dashboard': (context) => const ProfessionalTradingDashboard(),
+          '/dashboard-ultra': (context) => const UltraProfessionalDashboard(),
+          '/api-config': (context) => const ApiConfigurationScreen(),
           '/trading': (context) => const TradingScreen(),
           '/alerts': (context) => const AlertsScreen(),
           '/news': (context) => const NewsScreen(),
