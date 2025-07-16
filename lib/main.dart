@@ -10,6 +10,7 @@ import 'ui/theme/app_theme.dart';
 // Service imports
 import 'services/auth_service.dart';
 import 'services/ai_service_professional.dart' as professional_ai;
+import 'services/professional_ai_service.dart';
 import 'services/advanced_ai_service.dart';
 import 'services/technical_indicator_service.dart';
 import 'services/data_stream_service.dart';
@@ -93,6 +94,7 @@ class InvictusTraderApp extends StatelessWidget {
         // Core Professional Services
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => BinanceService()),
+        ChangeNotifierProvider(create: (_) => ProfessionalAIService()),
         ChangeNotifierProvider(create: (_) => professional_ai.AIService()),
         ChangeNotifierProvider(create: (_) => AdvancedAIService()),
         ChangeNotifierProvider(create: (_) => TechnicalIndicatorService()),

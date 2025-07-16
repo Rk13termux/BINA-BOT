@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../ui/theme/app_colors.dart';
-import '../../../services/binance_service.dart';
-import '../../../utils/logger.dart';
+import '../../ui/theme/app_colors.dart';
+import '../../services/binance_service.dart';
+import '../../services/professional_ai_service.dart';
+import '../../utils/logger.dart';
 
 /// Pantalla profesional de configuración de APIs sin keys preconfiguradas
 class ApiConfigurationScreen extends StatefulWidget {
@@ -53,10 +54,13 @@ class _ApiConfigurationScreenState extends State<ApiConfigurationScreen>
 
   void _checkExistingConfiguration() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // No cargar APIs preexistentes - forzar configuración manual
+      // Verificar configuraciones existentes
+      final binanceService = context.read<BinanceService>();
+      final aiService = context.read<ProfessionalAIService>();
+      
       setState(() {
-        _binanceConfigured = false;
-        _groqConfigured = false;
+        _binanceConfigured = binanceService.isAuthenticated;
+        _groqConfigured = aiService.isConnected;
       });
     });
   }

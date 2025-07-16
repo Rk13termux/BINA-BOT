@@ -10,6 +10,7 @@ import '../widgets/technical_indicators_widget.dart';
 import '../widgets/real_time_prices_widget.dart';
 import '../widgets/portfolio_balance_widget.dart';
 import '../widgets/floating_menu_widget.dart';
+import '../../ai_assistant/professional_ai_assistant_screen.dart';
 
 /// Dashboard profesional de trading con análisis en tiempo real
 class ProfessionalTradingDashboard extends StatefulWidget {
@@ -107,6 +108,7 @@ class _ProfessionalTradingDashboardState extends State<ProfessionalTradingDashbo
                   onIndicatorConfig: _navigateToIndicatorConfig,
                   onSettings: _navigateToSettings,
                   onHelp: _showHelp,
+                  onAIAssistant: _navigateToAIAssistant,
                 ),
               ),
               
@@ -608,6 +610,19 @@ class _ProfessionalTradingDashboardState extends State<ProfessionalTradingDashbo
 
   void _navigateToSettings() {
     Navigator.pushNamed(context, '/settings');
+  }
+
+  void _navigateToAIAssistant() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProfessionalAIAssistantScreen(
+          selectedSymbol: _selectedSymbol,
+          selectedTimeframe: _selectedTimeframe,
+          activeIndicators: _selectedIndicators,
+        ),
+      ),
+    );
   }
 
   void _showHelp() {
