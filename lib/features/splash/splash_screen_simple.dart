@@ -15,7 +15,7 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _progressController;
   late Animation<double> _logoScale;
   late Animation<double> _progressAnimation;
-  
+
   String _currentStatus = 'Iniciando aplicación...';
 
   @override
@@ -41,7 +41,8 @@ class _SplashScreenState extends State<SplashScreen>
     ));
 
     // Animación del progreso
-    _progressAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+    _progressAnimation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
       parent: _progressController,
       curve: Curves.easeInOut,
     ));
@@ -59,53 +60,54 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _startInitialization() async {
     // Iniciar animación del logo
     _logoController.forward();
-    
+
     setState(() {
       _currentStatus = 'Cargando recursos...';
     });
-    
+
     // Esperar un momento para que se vea la animación
     await Future.delayed(const Duration(milliseconds: 800));
-    
+
     setState(() {
       _currentStatus = 'Preparando dashboard...';
     });
-    
+
     // Iniciar animación del progreso
     _progressController.forward();
-    
+
     try {
       setState(() {
         _currentStatus = 'Configurando aplicación...';
       });
-      
+
       // Inicialización básica y segura
       await _performBasicInitialization();
-      
+
       setState(() {
         _currentStatus = 'Iniciando dashboard profesional...';
       });
-      
+
       // Esperar que las animaciones terminen
       await Future.delayed(const Duration(milliseconds: 1000));
-      
+
       if (mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const ProfessionalTradingDashboard()),
+          MaterialPageRoute(
+              builder: (_) => const ProfessionalTradingDashboard()),
         );
       }
-      
     } catch (e) {
       setState(() {
         _currentStatus = 'Continuando al dashboard...';
       });
-      
+
       // En caso de error, navegar al dashboard para configuración manual
       if (mounted) {
         await Future.delayed(const Duration(milliseconds: 1000));
         if (mounted) {
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const ProfessionalTradingDashboard()),
+            MaterialPageRoute(
+                builder: (_) => const ProfessionalTradingDashboard()),
           );
         }
       }
@@ -120,17 +122,16 @@ class _SplashScreenState extends State<SplashScreen>
         _currentStatus = 'Verificando tema...';
       });
       await Future.delayed(const Duration(milliseconds: 200));
-      
+
       setState(() {
         _currentStatus = 'Cargando configuración...';
       });
       await Future.delayed(const Duration(milliseconds: 200));
-      
+
       setState(() {
         _currentStatus = 'Preparando servicios...';
       });
       await Future.delayed(const Duration(milliseconds: 200));
-      
     } catch (e) {
       // Log the error but don't fail
       print('Basic initialization warning: $e');
@@ -158,7 +159,7 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               children: [
                 const Spacer(flex: 2),
-                
+
                 // Logo principal
                 AnimatedBuilder(
                   animation: _logoScale,
@@ -195,9 +196,9 @@ class _SplashScreenState extends State<SplashScreen>
                     );
                   },
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // Título de la aplicación
                 AnimatedBuilder(
                   animation: _logoScale,
@@ -238,9 +239,9 @@ class _SplashScreenState extends State<SplashScreen>
                     );
                   },
                 ),
-                
+
                 const Spacer(flex: 2),
-                
+
                 // Estado de inicialización
                 AnimatedBuilder(
                   animation: _progressAnimation,
@@ -259,7 +260,7 @@ class _SplashScreenState extends State<SplashScreen>
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 20),
-                          
+
                           // Barra de progreso
                           Container(
                             width: double.infinity,
@@ -280,9 +281,9 @@ class _SplashScreenState extends State<SplashScreen>
                     );
                   },
                 ),
-                
+
                 const Spacer(flex: 3),
-                
+
                 // Versión y copyright
                 AnimatedBuilder(
                   animation: _progressAnimation,
