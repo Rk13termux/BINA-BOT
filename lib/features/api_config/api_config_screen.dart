@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'dart:async';
 import '../../services/binance_service.dart';
 import '../../services/ai_service_professional.dart';
+import '../../services/professional_ai_service.dart';
 import '../../ui/theme/app_theme.dart';
 import '../../utils/logger.dart';
 
@@ -892,10 +893,38 @@ class _ApiConfigScreenState extends State<ApiConfigScreen>
     });
 
     try {
-      // Las credenciales ya se guardaron durante las pruebas
-      // Solo confirmamos que están configuradas
+      final binanceService = context.read<BinanceService>();
       
-      await Future.delayed(const Duration(milliseconds: 1000)); // UX
+      // Guardar credenciales de Binance si están configuradas
+      if (_binanceApiKeyController.text.isNotEmpty && 
+          _binanceSecretController.text.isNotEmpty) {
+        final binanceSuccess = await binanceService.setCredentials(
+          apiKey: _binanceApiKeyController.text.trim(),
+          secretKey: _binanceSecretController.text.trim(),
+          isTestNet: _isTestNet,
+        );
+        
+        if (!binanceSuccess) {
+          throw Exception('Error al guardar credenciales de Binance');
+        }
+      }
+      
+      // Guardar credenciales de Groq si están configuradas
+      if (_groqApiKeyController.text.isNotEmpty) {
+        try {
+          final professionalAIService = context.read<ProfessionalAIService>();
+          final groqSuccess = await professionalAIService.setApiKey(_groqApiKeyController.text.trim());
+          
+          if (!groqSuccess) {
+            throw Exception('Error al guardar API key de Groq');
+          }
+        } catch (e) {
+          _logger.warning('Groq API service not available: $e');
+          // Continue anyway as Groq might not be essential
+        }
+      }
+      
+      await Future.delayed(const Duration(milliseconds: 500)); // UX
       
       _showSnackBar('✅ Configuración guardada exitosamente', true);
       

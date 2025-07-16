@@ -1,15 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <data-extraction-rules>
     <cloud-backup>
+        <!-- Include general app data -->
         <include domain="file" path="." />
         <include domain="sharedpref" path="." />
+        
+        <!-- Exclude sensitive trading data -->
         <exclude domain="file" path="no_backup/" />
+        <exclude domain="file" path="secure/" />
         <exclude domain="sharedpref" path="secure_prefs.xml" />
+        <exclude domain="sharedpref" path="FlutterSecureStorage" />
+        <exclude domain="sharedpref" path="secure_storage" />
+        <exclude domain="database" />
     </cloud-backup>
+    
     <device-transfer>
+        <!-- Include general app data for device transfer -->
         <include domain="file" path="." />
         <include domain="sharedpref" path="." />
+        
+        <!-- Exclude sensitive trading data from device transfer -->
         <exclude domain="file" path="no_backup/" />
+        <exclude domain="file" path="secure/" />
         <exclude domain="sharedpref" path="secure_prefs.xml" />
+        <exclude domain="sharedpref" path="FlutterSecureStorage" />
+        <exclude domain="sharedpref" path="secure_storage" />
+        <exclude domain="database" />
     </device-transfer>
 </data-extraction-rules>
