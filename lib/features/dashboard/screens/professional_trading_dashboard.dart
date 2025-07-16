@@ -55,24 +55,47 @@ class _ProfessionalTradingDashboardState extends State<ProfessionalTradingDashbo
   void _initializeServices() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       try {
-        final websocketService = context.read<BinanceWebSocketService>();
-        final dataStreamService = context.read<DataStreamService>();
-        
-        // Conectar WebSocket si no está conectado
-        if (!websocketService.isConnected) {
-          websocketService.connect();
-        }
-        
-        // Inicializar el servicio de datos en tiempo real
-        if (!dataStreamService.isRunning) {
-          dataStreamService.initialize();
-        }
+        // Inicialización segura y opcional de servicios
+        _initializeWebSocketService();
+        _initializeDataStreamService();
         
         _logger.info('Trading dashboard services initialized');
       } catch (e) {
         _logger.error('Error initializing dashboard services: $e');
+        // No re-lanzar el error, continuar con la aplicación
       }
     });
+  }
+
+  void _initializeWebSocketService() {
+    try {
+      final websocketService = context.read<BinanceWebSocketService>();
+      
+      // Conectar WebSocket si no está conectado (sin bloquear)
+      if (!websocketService.isConnected) {
+        websocketService.connect().catchError((e) {
+          _logger.warning('WebSocket connection failed: $e');
+          return false; // Retornar false en caso de error
+        });
+      }
+    } catch (e) {
+      _logger.warning('WebSocket service not available: $e');
+    }
+  }
+
+  void _initializeDataStreamService() {
+    try {
+      final dataStreamService = context.read<DataStreamService>();
+      
+      // Inicializar el servicio de datos en tiempo real (sin bloquear)
+      if (!dataStreamService.isRunning) {
+        dataStreamService.initialize().catchError((e) {
+          _logger.warning('Data stream initialization failed: $e');
+        });
+      }
+    } catch (e) {
+      _logger.warning('Data stream service not available: $e');
+    }
   }
 
   @override
@@ -578,13 +601,17 @@ class _ProfessionalTradingDashboardState extends State<ProfessionalTradingDashbo
   }
 
   void _onPriceUpdate(String symbol, double price) {
-    setState(() {
-      _currentPrices[symbol] = price;
-    });
-    
-    // Animar actualización de precio
-    _priceUpdateController.forward().then((_) {
-      _priceUpdateController.reverse();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _currentPrices[symbol] = price;
+        });
+        
+        // Animar actualización de precio
+        _priceUpdateController.forward().then((_) {
+          _priceUpdateController.reverse();
+        });
+      }
     });
   }
 

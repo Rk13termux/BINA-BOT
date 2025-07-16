@@ -21,7 +21,7 @@ import 'services/binance_websocket_service.dart';
 import 'core/api_manager.dart';
 
 // Feature imports
-import 'features/splash/splash_screen.dart';
+import 'features/splash/splash_screen_simple.dart';
 import 'features/main/main_screen_simple.dart';
 import 'features/dashboard/screens/ultra_professional_dashboard.dart';
 import 'features/dashboard/screens/professional_trading_dashboard.dart';
