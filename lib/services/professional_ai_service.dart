@@ -120,6 +120,10 @@ class ProfessionalAIService extends ChangeNotifier {
   static const String _groqApiUrl = 'https://api.groq.com/openai/v1/chat/completions';
   static const String _apiKeyKey = 'groq_api_key';
   
+  // Modelos disponibles de Groq
+  static const String _defaultModel = 'llama-3.3-70b-versatile';
+  static const String _fastModel = 'llama-3.1-8b-instant';
+  
   String? _apiKey;
   bool _isConnected = false;
   bool _isAnalyzing = false;
@@ -189,7 +193,7 @@ class ProfessionalAIService extends ChangeNotifier {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          'model': 'mixtral-8x7b-32768',
+          'model': _fastModel, // Usar modelo rápido para test
           'messages': [
             {
               'role': 'user',
@@ -197,15 +201,24 @@ class ProfessionalAIService extends ChangeNotifier {
             }
           ],
           'max_tokens': 10,
+          'temperature': 0.1,
         }),
       );
       
       if (response.statusCode == 200) {
         _isConnected = true;
-        _logger.info('Groq AI connection established');
+        _logger.info('Groq AI connection established successfully');
       } else {
         _isConnected = false;
-        _logger.error('Groq AI connection failed: ${response.statusCode}');
+        final errorBody = response.body;
+        _logger.error('Groq AI connection failed: ${response.statusCode} - $errorBody');
+        
+        // Log detalles específicos del error
+        if (response.statusCode == 401) {
+          _logger.error('Authentication failed - Check API key');
+        } else if (response.statusCode == 400) {
+          _logger.error('Bad request - Check model name or parameters');
+        }
       }
     } catch (e) {
       _isConnected = false;
@@ -248,7 +261,7 @@ class ProfessionalAIService extends ChangeNotifier {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          'model': 'mixtral-8x7b-32768',
+          'model': _defaultModel, // Usar modelo principal para análisis
           'messages': [
             {
               'role': 'system',
@@ -311,7 +324,7 @@ class ProfessionalAIService extends ChangeNotifier {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          'model': 'mixtral-8x7b-32768',
+          'model': _defaultModel, // Usar modelo principal para chat
           'messages': [
             {
               'role': 'system',
@@ -346,8 +359,18 @@ class ProfessionalAIService extends ChangeNotifier {
         
         return aiResponse;
       } else {
-        _logger.error('AI chat failed: ${response.statusCode}');
-        return 'Lo siento, hubo un error al procesar tu mensaje. Inténtalo de nuevo.';
+        final errorBody = response.body;
+        _logger.error('AI chat failed: ${response.statusCode} - $errorBody');
+        
+        if (response.statusCode == 401) {
+          return 'Error de autenticación. Verifica tu API key de Groq en Configuración.';
+        } else if (response.statusCode == 400) {
+          return 'Error en la solicitud. El modelo o parámetros pueden ser incorrectos.';
+        } else if (response.statusCode == 429) {
+          return 'Has alcanzado el límite de solicitudes. Espera un momento e inténtalo de nuevo.';
+        } else {
+          return 'Error del servidor (${response.statusCode}). Inténtalo de nuevo más tarde.';
+        }
       }
     } catch (e) {
       _logger.error('Error during AI chat: $e');
