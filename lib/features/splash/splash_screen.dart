@@ -17,6 +17,8 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _progressController;
   late Animation<double> _logoScale;
   late Animation<double> _progressAnimation;
+  
+  String _currentStatus = 'Iniciando aplicación...';
 
   @override
   void initState() {
@@ -60,23 +62,70 @@ class _SplashScreenState extends State<SplashScreen>
     // Iniciar animación del logo
     _logoController.forward();
     
+    setState(() {
+      _currentStatus = 'Cargando recursos...';
+    });
+    
     // Esperar un momento para que se vea la animación
     await Future.delayed(const Duration(milliseconds: 800));
+    
+    setState(() {
+      _currentStatus = 'Preparando dashboard...';
+    });
     
     // Iniciar animación del progreso
     _progressController.forward();
     
-    // Inicializar la aplicación
-    final initService = context.read<InitializationService>();
-    final success = await initService.initialize();
-    
-    if (success && mounted) {
-      // Navegar al dashboard profesional después de una pequeña pausa
-      await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      // Inicializar la aplicación
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const ProfessionalTradingDashboard()),
-        );
+        setState(() {
+          _currentStatus = 'Verificando configuración...';
+        });
+        
+        final initService = context.read<InitializationService>();
+        final success = await initService.initialize();
+        
+        if (success && mounted) {
+          setState(() {
+            _currentStatus = 'Iniciando dashboard profesional...';
+          });
+          
+          // Navegar al dashboard profesional después de una pequeña pausa
+          await Future.delayed(const Duration(milliseconds: 500));
+          if (mounted) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const ProfessionalTradingDashboard()),
+            );
+          }
+        } else if (mounted) {
+          setState(() {
+            _currentStatus = 'APIs no configuradas - Accediendo al dashboard...';
+          });
+          
+          // Si falla la inicialización, aún así ir al dashboard
+          // para que el usuario pueda configurar las APIs
+          await Future.delayed(const Duration(milliseconds: 1000));
+          if (mounted) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const ProfessionalTradingDashboard()),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _currentStatus = 'Configuración pendiente - Abriendo dashboard...';
+      });
+      
+      // En caso de error, navegar al dashboard para configuración manual
+      if (mounted) {
+        await Future.delayed(const Duration(milliseconds: 1000));
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const ProfessionalTradingDashboard()),
+          );
+        }
       }
     }
   }
@@ -119,14 +168,14 @@ class _SplashScreenState extends State<SplashScreen>
                               gradient: LinearGradient(
                                 colors: [
                                   AppColors.goldPrimary,
-                                  AppColors.goldPrimary.withValues(alpha: 0.7),
+                                  AppColors.goldPrimary.withOpacity(0.7),
                                 ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.goldPrimary.withValues(alpha: 0.3),
+                                  color: AppColors.goldPrimary.withOpacity(0.3),
                                   blurRadius: 20,
                                   spreadRadius: 5,
                                 ),
@@ -169,7 +218,7 @@ class _SplashScreenState extends State<SplashScreen>
                                   shadows: [
                                     Shadow(
                                       blurRadius: 10.0,
-                                      color: AppColors.goldPrimary.withValues(alpha: 0.5),
+                                      color: AppColors.goldPrimary.withOpacity(0.5),
                                       offset: const Offset(0, 2),
                                     ),
                                   ],
@@ -181,7 +230,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 'Professional Trading Platform',
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Colors.white.withValues(alpha: 0.8),
+                                  color: Colors.white.withOpacity(0.8),
                                   letterSpacing: 1.0,
                                 ),
                                 textAlign: TextAlign.center,
@@ -203,7 +252,9 @@ class _SplashScreenState extends State<SplashScreen>
                           child: Column(
                             children: [
                               Text(
-                                initService.initStatus,
+                                initService.initStatus.isNotEmpty 
+                                    ? initService.initStatus 
+                                    : _currentStatus,
                                 style: const TextStyle(
                                   fontSize: 16,
                                   color: Colors.white,
@@ -219,7 +270,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 height: 6,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(3),
-                                  color: Colors.white.withValues(alpha: 0.1),
+                                  color: Colors.white.withOpacity(0.1),
                                 ),
                                 child: LinearProgressIndicator(
                                   backgroundColor: Colors.transparent,
@@ -261,14 +312,17 @@ class _SplashScreenState extends State<SplashScreen>
                                     const SizedBox(height: 20),
                                     ElevatedButton(
                                       onPressed: () {
-                                        // Reiniciar la inicialización
-                                        _startInitialization();
+                                        // Navegar directamente al dashboard en caso de error persistente
+                                        Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(builder: (_) => const ProfessionalTradingDashboard()),
+                                        );
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: AppColors.goldPrimary,
                                         foregroundColor: AppColors.primaryDark,
+                                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                                       ),
-                                      child: const Text('Reintentar'),
+                                      child: const Text('Continuar al Dashboard'),
                                     ),
                                   ],
                                 ),
@@ -292,7 +346,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 'Versión 1.0.0',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.white.withValues(alpha: 0.5),
+                                  color: Colors.white.withOpacity(0.5),
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -300,7 +354,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 '© 2025 Invictus Trading Solutions',
                                 style: TextStyle(
                                   fontSize: 10,
-                                  color: Colors.white.withValues(alpha: 0.3),
+                                  color: Colors.white.withOpacity(0.3),
                                 ),
                               ),
                             ],

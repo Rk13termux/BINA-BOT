@@ -9,6 +9,7 @@ class FloatingMenuWidget extends StatefulWidget {
   final VoidCallback onIndicatorConfig;
   final VoidCallback onSettings;
   final VoidCallback onHelp;
+  final VoidCallback? onAIAssistant;
 
   const FloatingMenuWidget({
     super.key,
@@ -18,6 +19,7 @@ class FloatingMenuWidget extends StatefulWidget {
     required this.onIndicatorConfig,
     required this.onSettings,
     required this.onHelp,
+    this.onAIAssistant,
   });
 
   @override
@@ -78,6 +80,11 @@ class _FloatingMenuWidgetState extends State<FloatingMenuWidget>
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
+                  // Opción de IA Assistant (destacada)
+                  if (widget.onAIAssistant != null)
+                    _buildAIAssistantOption(),
+                  if (widget.onAIAssistant != null)
+                    const SizedBox(height: 8),
                   _buildMenuOption(
                     'Configurar APIs',
                     Icons.api,
@@ -141,6 +148,72 @@ class _FloatingMenuWidgetState extends State<FloatingMenuWidget>
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildAIAssistantOption() {
+    return ScaleTransition(
+      scale: _scaleAnimation,
+      child: GestureDetector(
+        onTap: () {
+          widget.onAIAssistant?.call();
+          widget.onToggle(); // Cerrar menú después de seleccionar
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppColors.goldPrimary,
+                AppColors.goldPrimary.withOpacity(0.8),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(25),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.goldPrimary.withOpacity(0.3),
+                blurRadius: 15,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.psychology,
+                color: Colors.black,
+                size: 20,
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'IA Assistant',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  'PRO',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
