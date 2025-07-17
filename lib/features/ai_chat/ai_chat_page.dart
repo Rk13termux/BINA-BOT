@@ -21,14 +21,32 @@ class _AIChatPageState extends State<AIChatPage> {
   @override
   void initState() {
     super.initState();
-    _addInitialMessage();
+    // Defer the initial message until after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _addInitialMessage();
+    });
   }
 
   void _addInitialMessage() {
-    _messages.add(ChatMessage(
-      content: '¡Hola! Soy tu asistente de IA para análisis de mercado. ¿En qué puedo ayudarte hoy?',
-      role: 'assistant',
-    ));
+    try {
+      final groqService = Provider.of<GroqService>(context, listen: false);
+      if (!groqService.isConfigured) {
+        _messages.add(ChatMessage(
+          content: '⚠️ ${groqService.configurationStatus}\n\nPara usar el asistente de IA, ve a Configuración → API Config y configura tu clave de Groq AI.',
+          role: 'assistant',
+        ));
+      } else {
+        _messages.add(ChatMessage(
+          content: '¡Hola! Soy tu asistente de IA para análisis de mercado. ¿En qué puedo ayudarte hoy?',
+          role: 'assistant',
+        ));
+      }
+    } catch (e) {
+      _messages.add(ChatMessage(
+        content: 'Error al inicializar el asistente de IA. Por favor, verifica la configuración.',
+        role: 'assistant',
+      ));
+    }
   }
 
   void _sendMessage() async {
@@ -43,6 +61,18 @@ class _AIChatPageState extends State<AIChatPage> {
 
     try {
       final groqService = Provider.of<GroqService>(context, listen: false);
+      
+      // Verificar si el servicio está configurado
+      if (!groqService.isConfigured) {
+        setState(() {
+          _messages.add(ChatMessage(
+            content: '⚠️ ${groqService.configurationStatus}\n\nPor favor, configura tu clave de API de Groq en Configuración → API Config para usar el asistente de IA.',
+            role: 'assistant',
+          ));
+        });
+        return;
+      }
+
       final response = await groqService.getChatCompletion(messages: _messages);
 
       setState(() {
@@ -52,7 +82,7 @@ class _AIChatPageState extends State<AIChatPage> {
       _logger.error('Error sending message to AI: $e');
       setState(() {
         _messages.add(ChatMessage(
-          content: 'Lo siento, hubo un error al procesar tu solicitud: $e',
+          content: 'Lo siento, hubo un error al procesar tu solicitud. Por favor, verifica tu configuración de API y conexión a internet.',
           role: 'assistant',
         ));
       });
