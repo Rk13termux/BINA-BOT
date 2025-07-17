@@ -71,6 +71,7 @@ class BinanceWebSocketService extends ChangeNotifier {
 
       final url = useTestnet ? _testnetUrl : _baseUrl;
       _logger.info('Connecting to Binance WebSocket: $url');
+      _logger.debug('Binance WebSocket URL being used: $url');
 
       _channel = WebSocketChannel.connect(Uri.parse(url));
 

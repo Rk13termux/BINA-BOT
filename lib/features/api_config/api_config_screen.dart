@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
 import '../../services/binance_service.dart';
-import '../../services/ai_service_professional.dart';
-import '../../services/professional_ai_service.dart';
 import '../../ui/theme/app_theme.dart';
 import '../../utils/logger.dart';
 
@@ -23,7 +21,6 @@ class _ApiConfigScreenState extends State<ApiConfigScreen>
   // Controladores de texto
   final TextEditingController _binanceApiKeyController = TextEditingController();
   final TextEditingController _binanceSecretController = TextEditingController();
-  final TextEditingController _groqApiKeyController = TextEditingController();
   
   // Controladores de animación
   late AnimationController _loadingController;
@@ -31,17 +28,13 @@ class _ApiConfigScreenState extends State<ApiConfigScreen>
   
   // Estado de la pantalla
   bool _isTestingBinance = false;
-  bool _isTestingGroq = false;
   bool _isSaving = false;
   bool _obscureBinanceSecret = true;
-  bool _obscureGroqKey = true;
   bool _isTestNet = false;
   
   // Resultados de tests
   String? _binanceTestResult;
-  String? _groqTestResult;
   bool _binanceTestSuccess = false;
-  bool _groqTestSuccess = false;
 
   @override
   void initState() {
@@ -69,7 +62,6 @@ class _ApiConfigScreenState extends State<ApiConfigScreen>
     // Las credenciales se cargan automáticamente por los servicios
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final binanceService = context.read<BinanceService>();
-      final aiService = context.read<AIService>();
       
       // Indicar si ya están configurados (sin mostrar las keys)
       if (binanceService.isAuthenticated) {
@@ -77,12 +69,6 @@ class _ApiConfigScreenState extends State<ApiConfigScreen>
         _binanceSecretController.text = '••••••••••••••••';
         _binanceTestResult = 'Configurado anteriormente';
         _binanceTestSuccess = true;
-      }
-      
-      if (aiService.isAvailable) {
-        _groqApiKeyController.text = '••••••••••••••••';
-        _groqTestResult = 'Configurado anteriormente';
-        _groqTestSuccess = true;
       }
       
       setState(() {});
@@ -93,7 +79,6 @@ class _ApiConfigScreenState extends State<ApiConfigScreen>
   void dispose() {
     _binanceApiKeyController.dispose();
     _binanceSecretController.dispose();
-    _groqApiKeyController.dispose();
     _loadingController.dispose();
     super.dispose();
   }
@@ -111,8 +96,7 @@ class _ApiConfigScreenState extends State<ApiConfigScreen>
             _buildHeader(),
             const SizedBox(height: 30),
             _buildBinanceSection(),
-            const SizedBox(height: 30),
-            _buildGroqSection(),
+            
             const SizedBox(height: 30),
             _buildTestResultsSection(),
             const SizedBox(height: 40),
@@ -388,127 +372,7 @@ class _ApiConfigScreenState extends State<ApiConfigScreen>
     );
   }
 
-  Widget _buildGroqSection() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFF9C27B0).withValues(alpha: 0.3),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF9C27B0).withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.psychology,
-                  color: Color(0xFF9C27B0),
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 16),
-              const Text(
-                'Groq AI (Mistral 7B)',
-                style: TextStyle(
-                  color: Color(0xFF9C27B0),
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const Spacer(),
-              Consumer<AIService>(
-                builder: (context, service, _) {
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: service.isAvailable 
-                          ? const Color(0xFF4CAF50).withValues(alpha: 0.2)
-                          : const Color(0xFFFF5722).withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      service.isAvailable ? 'CONECTADO' : 'DESCONECTADO',
-                      style: TextStyle(
-                        color: service.isAvailable 
-                            ? const Color(0xFF4CAF50)
-                            : const Color(0xFFFF5722),
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-          
-          const SizedBox(height: 20),
-          
-          // API Key Field
-          _buildTextField(
-            controller: _groqApiKeyController,
-            label: 'Groq API Key',
-            hint: 'Ingrese su Groq API Key',
-            obscureText: _obscureGroqKey,
-            prefixIcon: Icons.smart_toy,
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscureGroqKey ? Icons.visibility : Icons.visibility_off,
-                color: const Color(0xFFFFD700),
-              ),
-              onPressed: () {
-                setState(() {
-                  _obscureGroqKey = !_obscureGroqKey;
-                });
-              },
-            ),
-          ),
-          
-          const SizedBox(height: 20),
-          
-          // Test Button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: _isTestingGroq ? null : _testGroqConnection,
-              icon: _isTestingGroq 
-                  ? SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                  : const Icon(Icons.psychology),
-              label: Text(_isTestingGroq ? 'PROBANDO...' : 'PROBAR IA'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF9C27B0),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          ),
-          
-          // Instrucciones
-          const SizedBox(height: 16),
-          _buildInstructions('Groq'),
-        ],
-      ),
-    );
-  }
+  
 
   Widget _buildTextField({
     required TextEditingController controller,
@@ -580,13 +444,7 @@ class _ApiConfigScreenState extends State<ApiConfigScreen>
             '4. Copie y pegue las keys aquí',
             '5. Para seguridad, use TestNet primero',
           ]
-        : [
-            '1. Vaya a console.groq.com',
-            '2. Regístrese o inicie sesión',
-            '3. Vaya a API Keys',
-            '4. Cree una nueva API Key',
-            '5. Copie y pegue la key aquí',
-          ];
+        : [];
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -625,7 +483,7 @@ class _ApiConfigScreenState extends State<ApiConfigScreen>
   }
 
   Widget _buildTestResultsSection() {
-    if (_binanceTestResult == null && _groqTestResult == null) {
+    if (_binanceTestResult == null) {
       return const SizedBox.shrink();
     }
 
@@ -660,16 +518,7 @@ class _ApiConfigScreenState extends State<ApiConfigScreen>
               Icons.currency_bitcoin,
             ),
           
-          if (_binanceTestResult != null && _groqTestResult != null)
-            const SizedBox(height: 12),
           
-          if (_groqTestResult != null)
-            _buildTestResult(
-              'Groq AI',
-              _groqTestResult!,
-              _groqTestSuccess,
-              Icons.psychology,
-            ),
         ],
       ),
     );
@@ -840,52 +689,7 @@ class _ApiConfigScreenState extends State<ApiConfigScreen>
     }
   }
 
-  Future<void> _testGroqConnection() async {
-    if (_groqApiKeyController.text.isEmpty) {
-      _showSnackBar('Por favor ingrese la Groq API Key', false);
-      return;
-    }
-
-    setState(() {
-      _isTestingGroq = true;
-      _groqTestResult = null;
-    });
-
-    try {
-      final aiService = context.read<AIService>();
-      
-      final success = await aiService.setGroqApiKey(_groqApiKeyController.text.trim());
-
-      if (success) {
-        // Probar con un análisis simple
-        final response = await aiService.analyzeWithAI(
-          'Analiza brevemente: El precio de Bitcoin está en \$50000. ¿Es momento de comprar?'
-        );
-        
-        setState(() {
-          _groqTestResult = 'Conexión exitosa. Respuesta IA recibida correctamente.';
-          _groqTestSuccess = true;
-        });
-        _showSnackBar('✅ Groq AI conectado exitosamente', true);
-      } else {
-        setState(() {
-          _groqTestResult = 'Error: ${aiService.lastError ?? "API Key inválida"}';
-          _groqTestSuccess = false;
-        });
-        _showSnackBar('❌ Error conectando con Groq AI', false);
-      }
-    } catch (e) {
-      setState(() {
-        _groqTestResult = 'Error: $e';
-        _groqTestSuccess = false;
-      });
-      _showSnackBar('❌ Error: $e', false);
-    } finally {
-      setState(() {
-        _isTestingGroq = false;
-      });
-    }
-  }
+  
 
   Future<void> _saveConfiguration() async {
     setState(() {
@@ -909,20 +713,7 @@ class _ApiConfigScreenState extends State<ApiConfigScreen>
         }
       }
       
-      // Guardar credenciales de Groq si están configuradas
-      if (_groqApiKeyController.text.isNotEmpty) {
-        try {
-          final professionalAIService = context.read<ProfessionalAIService>();
-          final groqSuccess = await professionalAIService.setApiKey(_groqApiKeyController.text.trim());
-          
-          if (!groqSuccess) {
-            throw Exception('Error al guardar API key de Groq');
-          }
-        } catch (e) {
-          _logger.warning('Groq API service not available: $e');
-          // Continue anyway as Groq might not be essential
-        }
-      }
+      
       
       await Future.delayed(const Duration(milliseconds: 500)); // UX
       
@@ -976,22 +767,8 @@ class _ApiConfigScreenState extends State<ApiConfigScreen>
     if (confirm == true) {
       try {
         final binanceService = context.read<BinanceService>();
-        final aiService = context.read<AIService>();
         
         await binanceService.clearCredentials();
-        await aiService.clearCredentials();
-        
-        // Limpiar campos
-        _binanceApiKeyController.clear();
-        _binanceSecretController.clear();
-        _groqApiKeyController.clear();
-        
-        setState(() {
-          _binanceTestResult = null;
-          _groqTestResult = null;
-          _binanceTestSuccess = false;
-          _groqTestSuccess = false;
-        });
         
         _showSnackBar('✅ Credenciales eliminadas', true);
       } catch (e) {

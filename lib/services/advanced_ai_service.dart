@@ -351,8 +351,6 @@ ${enabledIndicators.map((i) => '''
 
   /// Genera respuesta inteligente de fallback basada en datos técnicos
   Map<String, dynamic> _generateIntelligentFallback() {
-    final random = Random();
-    
     // Análisis básico basado en indicadores comunes
     return {
       'recommendation': 'HOLD',
