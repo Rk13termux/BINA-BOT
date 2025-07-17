@@ -72,6 +72,7 @@ class WebSocketManager {
     try {
       final wsUrl = _isTestnet ? _binanceTestnetWsUrl : _binanceWsUrl;
       final uri = Uri.parse('$wsUrl$streamName');
+      _logger.debug('WebSocketManager URL being used: $uri');
 
       final channel = WebSocketChannel.connect(uri);
       _connections[streamName] = channel;

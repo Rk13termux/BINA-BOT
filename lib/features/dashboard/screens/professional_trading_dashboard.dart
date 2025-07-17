@@ -10,7 +10,7 @@ import '../widgets/technical_indicators_widget.dart';
 import '../widgets/real_time_prices_widget.dart';
 import '../widgets/portfolio_balance_widget.dart';
 import '../widgets/floating_menu_widget.dart';
-import '../../ai_assistant/professional_ai_assistant_screen.dart';
+
 
 /// Dashboard profesional de trading con análisis en tiempo real
 class ProfessionalTradingDashboard extends StatefulWidget {
@@ -640,16 +640,7 @@ class _ProfessionalTradingDashboardState extends State<ProfessionalTradingDashbo
   }
 
   void _navigateToAIAssistant() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ProfessionalAIAssistantScreen(
-          selectedSymbol: _selectedSymbol,
-          selectedTimeframe: _selectedTimeframe,
-          activeIndicators: _selectedIndicators,
-        ),
-      ),
-    );
+    Navigator.pushNamed(context, '/ai-chat');
   }
 
   void _showHelp() {
