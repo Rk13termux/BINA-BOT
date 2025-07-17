@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'dart:math';
 import '../models/chat_message.dart'; // Asumiremos que tienes un modelo para mensajes
 import '../utils/logger.dart';
 
@@ -12,10 +11,36 @@ class GroqService {
   String get _apiKey => dotenv.env['GROQ_API_KEY'] ?? '';
 
   GroqService() {
-    _logger.debug('Groq API Key (first 5 chars): ${_apiKey.substring(0, min(5, _apiKey.length))}');
+    try {
+      _logger.debug('Initializing GroqService...');
+      _logger.debug('dotenv loaded: ${dotenv.env.isNotEmpty}');
+      _logger.debug('GROQ_API_KEY available: ${dotenv.env.containsKey('GROQ_API_KEY')}');
+      _logger.debug('API Key length: ${_apiKey.length}');
+      if (_apiKey.isNotEmpty && _apiKey.length >= 5) {
+        _logger.debug('Groq API Key (first 5 chars): ${_apiKey.substring(0, 5)}...');
+      } else {
+        _logger.warning('Groq API Key is empty or too short');
+      }
+    } catch (e) {
+      _logger.error('Error initializing GroqService: $e');
+    }
   }
 
   static const String _apiBaseUrl = 'https://api.groq.com/openai/v1';
+
+  /// Verifica si el servicio está correctamente configurado
+  bool get isConfigured => _apiKey.isNotEmpty && _apiKey != 'your_groq_api_key_here';
+
+  /// Obtiene el estado de configuración como mensaje
+  String get configurationStatus {
+    if (_apiKey.isEmpty) {
+      return 'La clave API de Groq no está configurada en el archivo .env';
+    } else if (_apiKey == 'your_groq_api_key_here') {
+      return 'La clave API de Groq usa el valor por defecto. Configura tu clave real.';
+    } else {
+      return 'Servicio de Groq configurado correctamente';
+    }
+  }
 
   /// Obtiene una respuesta de chat de la API de Groq.
   ///
@@ -25,8 +50,8 @@ class GroqService {
     required List<ChatMessage> messages,
     String model = 'llama3-8b-8192',
   }) async {
-    if (_apiKey.isEmpty) {
-      const errorMsg = 'Groq API key is not set in .env file.';
+    if (_apiKey.isEmpty || _apiKey == 'your_groq_api_key_here') {
+      const errorMsg = 'La clave API de Groq no está configurada. Por favor, configura tu API key en la configuración de la app.';
       _logger.error(errorMsg);
       throw Exception(errorMsg);
     }
