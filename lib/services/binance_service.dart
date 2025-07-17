@@ -536,7 +536,27 @@ class BinanceService extends ChangeNotifier {
         await getAccountInfo();
       }
 
-      return _accountInfo?.getTotalBalanceUSDT() ?? 0.0;
+      if (_accountInfo == null) {
+        return 0.0;
+      }
+
+      double total = 0.0;
+      for (final balance in _accountInfo!.balances) {
+        if (balance.free > 0 || balance.locked > 0) {
+          if (balance.asset == 'USDT') {
+            total += balance.free + balance.locked;
+          } else {
+            try {
+              final price = await getPrice('${balance.asset}USDT');
+              total += (balance.free + balance.locked) * price;
+            } catch (e) {
+              _logger.warning('Could not get USDT price for ${balance.asset}: $e');
+              // Si no se puede obtener el precio, se ignora este activo para el total en USDT
+            }
+          }
+        }
+      }
+      return total;
     } catch (e) {
       _logger.error('Error getting total balance: $e');
       return 0.0;

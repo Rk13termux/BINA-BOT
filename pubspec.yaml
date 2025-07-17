@@ -90,7 +90,6 @@ flutter:
     - assets/icons/
     - assets/plugins/
     - assets/ml_models/
-    - .env
 
 # Configuración para generar iconos automáticamente
 flutter_launcher_icons:
