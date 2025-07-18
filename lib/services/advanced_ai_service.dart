@@ -15,10 +15,10 @@ class AdvancedAIService extends ChangeNotifier {
   AIAnalysisState _state = AIAnalysisState();
   AIAnalysisState get state => _state;
 
-  // Use defaults if .env is not available (production builds)
+  // Use optimized configuration from .env
   String get _groqApiKey => dotenv.env['GROQ_API_KEY'] ?? '';
   String get _groqBaseUrl => dotenv.env['GROQ_BASE_URL'] ?? 'https://api.groq.com/openai/v1/chat/completions';
-  String get _model => dotenv.env['GROQ_MODEL'] ?? 'mixtral-8x7b-32768';
+  String get _model => dotenv.env['GROQ_MODEL'] ?? 'llama-3.3-70b-versatile';
 
   /// Realiza análisis estratégico completo con IA
   Future<void> performStrategicAnalysis({

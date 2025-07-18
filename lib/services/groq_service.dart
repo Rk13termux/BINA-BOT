@@ -45,10 +45,10 @@ class GroqService {
   /// Obtiene una respuesta de chat de la API de Groq.
   ///
   /// [messages] es el historial de la conversación.
-  /// [model] es el modelo a utilizar (ej. 'llama3-8b-8192').
+  /// [model] es el modelo a utilizar (ej. 'llama-3.3-70b-versatile').
   Future<String> getChatCompletion({
     required List<ChatMessage> messages,
-    String model = 'llama3-8b-8192',
+    String model = 'llama-3.3-70b-versatile',
   }) async {
     if (_apiKey.isEmpty || _apiKey == 'your_groq_api_key_here') {
       const errorMsg = 'La clave API de Groq no está configurada. Por favor, configura tu API key en la configuración de la app.';

@@ -10,12 +10,12 @@ class AIService extends ChangeNotifier {
   static final AppLogger _logger = AppLogger();
   static const FlutterSecureStorage _storage = FlutterSecureStorage();
 
-  // Configuración Groq API
+  // Configuración Groq API - MODELO OPTIMIZADO
   String? _apiKey;
   static const String _baseUrl = 'https://api.groq.com/openai/v1/chat/completions';
-  static const String _model = 'mistral-7b-8k';
-  static const double _temperature = 0.5;
-  static const int _maxTokens = 512;
+  static const String _model = 'llama-3.3-70b-versatile';
+  static const double _temperature = 0.2;
+  static const int _maxTokens = 2048;
 
   // Estado del servicio
   bool _isInitialized = false;
