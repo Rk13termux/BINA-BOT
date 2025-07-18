@@ -40,7 +40,8 @@ class GroqService {
     _logger.debug('Initializing GroqService with secure storage...');
   }
 
-  static const String _apiBaseUrl = 'https://api.groq.com/openai/v1';
+  String get _apiBaseUrl =>
+      dotenv.env['GROQ_BASE_URL'] ?? 'https://api.groq.com/openai/v1/chat/completions';
 
   /// Verifica si el servicio está correctamente configurado
   Future<bool> get isConfigured async {
@@ -105,7 +106,7 @@ class GroqService {
 
     try {
       final response = await http.post(
-        Uri.parse('$_apiBaseUrl/chat/completions'),
+        Uri.parse(_apiBaseUrl),
         headers: {
           'Authorization': 'Bearer $apiKey',
           'Content-Type': 'application/json',

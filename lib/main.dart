@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // Tema y configuración
 import 'ui/theme/quantix_theme.dart';
@@ -14,7 +15,14 @@ import 'features/dashboard/quantix_dashboard.dart';
 /// "Piensa como fondo, opera como elite."
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
+  // Cargar variables de entorno si existe un archivo .env
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (_) {
+    // Ignorar si no hay archivo .env
+  }
+
   // Configurar orientación
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -31,8 +39,8 @@ void main() async {
     ),
   );
   
-  // QUANTIX AI CORE ya no necesita archivos .env
-  // Las claves API se configuran de forma segura en el onboarding
+  // Las claves API se configuran de forma segura en el onboarding.
+  // Si existe un archivo `.env`, sus valores se usarán como configuración inicial.
   
   runApp(const QuantixAICore());
 }

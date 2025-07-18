@@ -12,11 +12,11 @@ QUANTIX AI CORE es una aplicación de trading de criptomonedas de nueva generaci
 
 ---
 
-## 🔐 Configuración Segura (Sin .env)
+## 🔐 Configuración Segura
 
 ### ✅ **NUEVA ARQUITECTURA DE SEGURIDAD**
 
-**QUANTIX ya NO usa archivos .env** - Todo se configura de forma segura:
+Las claves pueden configurarse en el onboarding y opcionalmente mediante un archivo `.env`:
 
 1. **📱 Al abrir la app por primera vez:**
    - Onboarding guiado te pide las API keys
@@ -145,6 +145,11 @@ flutter build ios --release
    BINANCE_SECRET_KEY=your_binance_secret_key
    ADMOB_APP_ID_ANDROID=your_android_admob_app_id
    ADMOB_APP_ID_IOS=your_ios_admob_app_id
+   GROQ_API_KEY=your_groq_api_key
+   GROQ_BASE_URL=https://api.groq.com/openai/v1/chat/completions
+   GROQ_MODEL=llama-3.3-70b-versatile
+   GROQ_MAX_TOKENS=2048
+   GROQ_TEMPERATURE=0.3
    ```
 
 2. Update `lib/utils/constants.dart` with your configuration
