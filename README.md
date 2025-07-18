@@ -1,4 +1,31 @@
-# Invictus Trader Pro
+# 🚀 QUANTIX AI CORE
+**"Piensa como fondo, opera como elite."**
+
+## 📱 Plataforma de Trading Profesional con IA
+
+QUANTIX AI CORE es una aplicación de trading de criptomonedas de nueva generación que combina:
+- **Análisis de IA avanzado** con Groq Llama 3.3 70B
+- **Integración directa con Binance**
+- **100+ Indicadores técnicos**
+- **Arquitectura modular profesional**
+- **Seguridad de nivel empresarial**
+
+---
+
+## 🔐 Configuración Segura (Sin .env)
+
+### ✅ **NUEVA ARQUITECTURA DE SEGURIDAD**
+
+**QUANTIX ya NO usa archivos .env** - Todo se configura de forma segura:
+
+1. **📱 Al abrir la app por primera vez:**
+   - Onboarding guiado te pide las API keys
+   - Se almacenan cifradas con Flutter Secure Storage
+   - Cifrado a nivel de dispositivo
+
+2. **🔑 APIs necesarias:**
+   - **Groq API** (GRATIS): https://console.groq.com/keys
+   - **Binance API**: https://www.binance.com/en/support/faq/360002502072
 
 A professional Flutter trading application for cryptocurrency trading with Binance integration, real-time analysis, and advanced features.
 

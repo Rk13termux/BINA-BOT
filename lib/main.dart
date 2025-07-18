@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // Tema y configuración
@@ -32,13 +31,8 @@ void main() async {
     ),
   );
   
-  // Cargar variables de entorno
-  try {
-    await dotenv.load(fileName: ".env");
-  } catch (e) {
-    // Si no existe .env, continuar sin error
-    debugPrint('No se pudo cargar .env: $e');
-  }
+  // QUANTIX AI CORE ya no necesita archivos .env
+  // Las claves API se configuran de forma segura en el onboarding
   
   runApp(const QuantixAICore());
 }
