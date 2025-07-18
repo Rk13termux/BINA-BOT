@@ -12,6 +12,8 @@
 # Environment variables with secrets
 .env
 .env.*
+.env.local
+.env.complete
 .svn/
 .swiftpm/
 migrate_working_dir/
@@ -20,6 +22,10 @@ migrate_working_dir/
 MI-CONFIGURACION-PERSONAL.txt
 **/personal-config.*
 **/api-keys.*
+
+# Test files with API keys
+test_groq*.dart
+test_trading_analysis.dart
 
 # IntelliJ related
 *.iml
