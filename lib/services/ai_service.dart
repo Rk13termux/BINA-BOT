@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../utils/logger.dart';
 
 /// Respuesta de análisis de mercado AI
@@ -151,8 +152,13 @@ class AIService extends ChangeNotifier {
 
   // Configuración
   String? _apiKey;
-  String get _baseUrl => 'https://api.groq.com/openai/v1/chat/completions';
-  String get _model => 'mixtral-8x7b-32768';
+  String get _baseUrl =>
+      dotenv.env['GROQ_BASE_URL'] ?? 'https://api.groq.com/openai/v1/chat/completions';
+  String get _model => dotenv.env['GROQ_MODEL'] ?? 'mixtral-8x7b-32768';
+  int get _defaultMaxTokens =>
+      int.tryParse(dotenv.env['GROQ_MAX_TOKENS'] ?? '1000') ?? 1000;
+  double get _defaultTemperature =>
+      double.tryParse(dotenv.env['GROQ_TEMPERATURE'] ?? '0.3') ?? 0.3;
 
   // Estado del servicio
   bool _isInitialized = false;
@@ -438,7 +444,7 @@ Responde en formato JSON:
   }
 
   /// Realizar petición a Groq API
-  Future<String> _makeRequest(String prompt, {int maxTokens = 1000}) async {
+  Future<String> _makeRequest(String prompt, {int? maxTokens}) async {
     if (_apiKey == null) {
       throw Exception('API key not configured');
     }
@@ -460,8 +466,8 @@ Responde en formato JSON:
           'content': prompt,
         }
       ],
-      'max_tokens': maxTokens,
-      'temperature': 0.3,
+      'max_tokens': maxTokens ?? _defaultMaxTokens,
+      'temperature': _defaultTemperature,
     });
 
     final response = await http.post(
