@@ -226,6 +226,7 @@ Si el problema persiste, verifica que tu API key sea válida.''',
 
   @override
   Widget build(BuildContext context) {
+    final binanceService = Provider.of<BinanceService>(context);
     return Scaffold(
       backgroundColor: QuantixTheme.primaryBlack,
       appBar: AppBar(
@@ -243,9 +244,90 @@ Si el problema persiste, verifica que tu API key sea válida.''',
         ),
         centerTitle: true,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings, color: QuantixTheme.primaryGold),
+            tooltip: 'Configurar APIs',
+            onPressed: () {
+              Navigator.of(context).pushNamed('/configuracion');
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
+          // Saldo y precio en tiempo real
+          Container(
+            width: double.infinity,
+            color: QuantixTheme.cardBlack,
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.account_balance_wallet, color: QuantixTheme.primaryGold),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Saldo Binance:',
+                      style: TextStyle(color: QuantixTheme.primaryGold, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      binanceService.isAuthenticated && binanceService.accountInfo != null
+                        ? '${binanceService.accountInfo!.getTotalBalanceUSDT().toStringAsFixed(2)} USDT'
+                        : 'No disponible',
+                      style: TextStyle(color: QuantixTheme.electricBlue, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Icon(Icons.show_chart, color: QuantixTheme.bullishGreen),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Precio BTCUSDT:',
+                      style: TextStyle(color: QuantixTheme.bullishGreen, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(width: 8),
+                    FutureBuilder<double?>(
+                      future: binanceService.getCurrentPrice('BTCUSDT'),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Text('Cargando...', style: TextStyle(color: QuantixTheme.neutralGray));
+                        }
+                        if (snapshot.hasError || !snapshot.hasData) {
+                          return Text('No disponible', style: TextStyle(color: QuantixTheme.bearishRed));
+                        }
+                        return Text('${snapshot.data!.toStringAsFixed(2)}', style: TextStyle(color: QuantixTheme.bullishGreen, fontWeight: FontWeight.bold));
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    ElevatedButton.icon(
+                      icon: Icon(Icons.swap_vert, color: QuantixTheme.primaryBlack),
+                      label: Text('Trade', style: TextStyle(color: QuantixTheme.primaryBlack)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: QuantixTheme.primaryGold,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        elevation: 0,
+                      ),
+                      onPressed: binanceService.isAuthenticated
+                        ? () {
+                            Navigator.of(context).pushNamed('/trade');
+                          }
+                        : null,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // ...existing code...
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(16.0),
