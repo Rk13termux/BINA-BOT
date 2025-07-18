@@ -48,6 +48,18 @@ class BinanceService extends ChangeNotifier {
   bool get isRateLimited => _requestWeight > 1000;
   bool get isCircuitBreakerOpen => _circuitBreakerOpen;
   int get consecutiveFailures => _consecutiveFailures;
+  
+  /// Check if Binance API is configured with valid credentials
+  Future<bool> get isConfigured async {
+    try {
+      final apiKey = await _storage.read(key: 'binance_api_key');
+      final secretKey = await _storage.read(key: 'binance_secret_key');
+      return apiKey != null && secretKey != null && apiKey.isNotEmpty && secretKey.isNotEmpty;
+    } catch (e) {
+      _logger.error('Error checking Binance configuration: $e');
+      return false;
+    }
+  }
 
   /// Inicializar servicio Binance
   Future<void> initialize() async {
