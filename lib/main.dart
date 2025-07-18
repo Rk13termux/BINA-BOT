@@ -1,164 +1,281 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'dart:async';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-// Theme imports
-import 'ui/theme/app_theme.dart';
+// Tema y configuración
+import 'ui/theme/quantix_theme.dart';
 
-// Service imports
-import 'services/auth_service.dart';
-import 'services/technical_indicator_service.dart';
-import 'services/data_stream_service.dart';
-import 'services/plugins/plugin_manager.dart';
-import 'services/initialization_service.dart';
-import 'services/binance_service.dart';
-import 'services/binance_websocket_service.dart';
-import 'services/groq_service.dart';
-import 'services/ai_assistant_service.dart';
-import 'services/ai_service_professional.dart' as ai_professional;
-import 'core/api_manager.dart';
+// Pantallas principales
+import 'features/auth_api_binance/quantix_onboarding_screen.dart';
+import 'features/dashboard/quantix_dashboard.dart';
 
-// Feature imports
-import 'features/splash/splash_screen.dart';
-import 'features/main/main_screen.dart';
-import 'features/dashboard/screens/ultra_professional_dashboard.dart';
-import 'features/dashboard/screens/professional_trading_dashboard.dart';
-import 'features/trading/trading_screen.dart';
-import 'features/alerts/alerts_screen.dart';
-import 'features/news/news_screen.dart';
-import 'features/settings/settings_screen.dart';
-import 'features/news/news_controller.dart';
-import 'features/trading/trading_controller.dart';
-import 'features/alerts/alerts_controller.dart';
-import 'features/ai_assistant/ai_assistant_controller.dart';
-import 'features/ai_chat/ai_chat_page.dart';
-
-// Utils
-import 'utils/logger.dart';
-
+/// 🚀 QUANTIX AI CORE - Punto de entrada principal
+/// "Piensa como fondo, opera como elite."
 void main() async {
-  // Configurar manejo de errores global
-  FlutterError.onError = (FlutterErrorDetails details) {
-    AppLogger().error('Flutter Error: ${details.exception}');
-  };
-
-  // Configurar manejo de errores en Zone
-  runZonedGuarded(() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    
-    // Cargar variables de entorno
-    try {
-      await dotenv.load(fileName: ".env");
-      AppLogger().info('Environment variables loaded successfully');
-    } catch (e) {
-      AppLogger().warning('Could not load .env file: $e');
-    }
-
-    // Configurar orientación de pantalla
-    await SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
-
-    // Configurar barra de estado para tema negro
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        systemNavigationBarColor: Color(0xFF000000), // Negro puro
-        systemNavigationBarIconBrightness: Brightness.light,
-      ),
-    );
-
-    runApp(const InvictusTraderApp());
-  }, (error, stack) {
-    AppLogger().error('Unhandled error: $error');
-  });
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Configurar orientación
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+  
+  // Configurar barra de estado
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+      systemNavigationBarColor: QuantixTheme.primaryBlack,
+      systemNavigationBarIconBrightness: Brightness.light,
+    ),
+  );
+  
+  // Cargar variables de entorno
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    // Si no existe .env, continuar sin error
+    debugPrint('No se pudo cargar .env: $e');
+  }
+  
+  runApp(const QuantixAICore());
 }
 
-class InvictusTraderApp extends StatelessWidget {
-  const InvictusTraderApp({super.key});
+/// Aplicación principal de QUANTIX AI CORE
+class QuantixAICore extends StatelessWidget {
+  const QuantixAICore({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Core Services (Singleton)
-        Provider<ApiManager>(create: (_) => ApiManager()),
-        Provider<GroqService>(create: (_) => GroqService()),
-        ChangeNotifierProvider(create: (_) => InitializationService()),
-        ChangeNotifierProvider(create: (_) => AuthService()),
-        ChangeNotifierProvider(create: (_) => BinanceService()),
-        ChangeNotifierProvider(create: (_) => TechnicalIndicatorService()),
-        ChangeNotifierProvider(create: (_) => BinanceWebSocketService()),
-        Provider<PluginManager>(create: (_) => PluginManager()),
-
-        // AI Services
-        ChangeNotifierProvider<ai_professional.AIService>(create: (_) => ai_professional.AIService()),
-
-        // AI Assistant Service (depende de Groq y Binance)
-        ProxyProvider2<GroqService, BinanceService, AIAssistantService>(
-          update: (context, groqService, binanceService, previous) =>
-              AIAssistantService(
-                  groqService: groqService, binanceService: binanceService),
-        ),
-
-        // Data Stream Service
-        ChangeNotifierProvider(create: (context) => DataStreamService(
-          binanceService: context.read<BinanceService>(),
-          aiService: context.read<ai_professional.AIService>(),
-        )),
-
-        // Controllers (UI-specific state)
-        ChangeNotifierProvider(create: (_) => NewsController()),
-        ChangeNotifierProvider(create: (_) => TradingController()),
-        ChangeNotifierProvider(create: (_) => AlertsController()),
-        ChangeNotifierProxyProvider<AIAssistantService, AIAssistantController>(
-          create: (context) => AIAssistantController(aiAssistantService: context.read<AIAssistantService>()),
-          update: (context, aiAssistantService, previous) => AIAssistantController(aiAssistantService: aiAssistantService),
-        ),
+        // TODO: Agregar providers para servicios
+        // ChangeNotifierProvider(create: (context) => MarketDataProvider()),
+        // ChangeNotifierProvider(create: (context) => AIAnalysisProvider()),
+        // ChangeNotifierProvider(create: (context) => SignalEngineProvider()),
       ],
       child: MaterialApp(
-        title: 'INVICTUS TRADER PRO',
+        title: 'QUANTIX AI CORE',
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.darkTheme,
-
-        // Iniciar con SplashScreen que redirige al dashboard profesional
-        home: const SplashScreen(),
-
-        // Configuración de rutas
+        
+        // Tema profesional
+        theme: QuantixTheme.darkTheme,
+        
+        // Rutas
+        initialRoute: '/',
         routes: {
-          '/splash': (context) => const SplashScreen(),
-          '/main': (context) => const MainScreen(),
-          '/dashboard': (context) => const ProfessionalTradingDashboard(),
-          '/dashboard-ultra': (context) => const UltraProfessionalDashboard(),
-          '/trading': (context) => const TradingScreen(),
-          '/alerts': (context) => const AlertsScreen(),
-          '/news': (context) => const NewsScreen(),
-          '/settings': (context) => const SettingsScreen(),
-          '/ai-chat': (context) => const AIChatPage(),
+          '/': (context) => const QuantixSplashScreen(),
+          '/onboarding': (context) => const QuantixOnboardingScreen(),
+          '/dashboard': (context) => const QuantixDashboard(),
         },
-
-        // Configuración del builder para el tema
+        
+        // Configuración adicional
         builder: (context, child) {
           return MediaQuery(
             data: MediaQuery.of(context).copyWith(
-              textScaler: const TextScaler.linear(1.0), // Prevenir escalado de texto
+              textScaler: const TextScaler.linear(1.0), // Evitar escalado de fuentes
             ),
             child: child!,
           );
         },
+      ),
+    );
+  }
+}
 
-        // Manejar rutas desconocidas
-        onUnknownRoute: (settings) {
-          return MaterialPageRoute(
-            builder: (context) => const MainScreen(),
-          );
-        },
+/// 🎬 Splash Screen de QUANTIX AI CORE
+class QuantixSplashScreen extends StatefulWidget {
+  const QuantixSplashScreen({super.key});
+
+  @override
+  State<QuantixSplashScreen> createState() => _QuantixSplashScreenState();
+}
+
+class _QuantixSplashScreenState extends State<QuantixSplashScreen>
+    with TickerProviderStateMixin {
+  late AnimationController _logoController;
+  late AnimationController _textController;
+  late Animation<double> _logoAnimation;
+  late Animation<double> _textAnimation;
+  
+  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
+
+  @override
+  void initState() {
+    super.initState();
+    
+    // Animaciones
+    _logoController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+    _textController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    
+    _logoAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _logoController, curve: Curves.elasticOut),
+    );
+    _textAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _textController, curve: Curves.easeInOut),
+    );
+    
+    _startAnimations();
+    _checkOnboardingStatus();
+  }
+
+  @override
+  void dispose() {
+    _logoController.dispose();
+    _textController.dispose();
+    super.dispose();
+  }
+
+  /// Iniciar animaciones
+  void _startAnimations() {
+    _logoController.forward();
+    Future.delayed(const Duration(milliseconds: 600), () {
+      _textController.forward();
+    });
+  }
+
+  /// Verificar si el onboarding está completado
+  Future<void> _checkOnboardingStatus() async {
+    await Future.delayed(const Duration(seconds: 3)); // Mostrar splash por 3 segundos
+    
+    try {
+      final onboardingCompleted = await _secureStorage.read(key: 'onboarding_completed');
+      
+      if (mounted) {
+        if (onboardingCompleted == 'true') {
+          Navigator.pushReplacementNamed(context, '/dashboard');
+        } else {
+          Navigator.pushReplacementNamed(context, '/onboarding');
+        }
+      }
+    } catch (e) {
+      // Si hay error, ir al onboarding
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/onboarding');
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              QuantixTheme.primaryBlack,
+              QuantixTheme.secondaryBlack,
+              QuantixTheme.primaryBlack,
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            stops: [0.0, 0.5, 1.0],
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Logo animado
+              ScaleTransition(
+                scale: _logoAnimation,
+                child: Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    gradient: QuantixTheme.goldGradient,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: QuantixTheme.primaryGold.withValues(alpha: 0.4),
+                        blurRadius: 40,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.auto_graph,
+                    size: 60,
+                    color: QuantixTheme.primaryBlack,
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 40),
+              
+              // Texto animado
+              FadeTransition(
+                opacity: _textAnimation,
+                child: Column(
+                  children: [
+                    // Título principal
+                    ShaderMask(
+                      shaderCallback: (bounds) => QuantixTheme.goldGradient.createShader(bounds),
+                      child: Text(
+                        'QUANTIX',
+                        style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    
+                    // Subtítulo
+                    Text(
+                      'AI CORE',
+                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                        color: QuantixTheme.electricBlue,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 4,
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 20),
+                    
+                    // Eslogan
+                    Text(
+                      'Piensa como fondo, opera como elite.',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: QuantixTheme.lightGold,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    
+                    const SizedBox(height: 40),
+                    
+                    // Indicador de carga
+                    SizedBox(
+                      width: 200,
+                      child: LinearProgressIndicator(
+                        backgroundColor: QuantixTheme.neutralGray.withValues(alpha: 0.3),
+                        valueColor: const AlwaysStoppedAnimation<Color>(QuantixTheme.primaryGold),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 20),
+                    
+                    Text(
+                      'Inicializando sistemas...',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: QuantixTheme.neutralGray,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

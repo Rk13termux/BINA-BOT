@@ -1,5 +1,5 @@
-name: invictus_trader_pro
-description: "Professional Trading App - Cryptocurrency trading platform with real-time analysis and automation"
+name: quantix_ai_core
+description: "QUANTIX AI CORE - Professional Trading Intelligence Platform with Advanced AI Analysis"
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -19,6 +19,7 @@ dependencies:
   # HTTP & WebSocket
   http: ^1.2.0
   web_socket_channel: ^2.4.4
+  dio: ^5.4.0
   
   # HTML Parsing for News Scraping
   html: ^0.15.4
@@ -26,16 +27,19 @@ dependencies:
   # Charts & Visualization
   candlesticks: ^2.1.0
   fl_chart: ^0.68.0
+  syncfusion_flutter_charts: ^24.2.9
   
   # Local Storage & Security
   flutter_secure_storage: ^9.2.2
   shared_preferences: ^2.2.2
   hive: ^2.2.3
   hive_flutter: ^1.1.0
+  sqflite: ^2.3.2
   
-  # Cryptography
+  # Cryptography & Security
   crypto: ^3.0.3
   encrypt: ^5.0.3
+  device_info_plus: ^10.1.0
   
   # Notifications
   flutter_local_notifications: ^17.2.2
@@ -43,14 +47,19 @@ dependencies:
   # AI & Machine Learning
   tflite_flutter: ^0.10.4
   
-  # Monetization (Solo suscripciones)
+  # Monetization (Subscriptions)
   in_app_purchase: ^3.1.13
   
-  # UI Components
+  # UI Components & Animations
   cupertino_icons: ^1.0.8
+  animated_text_kit: ^4.2.2
+  lottie: ^3.0.0
+  shimmer: ^3.0.0
+  
+  # Fonts & Typography
+  google_fonts: ^6.1.0
   flutter_svg: ^2.0.10+1
   url_launcher: ^6.2.5
-  shimmer: ^3.0.0
   
   # Utils
   intl: ^0.19.0

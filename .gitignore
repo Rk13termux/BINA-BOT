@@ -11,9 +11,15 @@
 
 # Environment variables with secrets
 .env
+.env.*
 .svn/
 .swiftpm/
 migrate_working_dir/
+
+# Personal configuration files with API keys
+MI-CONFIGURACION-PERSONAL.txt
+**/personal-config.*
+**/api-keys.*
 
 # IntelliJ related
 *.iml

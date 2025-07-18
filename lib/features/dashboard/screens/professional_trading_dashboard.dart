@@ -4,12 +4,17 @@ import '../../../ui/theme/app_colors.dart';
 import '../../../services/binance_service.dart';
 import '../../../services/binance_websocket_service.dart';
 import '../../../services/data_stream_service.dart';
+import '../../../services/technical_indicator_service.dart';
 import '../../../utils/logger.dart';
 import '../widgets/crypto_selector_widget.dart';
 import '../widgets/technical_indicators_widget.dart';
 import '../widgets/real_time_prices_widget.dart';
 import '../widgets/portfolio_balance_widget.dart';
 import '../widgets/floating_menu_widget.dart';
+import '../../ai_analysis/ai_analysis_widget.dart';
+import '../../api_config/professional_api_config_screen.dart';
+import '../../settings/settings_screen.dart';
+import '../../ai_chat/ai_chat_page.dart';
 
 
 /// Dashboard profesional de trading con análisis en tiempo real
@@ -194,6 +199,21 @@ class _ProfessionalTradingDashboardState extends State<ProfessionalTradingDashbo
             selectedTimeframe: _selectedTimeframe,
             selectedIndicators: _selectedIndicators,
             onIndicatorToggle: _onIndicatorToggle,
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // Análisis de IA
+          Consumer2<DataStreamService, TechnicalIndicatorService>(
+            builder: (context, dataService, indicatorService, child) {
+              return AIAnalysisWidget(
+                symbol: _selectedSymbol,
+                candles: dataService.candleData,
+                indicators: indicatorService.enabledIndicators,
+                currentPrice: _currentPrices[_selectedSymbol] ?? 0.0,
+                timeframe: _selectedTimeframe,
+              );
+            },
           ),
           
           const SizedBox(height: 24),
@@ -628,19 +648,34 @@ class _ProfessionalTradingDashboardState extends State<ProfessionalTradingDashbo
 
   // Navegación
   void _navigateToApiConfig() {
-    Navigator.pushNamed(context, '/api-config');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ApiConfigurationScreen(),
+      ),
+    );
   }
 
   void _navigateToIndicatorConfig() {
-    Navigator.pushNamed(context, '/indicator-config');
+    _showHelp(); // Por ahora usa la ayuda hasta implementar configuración de indicadores
   }
 
   void _navigateToSettings() {
-    Navigator.pushNamed(context, '/settings');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SettingsScreen(),
+      ),
+    );
   }
 
   void _navigateToAIAssistant() {
-    Navigator.pushNamed(context, '/ai-chat');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AIChatPage(),
+      ),
+    );
   }
 
   void _showHelp() {
