@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../core/websocket_manager.dart';
+import 'package:provider/provider.dart';
+import '../../../services/binance_websocket_service.dart';
 import '../../../ui/theme/app_colors.dart';
 
 class RealTimePricesDashboard extends StatefulWidget {
@@ -10,52 +11,68 @@ class RealTimePricesDashboard extends StatefulWidget {
 }
 
 class _RealTimePricesDashboardState extends State<RealTimePricesDashboard> {
-  final WebSocketManager _wsManager = WebSocketManager();
-  late Stream<List<Map<String, dynamic>>> _tickerStream;
-
-  @override
-  void initState() {
-    super.initState();
-    _tickerStream = _wsManager.subscribeAllTickers();
-  }
-
-  @override
-  void dispose() {
-    _wsManager.dispose();
-    super.dispose();
-  }
+  // El WebSocket se gestiona globalmente por Provider
 
   @override
   Widget build(BuildContext context) {
+    // Lista ampliada de monedas populares
+    final allCoins = [
+      'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT',
+      'XRPUSDT', 'DOGEUSDT', 'AVAXUSDT', 'DOTUSDT', 'LINKUSDT',
+      'LTCUSDT', 'BCHUSDT', 'MATICUSDT', 'SHIBUSDT', 'UNIUSDT',
+      'TRXUSDT', 'XLMUSDT', 'ATOMUSDT', 'FILUSDT', 'APEUSDT'
+    ];
+
     return Container(
       color: AppColors.primaryDark,
-      child: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: _tickerStream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+      child: Consumer<BinanceWebSocketService>(
+        builder: (context, wsService, _) {
+          final prices = wsService.prices;
+          final changes = wsService.priceChanges;
+          final isConnected = wsService.isConnected;
+
+          final tickers = allCoins.map((symbol) {
+            return {
+              'symbol': symbol,
+              'price': prices[symbol],
+              'change': changes[symbol],
+            };
+          }).where((t) => t['price'] != null).toList();
+
+          if (!isConnected) {
             return const Center(child: CircularProgressIndicator(color: AppColors.goldPrimary));
           }
-          if (snapshot.hasError) {
+
+          if (tickers.isEmpty) {
             return Center(
-              child: Text(
-                'Error al cargar precios',
-                style: TextStyle(color: AppColors.bearish),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.info_outline, color: AppColors.goldPrimary, size: 48),
+                  const SizedBox(height: 12),
+                  Text(
+                    'No hay datos de precios disponibles.',
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 18),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Verifica tu conexión o espera unos segundos.',
+                    style: TextStyle(color: AppColors.textTertiary, fontSize: 14),
+                  ),
+                ],
               ),
             );
           }
-          final tickers = snapshot.data ?? [];
-          final mainCoins = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'ADAUSDT'];
-          final mainTickers = tickers.where((t) => mainCoins.contains(t['s'])).toList();
 
           return ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: mainTickers.length,
+            itemCount: tickers.length,
             itemBuilder: (context, index) {
-              final ticker = mainTickers[index];
-              final symbol = ticker['s'];
-              final price = ticker['c'];
-              final change = double.tryParse(ticker['P'] ?? '0') ?? 0;
+              final ticker = tickers[index];
+              final symbol = ticker['symbol'] as String;
+              final price = ticker['price'] as double?;
+              final change = ticker['change'] as double? ?? 0;
               final isBullish = change >= 0;
 
               return Card(
@@ -73,7 +90,7 @@ class _RealTimePricesDashboardState extends State<RealTimePricesDashboard> {
                     ),
                   ),
                   subtitle: Text(
-                    'Precio: $price USD',
+                    price != null ? 'Precio: ${price.toStringAsFixed(2)} USD' : 'Sin datos',
                     style: TextStyle(color: AppColors.textPrimary, fontSize: 16),
                   ),
                   trailing: Text(
