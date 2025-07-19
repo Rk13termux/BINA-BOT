@@ -1,97 +1,30 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'dart:math';
 import '../models/chat_message.dart'; // Asumiremos que tienes un modelo para mensajes
 import '../utils/logger.dart';
 
 class GroqService {
   final AppLogger _logger = AppLogger();
-  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
-  
-  // 🔐 SEGURIDAD: Obtener API key de almacenamiento seguro
-  Future<String> get _apiKey async {
-    try {
-      // Primero intentar obtener de secure storage (configurada por usuario)
-      final secureKey = await _secureStorage.read(key: 'groq_api_key');
-      if (secureKey != null && secureKey.isNotEmpty && secureKey != 'your_groq_api_key_here') {
-        return secureKey;
-      }
-      
-      // Fallback a dotenv (solo para desarrollo - se puede quitar)
-      try {
-        final envKey = dotenv.env['GROQ_API_KEY'] ?? '';
-        if (envKey.isNotEmpty && envKey != 'your_groq_api_key_here') {
-          return envKey;
-        }
-      } catch (e) {
-        // Ignorar errores de dotenv si no existe .env
-        _logger.debug('Dotenv no disponible: $e');
-      }
-      
-      return '';
-    } catch (e) {
-      _logger.error('Error obteniendo Groq API key: $e');
-      return '';
-    }
-  }
+  final String _apiKey = dotenv.env['GROQ_API_KEY'] ?? '';
 
   GroqService() {
-    _logger.debug('Initializing GroqService with secure storage...');
+    _logger.debug('Groq API Key (first 5 chars): ${_apiKey.substring(0, min(5, _apiKey.length))}');
   }
 
   static const String _apiBaseUrl = 'https://api.groq.com/openai/v1';
 
-  /// Verifica si el servicio está correctamente configurado
-  Future<bool> get isConfigured async {
-    final apiKey = await _apiKey;
-    return apiKey.isNotEmpty && apiKey != 'your_groq_api_key_here';
-  }
-
-  /// Obtiene el estado de configuración como mensaje
-  Future<String> get configurationStatus async {
-    final apiKey = await _apiKey;
-    if (apiKey.isEmpty) {
-      return 'La clave API de Groq no está configurada. Configúrala en el onboarding.';
-    } else if (apiKey == 'your_groq_api_key_here') {
-      return 'La clave API de Groq usa el valor por defecto. Configura tu clave real.';
-    } else {
-      return 'Servicio de Groq configurado correctamente';
-    }
-  }
-
-  /// 🔐 Configurar API key de forma segura
-  Future<void> setApiKey(String apiKey) async {
-    try {
-      await _secureStorage.write(key: 'groq_api_key', value: apiKey);
-      _logger.info('Groq API key configurada de forma segura');
-    } catch (e) {
-      _logger.error('Error guardando Groq API key: $e');
-      throw Exception('Error configurando clave API: $e');
-    }
-  }
-
-  /// 🗑️ Eliminar API key
-  Future<void> clearApiKey() async {
-    try {
-      await _secureStorage.delete(key: 'groq_api_key');
-      _logger.info('Groq API key eliminada');
-    } catch (e) {
-      _logger.error('Error eliminando Groq API key: $e');
-    }
-  }
-
   /// Obtiene una respuesta de chat de la API de Groq.
   ///
   /// [messages] es el historial de la conversación.
-  /// [model] es el modelo a utilizar (ej. 'llama-3.3-70b-versatile').
+  /// [model] es el modelo a utilizar (ej. 'llama3-8b-8192').
   Future<String> getChatCompletion({
     required List<ChatMessage> messages,
-    String model = 'llama-3.3-70b-versatile',
+    String model = 'llama3-8b-8192',
   }) async {
-    final apiKey = await _apiKey;
-    if (apiKey.isEmpty || apiKey == 'your_groq_api_key_here') {
-      const errorMsg = 'La clave API de Groq no está configurada. Por favor, configura tu API key en el onboarding de QUANTIX.';
+    if (_apiKey.isEmpty) {
+      const errorMsg = 'Groq API key is not set in .env file.';
       _logger.error(errorMsg);
       throw Exception(errorMsg);
     }
@@ -107,7 +40,7 @@ class GroqService {
       final response = await http.post(
         Uri.parse('$_apiBaseUrl/chat/completions'),
         headers: {
-          'Authorization': 'Bearer $apiKey',
+          'Authorization': 'Bearer $_apiKey',
           'Content-Type': 'application/json',
         },
         body: body,

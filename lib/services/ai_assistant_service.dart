@@ -271,7 +271,7 @@ class AIAssistantService extends ChangeNotifier {
         stopLossLevel: 0.0,
         timestamp: DateTime.now(),
         analysisTime: Duration.zero,
-        model: 'llama3-8b-8192', // Add missing model parameter
+        model: 'llama3-8b-8192',
       );
     }
   }

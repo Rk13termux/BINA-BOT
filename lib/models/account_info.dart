@@ -96,29 +96,6 @@ class AccountInfo {
     return balance != null && balance.free >= amount;
   }
 
-  /// Obtener balance total estimado en USDT
-  double getTotalBalanceUSDT() {
-    // Esta implementación básica suma USDT y BUSD directamente
-    // En un escenario real, necesitarías convertir otros assets usando precios actuales
-    double total = 0.0;
-    
-    // Sumar USDT directamente
-    final usdtBalance = getBalanceForAsset('USDT');
-    if (usdtBalance != null) {
-      total += usdtBalance.total;
-    }
-    
-    // Sumar BUSD directamente (asumiendo paridad 1:1 con USDT)
-    final busdBalance = getBalanceForAsset('BUSD');
-    if (busdBalance != null) {
-      total += busdBalance.total;
-    }
-    
-    // Para otros assets, sería necesario obtener su precio en USDT
-    // Por ahora retornamos solo el total de stablecoins
-    return total;
-  }
-
   @override
   String toString() {
     return 'AccountInfo(accountType: $accountType, canTrade: $canTrade, '

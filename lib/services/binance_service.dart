@@ -635,8 +635,8 @@ class BinanceService extends ChangeNotifier {
       'lastRequestTime': _lastRequestTime?.toIso8601String(),
       'accountType': _accountInfo?.accountType,
       'canTrade': canTrade,
-      'totalBalanceUSDT':
-          _accountInfo?.getTotalBalanceUSDT().toStringAsFixed(2),
+      // Usar el método de BinanceService para obtener el balance total en USDT
+      'totalBalanceUSDT': null, // Se debe calcular de forma asíncrona
     };
   }
 

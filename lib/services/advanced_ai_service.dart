@@ -15,10 +15,9 @@ class AdvancedAIService extends ChangeNotifier {
   AIAnalysisState _state = AIAnalysisState();
   AIAnalysisState get state => _state;
 
-  // Use optimized configuration from .env
-  String get _groqApiKey => dotenv.env['GROQ_API_KEY'] ?? '';
-  String get _groqBaseUrl => dotenv.env['GROQ_BASE_URL'] ?? 'https://api.groq.com/openai/v1/chat/completions';
-  String get _model => dotenv.env['GROQ_MODEL'] ?? 'llama-3.3-70b-versatile';
+  final String _groqApiKey = dotenv.env['GROQ_API_KEY'] ?? '';
+  final String _groqBaseUrl = dotenv.env['GROQ_BASE_URL'] ?? 'https://api.groq.com/openai/v1/chat/completions';
+  final String _model = dotenv.env['GROQ_MODEL'] ?? 'mixtral-8x7b-32768';
 
   /// Realiza análisis estratégico completo con IA
   Future<void> performStrategicAnalysis({
@@ -352,6 +351,8 @@ ${enabledIndicators.map((i) => '''
 
   /// Genera respuesta inteligente de fallback basada en datos técnicos
   Map<String, dynamic> _generateIntelligentFallback() {
+    final random = Random();
+    
     // Análisis básico basado en indicadores comunes
     return {
       'recommendation': 'HOLD',
