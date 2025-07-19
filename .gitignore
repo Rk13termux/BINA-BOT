@@ -1,3 +1,5 @@
+# Seguridad: nunca subas tus claves ni secretos
+.env
 # Miscellaneous
 *.class
 *.log

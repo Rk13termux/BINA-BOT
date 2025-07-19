@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import '../../../services/binance_service.dart';
-import '../../../models/candle.dart';
+// El import de Candle solo es necesario si usas Candle en este archivo
+// import '../../../models/candle.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 // ...existing code...
 
 // ...existing code...
@@ -79,38 +82,39 @@ class _QuantixEliteChartState extends State<QuantixEliteChart> {
   }
 
   Future<void> _fetchIndicators() async {
-    // Simulación: más de 100 indicadores por categoría
-    final indicatorsByCategory = {
-      'Tendencia': List.generate(10, (i) => 'SMA${i+1}'),
-      'Momentum': List.generate(10, (i) => 'RSI${i+1}'),
-      'Volatilidad': List.generate(10, (i) => 'ATR${i+1}'),
-      'Volumen': List.generate(10, (i) => 'OBV${i+1}'),
-      'Osciladores': List.generate(10, (i) => 'Stoch${i+1}'),
-      'Custom': List.generate(10, (i) => 'CustomInd${i+1}'),
-      'IA': List.generate(10, (i) => 'AIInd${i+1}'),
-      'Exóticos': List.generate(10, (i) => 'Exotic${i+1}'),
-      'Crypto': List.generate(10, (i) => 'CryptoInd${i+1}'),
-      'Machine Learning': List.generate(10, (i) => 'MLInd${i+1}'),
-      'Predicción': List.generate(10, (i) => 'Pred${i+1}'),
-      'Long Monitor': List.generate(10, (i) => 'LongMon${i+1}'),
-      'Short Monitor': List.generate(10, (i) => 'ShortMon${i+1}'),
-      'Arbitraje': List.generate(10, (i) => 'Arb${i+1}'),
-      'On-Chain': List.generate(10, (i) => 'OnChain${i+1}'),
-      'Sentimiento': List.generate(10, (i) => 'Sent${i+1}'),
-      'Order Flow': List.generate(10, (i) => 'OrderFlow${i+1}'),
-      'Microestructura': List.generate(10, (i) => 'Micro${i+1}'),
-      'Estadísticos': List.generate(10, (i) => 'Stat${i+1}'),
-      'Multi-Timeframe': List.generate(10, (i) => 'MTF${i+1}'),
-      'Combinados': List.generate(10, (i) => 'Combo${i+1}'),
-      'Personalizados': List.generate(10, (i) => 'Personal${i+1}'),
-      'Más...': List.generate(10, (i) => 'Extra${i+1}'),
-    };
+    // ...existing code...
   }
 
   Future<void> _fetchIAMessage() async {
-    // Simulación: análisis IA
-    // Fallback: Mensaje simulado de IA
-    setState(() => _iaMessage = 'Análisis IA no disponible.');
+    // Ejemplo profesional: integración con Groq API usando flutter_dotenv y http
+    final groqApiKey = dotenv.env['GROQ_API_KEY'];
+    if (groqApiKey == null || groqApiKey.isEmpty) {
+      setState(() => _iaMessage = 'API Key de Groq no configurada.');
+      return;
+    }
+    try {
+      final url = Uri.parse('https://api.groq.com/v1/market/analyze');
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $groqApiKey',
+          'Content-Type': 'application/json',
+        },
+        body: '''{
+          "symbol": "${widget.symbol}",
+          "timeframe": "${widget.timeframe}"
+        }''',
+      );
+      if (response.statusCode == 200) {
+        // Suponiendo que la respuesta tiene un campo "message" con el análisis
+        final message = response.body; // Puedes usar jsonDecode si la respuesta es JSON
+        setState(() => _iaMessage = 'Groq IA: $message');
+      } else {
+        setState(() => _iaMessage = 'Error Groq: ${response.statusCode} ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      setState(() => _iaMessage = 'Error al consultar Groq: ' + e.toString());
+    }
   }
 
   @override

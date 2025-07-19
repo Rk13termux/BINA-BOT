@@ -39,7 +39,7 @@ import 'features/ai_chat/ai_chat_page.dart';
 // Utils
 import 'utils/logger.dart';
 
-void main() async {
+Future<void> main() async {
   // Configurar manejo de errores global
   FlutterError.onError = (FlutterErrorDetails details) {
     AppLogger().error('Flutter Error: ${details.exception}');
@@ -48,9 +48,10 @@ void main() async {
   // Configurar manejo de errores en Zone
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
-    
-    // Cargar variables de entorno
+
+    // Cargar variables de entorno (.env) antes de cualquier uso
     try {
+      await dotenv.load(fileName: ".env");
       await EnvironmentConfig.initialize();
       AppLogger().info('Environment configuration initialized successfully');
       AppLogger().debug('Loaded ${dotenv.env.length} environment variables');
