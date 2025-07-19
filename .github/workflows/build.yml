@@ -38,6 +38,10 @@ jobs:
         
     - name: Flutter Dependencies
       run: flutter pub get
+
+    - name: Crear archivo .env para la build
+      run: |
+        echo "GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}" > .env
       
     - name: Fix XML Files (Android 14 Compatibility)
       run: |
