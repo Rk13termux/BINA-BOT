@@ -29,6 +29,15 @@ class AppColors {
   
   /// Rojo bajista oscuro
   static const Color bearishRedDark = Color(0xFFCC3333);
+  
+  /// Alias para verde alcista (compatibilidad con widgets)
+  static const Color bullish = bullishGreen;
+  
+  /// Alias para rojo bajista (compatibilidad con widgets)
+  static const Color bearish = bearishRed;
+  
+  /// Fondo oscuro para dashboards/widgets
+  static const Color surfaceDark = backgroundTertiary;
 
   // === COLORES DE FONDO ===
   
