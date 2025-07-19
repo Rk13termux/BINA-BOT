@@ -16,6 +16,7 @@ class ApiManager {
   String? _secretKey;
   bool _isTestnet = false;
 
+
   /// Configura las credenciales de la API
   Future<void> setCredentials(String apiKey, String secretKey,
       {bool testnet = false}) async {
@@ -61,34 +62,25 @@ class ApiManager {
     }
   }
 
-  /// Obtiene las velas (candlesticks) para un símbolo
-  Future<List<Map<String, dynamic>>?> getKlines(String symbol, String interval,
-      {int limit = 500}) async {
+  /// Obtiene los precios de todos los símbolos en una sola petición
+  Future<List<Map<String, dynamic>>?> getAllSymbolPrices() async {
     try {
-      final url =
-          '${_getBaseUrl()}$_binanceSpotUrl/klines?symbol=${symbol.toUpperCase()}&interval=$interval&limit=$limit';
+      final url = '${_getBaseUrl()}$_binanceSpotUrl/ticker/price';
       final response = await http.get(Uri.parse(url));
-
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        return data
-            .map((kline) => {
-                  'openTime': kline[0],
-                  'open': double.parse(kline[1]),
-                  'high': double.parse(kline[2]),
-                  'low': double.parse(kline[3]),
-                  'close': double.parse(kline[4]),
-                  'volume': double.parse(kline[5]),
-                  'closeTime': kline[6],
-                })
-            .toList();
+        final data = json.decode(response.body);
+        if (data is List) {
+          return data.map<Map<String, dynamic>>((item) => Map<String, dynamic>.from(item)).toList();
+        } else {
+          _logger.error('Unexpected response format for all prices');
+          return null;
+        }
       } else {
-        _logger
-            .error('Error getting klines for $symbol: ${response.statusCode}');
+        _logger.error('Error getting all prices: ${response.statusCode}');
         return null;
       }
     } catch (e) {
-      _logger.error('Exception getting klines for $symbol: $e');
+      _logger.error('Exception getting all prices: $e');
       return null;
     }
   }

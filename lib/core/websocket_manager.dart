@@ -1,8 +1,10 @@
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import '../utils/logger.dart';
+
 
 /// Gestiona las conexiones WebSocket para datos en tiempo real
 class WebSocketManager {
@@ -48,6 +50,50 @@ class WebSocketManager {
   Stream<Map<String, dynamic>> subscribeMultiple(List<String> streams) {
     final combinedStreamName = streams.join('/');
     return _createStream(combinedStreamName);
+  }
+
+  /// Suscribe a todos los tickers en tiempo real (~0.5s)
+  Stream<List<Map<String, dynamic>>> subscribeAllTickers() {
+    final streamName = '!ticker@arr';
+    final controller = StreamController<List<Map<String, dynamic>>>.broadcast();
+    _streamControllers[streamName] = controller;
+
+    final wsUrl = _isTestnet ? _binanceTestnetWsUrl : _binanceWsUrl;
+    final uri = Uri.parse('$wsUrl$streamName');
+    final channel = WebSocketChannel.connect(uri);
+    _connections[streamName] = channel;
+
+    channel.stream.listen(
+      (data) {
+        try {
+          final List<dynamic> jsonData = json.decode(data);
+          controller.add(List<Map<String, dynamic>>.from(jsonData));
+        } catch (e) {
+          _logger.error('Error parsing all tickers: $e');
+        }
+      },
+      onError: (error) {
+        _logger.error('WebSocket error for all tickers: $error');
+        controller.addError(error);
+        _reconnectAllTickers(streamName, controller);
+      },
+      onDone: () {
+        _logger.info('WebSocket connection closed for all tickers');
+        _reconnectAllTickers(streamName, controller);
+      },
+    );
+
+    return controller.stream;
+  }
+
+  /// Reconecta el stream de todos los tickers
+  void _reconnectAllTickers(String streamName, StreamController<List<Map<String, dynamic>>> controller) {
+    _logger.info('Attempting to reconnect all tickers WebSocket: $streamName');
+    Timer(const Duration(seconds: 5), () {
+      if (!controller.isClosed) {
+        subscribeAllTickers();
+      }
+    });
   }
 
   /// Crea un stream WebSocket
@@ -181,3 +227,4 @@ class WebSocketManager {
     _logger.info('WebSocketManager disposed');
   }
 }
+// ...existing code...
