@@ -14,7 +14,8 @@ class QuantixFloatingMenu extends StatefulWidget {
   State<QuantixFloatingMenu> createState() => _QuantixFloatingMenuState();
 }
 
-class _QuantixFloatingMenuState extends State<QuantixFloatingMenu> with SingleTickerProviderStateMixin {
+class _QuantixFloatingMenuState extends State<QuantixFloatingMenu>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
   bool _isOpen = false;
@@ -26,7 +27,8 @@ class _QuantixFloatingMenuState extends State<QuantixFloatingMenu> with SingleTi
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOutBack);
+    _animation =
+        CurvedAnimation(parent: _controller, curve: Curves.easeOutBack);
   }
 
   @override
@@ -48,8 +50,10 @@ class _QuantixFloatingMenuState extends State<QuantixFloatingMenu> with SingleTi
 
   @override
   Widget build(BuildContext context) {
-    final double radius = 90;
-    final double aiOffset = 70;
+    final size = MediaQuery.of(context).size;
+    final isMobile = size.width < 700;
+    final double radius = isMobile ? 90 : 140;
+    final double aiOffset = isMobile ? 70 : 120;
     return Stack(
       alignment: Alignment.bottomRight,
       children: [
@@ -60,8 +64,16 @@ class _QuantixFloatingMenuState extends State<QuantixFloatingMenu> with SingleTi
             animation: _animation,
             builder: (context, child) {
               final offset = Offset(
-                -radius * _animation.value * (1 - i / widget.items.length) * (i.isEven ? 1 : 0.7) * (i.isEven ? 1 : -1) * (i % 2 == 0 ? 1 : 0.8),
-                -radius * _animation.value * (i / widget.items.length) * (i.isEven ? 1 : 0.7),
+                -radius *
+                    _animation.value *
+                    (1 - i / widget.items.length) *
+                    (i.isEven ? 1 : 0.7) *
+                    (i.isEven ? 1 : -1) *
+                    (i % 2 == 0 ? 1 : 0.8),
+                -radius *
+                    _animation.value *
+                    (i / widget.items.length) *
+                    (i.isEven ? 1 : 0.7),
               );
               return Positioned(
                 right: 24 + offset.dx,
@@ -74,8 +86,8 @@ class _QuantixFloatingMenuState extends State<QuantixFloatingMenu> with SingleTi
             },
             child: FloatingActionButton(
               heroTag: 'menu_item_$i',
-              backgroundColor: Colors.yellow,
-              mini: true,
+              backgroundColor: Colors.amber,
+              mini: isMobile,
               onPressed: widget.items[i].onTap,
               child: Icon(widget.items[i].icon, color: Colors.black),
               tooltip: widget.items[i].label,
@@ -88,7 +100,7 @@ class _QuantixFloatingMenuState extends State<QuantixFloatingMenu> with SingleTi
           bottom: 24 + aiOffset,
           child: FloatingActionButton(
             heroTag: 'ai_button',
-            backgroundColor: Colors.yellow,
+            backgroundColor: Colors.amber,
             mini: false,
             onPressed: widget.onAIButtonPressed,
             child: const Icon(Icons.smart_toy, color: Colors.black, size: 32),
@@ -102,14 +114,14 @@ class _QuantixFloatingMenuState extends State<QuantixFloatingMenu> with SingleTi
           bottom: 24,
           child: FloatingActionButton(
             heroTag: 'main_menu',
-            backgroundColor: Colors.black,
+            backgroundColor: Colors.blueAccent,
             mini: false,
             onPressed: _toggleMenu,
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               child: _isOpen
-                  ? const Icon(Icons.close, color: Colors.yellow, size: 32)
-                  : const Icon(Icons.menu, color: Colors.yellow, size: 32),
+                  ? const Icon(Icons.close, color: Colors.amber, size: 32)
+                  : const Icon(Icons.menu, color: Colors.amber, size: 32),
             ),
             tooltip: 'Menú Principal',
             elevation: 8,
@@ -124,5 +136,6 @@ class QuantixMenuItem {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
-  QuantixMenuItem({required this.icon, required this.label, required this.onTap});
+  QuantixMenuItem(
+      {required this.icon, required this.label, required this.onTap});
 }

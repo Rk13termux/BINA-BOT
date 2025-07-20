@@ -147,19 +147,41 @@ class _QuantixDashboardState extends State<QuantixDashboard> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(color: Colors.blueAccent))
-            : Column(
-                children: [
-                  _buildUserPanel(),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isMobile = constraints.maxWidth < 700;
+            return Column(
+              children: [
+                _buildUserPanel(),
+                if (isMobile) ...[
                   _buildBalancePanel(),
                   _buildPairSelector(),
                   Expanded(child: _buildMainChart()),
                   _buildIndicatorsPanel(),
                   _buildAIAnalysisPanel(),
+                ] else ...[
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(child: _buildMainChart()),
+                        Container(
+                          width: 350,
+                          child: Column(
+                            children: [
+                              _buildBalancePanel(),
+                              _buildIndicatorsPanel(),
+                              _buildAIAnalysisPanel(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
-              ),
+              ],
+            );
+          },
+        ),
       ),
       floatingActionButton: _buildFloatingMenu(context),
     );

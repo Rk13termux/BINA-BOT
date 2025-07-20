@@ -88,10 +88,9 @@ flutter:
 
   assets:
     - assets/images/
-    - assets/icons/
     - assets/plugins/
     - assets/ml_models/
-    - .env
+# Asegúrate de que cada carpeta tenga al menos un archivo (puede ser .gitkeep)
 
 # Configuración para generar iconos automáticamente
 flutter_launcher_icons:
