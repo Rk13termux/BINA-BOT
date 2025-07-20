@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 import '../../../ui/theme/quantix_theme.dart';
+import 'rsi_indicator.dart';
+import 'macd_indicator.dart';
+import 'ema_indicator.dart';
 
 /// 📊 Panel de Indicadores Técnicos Profesionales
 /// Top 100 indicadores categorizados por función
 class TechnicalIndicatorsPanel extends StatefulWidget {
-  const TechnicalIndicatorsPanel({super.key});
+  final List<double> prices;
+  const TechnicalIndicatorsPanel({super.key, required this.prices});
 
   @override
-  State<TechnicalIndicatorsPanel> createState() => _TechnicalIndicatorsPanelState();
+  State<TechnicalIndicatorsPanel> createState() =>
+      _TechnicalIndicatorsPanelState();
 }
 
 class _TechnicalIndicatorsPanelState extends State<TechnicalIndicatorsPanel>
     with TickerProviderStateMixin {
   late TabController _tabController;
   String _selectedCategory = 'trend';
-  
+
   // Categorías de indicadores
   final Map<String, String> _categories = {
     'trend': 'Tendencia',
@@ -64,13 +69,14 @@ class _TechnicalIndicatorsPanelState extends State<TechnicalIndicatorsPanel>
                 Text(
                   'Indicadores Técnicos Pro',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: QuantixTheme.primaryBlack,
-                    fontWeight: FontWeight.bold,
-                  ),
+                        color: QuantixTheme.primaryBlack,
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: QuantixTheme.primaryBlack.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
@@ -78,15 +84,15 @@ class _TechnicalIndicatorsPanelState extends State<TechnicalIndicatorsPanel>
                   child: Text(
                     'TOP 100',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: QuantixTheme.primaryBlack,
-                      fontWeight: FontWeight.bold,
-                    ),
+                          color: QuantixTheme.primaryBlack,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                 ),
               ],
             ),
           ),
-          
+
           // Tab Bar de categorías
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -98,24 +104,27 @@ class _TechnicalIndicatorsPanelState extends State<TechnicalIndicatorsPanel>
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: GestureDetector(
-                      onTap: () => setState(() => _selectedCategory = entry.key),
+                      onTap: () =>
+                          setState(() => _selectedCategory = entry.key),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          color: isSelected 
+                          color: isSelected
                               ? QuantixTheme.indicatorColors[entry.key]
                               : QuantixTheme.cardBlack,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: QuantixTheme.indicatorColors[entry.key] ?? QuantixTheme.neutralGray,
+                            color: QuantixTheme.indicatorColors[entry.key] ??
+                                QuantixTheme.neutralGray,
                             width: 1,
                           ),
                         ),
                         child: Text(
                           entry.value,
                           style: TextStyle(
-                            color: isSelected 
-                                ? QuantixTheme.primaryBlack 
+                            color: isSelected
+                                ? QuantixTheme.primaryBlack
                                 : QuantixTheme.lightGold,
                             fontWeight: FontWeight.w600,
                             fontSize: 12,
@@ -128,7 +137,7 @@ class _TechnicalIndicatorsPanelState extends State<TechnicalIndicatorsPanel>
               ),
             ),
           ),
-          
+
           // Contenido de indicadores
           Padding(
             padding: const EdgeInsets.all(16),
@@ -141,22 +150,29 @@ class _TechnicalIndicatorsPanelState extends State<TechnicalIndicatorsPanel>
 
   /// Grid de indicadores por categoría
   Widget _buildIndicatorsGrid() {
-    final indicators = _getIndicatorsByCategory(_selectedCategory);
-    
-    return GridView.builder(
+    // Ejemplo: mostrar los widgets modulares según la categoría
+    List<Widget> indicatorsWidgets = [];
+    if (_selectedCategory == 'momentum') {
+      indicatorsWidgets.add(RSIIndicator(prices: widget.prices));
+      indicatorsWidgets.add(MACDIndicator(prices: widget.prices));
+    }
+    if (_selectedCategory == 'trend') {
+      indicatorsWidgets.add(EMAIndicator(prices: widget.prices));
+    }
+    // Puedes agregar más widgets según la categoría
+    if (indicatorsWidgets.isEmpty) {
+      return Center(
+          child: Text('No hay indicadores para esta categoría',
+              style: TextStyle(color: Colors.white70)));
+    }
+    return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1.5,
-      ),
-      itemCount: indicators.length,
-      itemBuilder: (context, index) {
-        final indicator = indicators[index];
-        return _buildIndicatorCard(indicator);
-      },
+      crossAxisCount: 2,
+      crossAxisSpacing: 12,
+      mainAxisSpacing: 12,
+      childAspectRatio: 1.5,
+      children: indicatorsWidgets,
     );
   }
 
@@ -164,7 +180,7 @@ class _TechnicalIndicatorsPanelState extends State<TechnicalIndicatorsPanel>
   Widget _buildIndicatorCard(Map<String, dynamic> indicator) {
     final signal = indicator['signal'] as String;
     final Color signalColor = _getSignalColor(signal);
-    
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -186,8 +202,8 @@ class _TechnicalIndicatorsPanelState extends State<TechnicalIndicatorsPanel>
                 child: Text(
                   indicator['name'],
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                        fontWeight: FontWeight.w600,
+                      ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -202,20 +218,20 @@ class _TechnicalIndicatorsPanelState extends State<TechnicalIndicatorsPanel>
               ),
             ],
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // Valor actual
           Text(
             indicator['value'],
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              color: QuantixTheme.primaryGold,
-              fontWeight: FontWeight.bold,
-            ),
+                  color: QuantixTheme.primaryGold,
+                  fontWeight: FontWeight.bold,
+                ),
           ),
-          
+
           const Spacer(),
-          
+
           // Señal
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

@@ -6,6 +6,18 @@ import '../utils/logger.dart';
 
 /// Gestiona todas las conexiones con APIs externas (principalmente Binance)
 class ApiManager {
+  /// Verifica las API keys ingresadas usando testConnection
+  static Future<bool> verifyApiKeys(String apiKey, String secretKey) async {
+    final manager = ApiManager();
+    await manager.setCredentials(apiKey, secretKey);
+    return await manager.testConnection();
+  }
+
+  /// Guarda las API keys de forma segura
+  static Future<void> saveApiKeys(String apiKey, String secretKey) async {
+    final manager = ApiManager();
+    await manager.setCredentials(apiKey, secretKey);
+  }
   static const String _binanceBaseUrl = 'https://api.binance.com';
   static const String _binanceSpotUrl = '/api/v3';
 

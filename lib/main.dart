@@ -35,6 +35,8 @@ import 'features/trading/trading_controller.dart';
 import 'features/alerts/alerts_controller.dart';
 import 'features/ai_assistant/ai_assistant_controller.dart';
 import 'features/ai_chat/ai_chat_page.dart';
+import 'features/onboarding/onboarding_screen.dart';
+import 'features/dashboard/quantix_dashboard.dart';
 
 // Utils
 import 'utils/logger.dart';
@@ -78,14 +80,14 @@ Future<void> main() async {
       ),
     );
 
-    runApp(const InvictusTraderApp());
+    runApp(const QuantixAICoreApp());
   }, (error, stack) {
     AppLogger().error('Unhandled error: $error');
   });
 }
 
-class InvictusTraderApp extends StatelessWidget {
-  const InvictusTraderApp({super.key});
+class QuantixAICoreApp extends StatelessWidget {
+  const QuantixAICoreApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -100,65 +102,58 @@ class InvictusTraderApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => TechnicalIndicatorService()),
         ChangeNotifierProvider(create: (_) => BinanceWebSocketService()),
         Provider<PluginManager>(create: (_) => PluginManager()),
-
         // AI Services
-        ChangeNotifierProvider<ai_professional.AIService>(create: (_) => ai_professional.AIService()),
-
+        ChangeNotifierProvider<ai_professional.AIService>(
+            create: (_) => ai_professional.AIService()),
         // AI Assistant Service (depende de Groq y Binance)
         ProxyProvider2<GroqService, BinanceService, AIAssistantService>(
           update: (context, groqService, binanceService, previous) =>
               AIAssistantService(
                   groqService: groqService, binanceService: binanceService),
         ),
-
         // Data Stream Service
-        ChangeNotifierProvider(create: (context) => DataStreamService(
-          binanceService: context.read<BinanceService>(),
-          aiService: context.read<ai_professional.AIService>(),
-        )),
-
+        ChangeNotifierProvider(
+            create: (context) => DataStreamService(
+                  binanceService: context.read<BinanceService>(),
+                  aiService: context.read<ai_professional.AIService>(),
+                )),
         // Controllers (UI-specific state)
         ChangeNotifierProvider(create: (_) => NewsController()),
         ChangeNotifierProvider(create: (_) => TradingController()),
         ChangeNotifierProvider(create: (_) => AlertsController()),
         ChangeNotifierProxyProvider<AIAssistantService, AIAssistantController>(
-          create: (context) => AIAssistantController(aiAssistantService: context.read<AIAssistantService>()),
-          update: (context, aiAssistantService, previous) => AIAssistantController(aiAssistantService: aiAssistantService),
+          create: (context) => AIAssistantController(
+              aiAssistantService: context.read<AIAssistantService>()),
+          update: (context, aiAssistantService, previous) =>
+              AIAssistantController(aiAssistantService: aiAssistantService),
         ),
       ],
       child: MaterialApp(
-        title: 'INVICTUS TRADER PRO',
+        title: 'QUANTIX AI CORE',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
-
-        // Iniciar con SplashScreen que redirige al dashboard profesional
-        home: const SplashScreen(),
-
-        // Configuración de rutas
+        // Onboarding seguro como pantalla inicial
+        home: const OnboardingScreen(),
         routes: {
-          '/splash': (context) => const SplashScreen(),
-          '/dashboard': (context) => const ProfessionalTradingDashboard(),
+          '/onboarding': (context) => const OnboardingScreen(),
+          '/dashboard': (context) => const QuantixDashboard(),
           '/trading': (context) => const TradingScreen(),
           '/alerts': (context) => const AlertsScreen(),
           '/news': (context) => const NewsScreen(),
           '/settings': (context) => const SettingsScreen(),
           '/ai-chat': (context) => const AIChatPage(),
         },
-
-        // Configuración del builder para el tema
         builder: (context, child) {
           return MediaQuery(
             data: MediaQuery.of(context).copyWith(
-              textScaler: const TextScaler.linear(1.0), // Prevenir escalado de texto
+              textScaler: const TextScaler.linear(1.0),
             ),
             child: child!,
           );
         },
-
-        // Manejar rutas desconocidas
         onUnknownRoute: (settings) {
           return MaterialPageRoute(
-            builder: (context) => const ProfessionalTradingDashboard(),
+            builder: (context) => const QuantixDashboard(),
           );
         },
       ),

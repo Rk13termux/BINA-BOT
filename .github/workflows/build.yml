@@ -1,4 +1,4 @@
-name: Build Invictus Trader Pro (APK & EXE)
+name: Build QUANTIX AI CORE (APK)
 
 on:
   push:
@@ -46,8 +46,7 @@ jobs:
     # ──────────────────────────────────────────────────────────────
     # 🟡 Android Build Section
     # ──────────────────────────────────────────────────────────────
-    # XML files are now versioned in the repo, no need to create them here
-      
+    
     - name: Build APK (Release)
       if: github.event.inputs.build_type != 'debug'
       run: flutter build apk --release --target-platform android-arm64
@@ -59,52 +58,6 @@ jobs:
     - name: Upload Android APK
       uses: actions/upload-artifact@v4
       with:
-        name: invictus-trader-android-apk
+        name: quantix-ai-core-android-apk
         path: build/app/outputs/flutter-apk/*.apk
-        retention-days: 30
-
-  build-windows:
-    name: Build Windows EXE
-    runs-on: windows-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.27.1'
-        channel: 'stable'
-        
-    - name: Enable Windows Desktop
-      run: flutter config --enable-windows-desktop
-      
-    - name: Flutter Dependencies
-      run: flutter pub get
-
-    - name: Crear archivo .env para la build de Windows
-      run: echo "GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}" > .env
-      
-    - name: Build Windows (Release)
-      if: github.event.inputs.build_type != 'debug'
-      run: flutter build windows --release
-        
-    - name: Build Windows (Debug)
-      if: github.event.inputs.build_type == 'debug'
-      run: flutter build windows --debug
-      
-    - name: Create Windows ZIP
-      run: |
-        cd build/windows/x64/runner
-        if ('${{ github.event.inputs.build_type }}' -eq 'debug') {
-          Compress-Archive -Path Debug/* -DestinationPath invictus-trader-windows-debug.zip
-        } else {
-          Compress-Archive -Path Release/* -DestinationPath invictus-trader-windows-release.zip
-        }
-        
-    - name: Upload Windows EXE
-      uses: actions/upload-artifact@v4
-      with:
-        name: invictus-trader-windows-exe
-        path: build/windows/x64/runner/*.zip
         retention-days: 30
